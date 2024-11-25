@@ -774,7 +774,7 @@ inline void BuilderCustom::applyValueBoxShadow(BuilderState& builderState, CSSVa
 
 inline void BuilderCustom::applyInitialFontFamily(BuilderState& builderState)
 {
-    auto& fontDescription = builderState.fontDescription();
+    auto fontDescription = builderState.fontDescription();
     auto initialDesc = FontCascadeDescription();
 
     // We need to adjust the size to account for the generic family change from monospace to non-monospace.
@@ -782,8 +782,9 @@ inline void BuilderCustom::applyInitialFontFamily(BuilderState& builderState)
         if (CSSValueID sizeIdentifier = fontDescription.keywordSizeAsIdentifier())
             builderState.setFontDescriptionFontSize(Style::fontSizeForKeyword(sizeIdentifier, false, builderState.document()));
     }
-    if (!initialDesc.firstFamily().isEmpty())
-        builderState.setFontDescriptionFamilies(initialDesc.families());
+    AtomString standardFontFamily = AtomString { builderState.document().settings().standardFontFamily() };
+    if (!standardFontFamily.isEmpty())
+        fontDescription.setOneFamily(standardFontFamily);
 }
 
 inline void BuilderCustom::applyInheritFontFamily(BuilderState& builderState)
