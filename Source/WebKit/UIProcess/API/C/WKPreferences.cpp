@@ -167,16 +167,6 @@ bool WKPreferencesGetLocalStorageEnabled(WKPreferencesRef preferencesRef)
     return toImpl(preferencesRef)->localStorageEnabled();
 }
 
-void WKPreferencesSetDatabasesEnabled(WKPreferencesRef preferencesRef, bool databasesEnabled)
-{
-    toImpl(preferencesRef)->setDatabasesEnabled(databasesEnabled);
-}
-
-bool WKPreferencesGetDatabasesEnabled(WKPreferencesRef preferencesRef)
-{
-    return toImpl(preferencesRef)->databasesEnabled();
-}
-
 void WKPreferencesSetJavaScriptCanOpenWindowsAutomatically(WKPreferencesRef preferencesRef, bool javaScriptCanOpenWindowsAutomatically)
 {
     toImpl(preferencesRef)->setJavaScriptCanOpenWindowsAutomatically(javaScriptCanOpenWindowsAutomatically);
@@ -2117,4 +2107,13 @@ void WKPreferencesSetServerTimingEnabled(WKPreferencesRef, bool)
 bool WKPreferencesGetServerTimingEnabled(WKPreferencesRef)
 {
     return true;
+}
+
+void WKPreferencesSetDatabasesEnabled(WKPreferencesRef preferencesRef, bool databasesEnabled)
+{
+}
+
+bool WKPreferencesGetDatabasesEnabled(WKPreferencesRef preferencesRef)
+{
+    return false;
 }

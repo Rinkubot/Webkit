@@ -134,8 +134,6 @@ class EmptyChromeClient : public ChromeClient {
 
     void print(LocalFrame&, const StringWithDirection&) final { }
 
-    void exceededDatabaseQuota(LocalFrame&, const String&, DatabaseDetails) final { }
-
     void reachedMaxAppCacheSize(int64_t) final { }
     void reachedApplicationCacheOriginQuota(SecurityOrigin&, int64_t) final { }
 

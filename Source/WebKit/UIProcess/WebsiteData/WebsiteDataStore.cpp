@@ -56,11 +56,9 @@
 #include "WebsiteDataStoreParameters.h"
 #include <WebCore/ApplicationCacheStorage.h>
 #include <WebCore/CredentialStorage.h>
-#include <WebCore/DatabaseTracker.h>
 #include <WebCore/HTMLMediaElement.h>
 #include <WebCore/NetworkStorageSession.h>
 #include <WebCore/NotificationResources.h>
-#include <WebCore/OriginLock.h>
 #include <WebCore/RegistrableDomain.h>
 #include <WebCore/ResourceRequest.h>
 #include <WebCore/SQLiteFileSystem.h>
@@ -530,11 +528,6 @@ void WebsiteDataStore::handleResolvedDirectoriesAsynchronously(const WebsiteData
 
     // Clear data of deprecated types.
     protectedQueue()->dispatch([webSQLDirectory = crossThreadCopy(directories.webSQLDatabaseDirectory), applicationCacheDirectory = crossThreadCopy(directories.applicationCacheDirectory), applicationCacheFlatFileSubdirectoryName = crossThreadCopy(directories.applicationCacheFlatFileSubdirectoryName), directoriesToExclude = WTFMove(allCacheDirectories)]() {
-        if (!webSQLDirectory.isEmpty()) {
-            WebCore::DatabaseTracker::trackerWithDatabasePath(webSQLDirectory)->deleteAllDatabasesImmediately();
-            FileSystem::deleteEmptyDirectory(webSQLDirectory);
-        }
-
         if (!applicationCacheDirectory.isEmpty()) {
             {
                 auto storage = WebCore::ApplicationCacheStorage::create(applicationCacheDirectory, applicationCacheFlatFileSubdirectoryName);

@@ -654,12 +654,6 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
     Modules/webcodecs/WebCodecsVideoFrame.h
     Modules/webcodecs/WebCodecsVideoFrameData.h
 
-    Modules/webdatabase/DatabaseDetails.h
-    Modules/webdatabase/DatabaseManager.h
-    Modules/webdatabase/DatabaseManagerClient.h
-    Modules/webdatabase/DatabaseTracker.h
-    Modules/webdatabase/OriginLock.h
-
     Modules/websockets/ThreadableWebSocketChannel.h
     Modules/websockets/WebSocketChannelClient.h
     Modules/websockets/WebSocketChannelInspector.h

@@ -68,7 +68,6 @@
 #import <WebCore/Chrome.h>
 #import <WebCore/ColorMac.h>
 #import <WebCore/CompositionHighlight.h>
-#import <WebCore/DatabaseManager.h>
 #import <WebCore/DocumentFragment.h>
 #import <WebCore/DocumentInlines.h>
 #import <WebCore/DocumentLoader.h>
@@ -189,7 +188,6 @@ NSString *WebPageCacheDocumentViewKey = @"WebPageCacheDocumentViewKey";
 NSString *WebFrameMainDocumentError = @"WebFrameMainDocumentErrorKey";
 NSString *WebFrameHasPlugins = @"WebFrameHasPluginsKey";
 NSString *WebFrameHasUnloadListener = @"WebFrameHasUnloadListenerKey";
-NSString *WebFrameUsesDatabases = @"WebFrameUsesDatabasesKey";
 NSString *WebFrameUsesGeolocation = @"WebFrameUsesGeolocationKey";
 NSString *WebFrameCanSuspendActiveDOMObjects = @"WebFrameCanSuspendActiveDOMObjectsKey";
 
@@ -2044,11 +2042,6 @@ static WebFrameLoadType toWebFrameLoadType(WebCore::FrameLoadType frameLoadType)
     if (auto* domWindow = _private->coreFrame->document()->domWindow()) {
         if (domWindow->hasEventListeners(WebCore::eventNames().unloadEvent))
             [result setObject:@YES forKey:WebFrameHasUnloadListener];
-    }
-    
-    if (auto* document = _private->coreFrame->document()) {
-        if (WebCore::DatabaseManager::singleton().hasOpenDatabases(*document))
-            [result setObject:@YES forKey:WebFrameUsesDatabases];
     }
     
     return result;

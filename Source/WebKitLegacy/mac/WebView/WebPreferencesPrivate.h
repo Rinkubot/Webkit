@@ -117,7 +117,6 @@ extern NSString *WebPreferencesCacheModelChangedInternalNotification WEBKIT_DEPR
 @property (nonatomic, getter=domTimersThrottlingEnabled) BOOL DOMTimersThrottlingEnabled;
 @property (nonatomic) BOOL webArchiveDebugModeEnabled;
 @property (nonatomic) BOOL localFileContentSniffingEnabled;
-@property (nonatomic) BOOL databasesEnabled;
 @property (nonatomic) BOOL localStorageEnabled;
 @property (nonatomic, getter=isWebSecurityEnabled) BOOL webSecurityEnabled;
 @property (nonatomic) BOOL allowUniversalAccessFromFileURLs;
@@ -209,7 +208,6 @@ extern NSString *WebPreferencesCacheModelChangedInternalNotification WEBKIT_DEPR
 @property (nonatomic) BOOL directoryUploadEnabled;
 @property (nonatomic) BOOL layoutFormattingContextIntegrationEnabled;
 @property (nonatomic, getter=isInAppBrowserPrivacyEnabled) BOOL inAppBrowserPrivacyEnabled;
-@property (nonatomic) BOOL webSQLEnabled;
 @property (nonatomic) BOOL CSSOMViewScrollingAPIEnabled;
 @property (nonatomic) BOOL largeImageAsyncDecodingEnabled;
 @property (nonatomic) BOOL animatedImageAsyncDecodingEnabled;
@@ -320,6 +318,8 @@ extern NSString *WebPreferencesCacheModelChangedInternalNotification WEBKIT_DEPR
 // The preferences in this category are deprecated and have no effect. They should
 // be removed when it is considered safe to do so.
 
+@property (nonatomic) BOOL webSQLEnabled;
+@property (nonatomic) BOOL databasesEnabled;
 @property (nonatomic) BOOL constantPropertiesEnabled;
 @property (nonatomic) BOOL maskWebGLStringsEnabled;
 @property (nonatomic) BOOL CSSCustomPropertiesAndValuesEnabled;

@@ -89,9 +89,6 @@ public:
     static void setAttrStyleEnabled(bool isEnabled) { shared().m_attrStyleEnabled = isEnabled; }
     static bool attrStyleEnabled() { return shared().m_attrStyleEnabled; }
 
-    static void setWebSQLEnabled(bool isEnabled) { shared().m_webSQLEnabled = isEnabled; }
-    static bool webSQLEnabled() { return shared().m_webSQLEnabled; }
-
 #if ENABLE(ATTACHMENT_ELEMENT)
     static void setAttachmentElementEnabled(bool areEnabled) { shared().m_isAttachmentElementEnabled = areEnabled; }
     static bool attachmentElementEnabled() { return shared().m_isAttachmentElementEnabled; }
@@ -172,7 +169,6 @@ private:
     bool m_isCustomPasteboardDataEnabled { false };
     bool m_isRestrictedHTTPResponseAccess { true };
     bool m_attrStyleEnabled { false };
-    bool m_webSQLEnabled { false };
 
 #if ENABLE(ATTACHMENT_ELEMENT)
     bool m_isAttachmentElementEnabled { false };

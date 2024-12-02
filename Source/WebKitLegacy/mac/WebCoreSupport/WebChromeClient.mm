@@ -685,16 +685,6 @@ void WebChromeClient::print(LocalFrame& frame, const StringWithDirection&)
         CallUIDelegate(m_webView, @selector(webView:printFrameView:), [webFrame frameView]);
 }
 
-void WebChromeClient::exceededDatabaseQuota(LocalFrame& frame, const String& databaseName, DatabaseDetails)
-{
-    BEGIN_BLOCK_OBJC_EXCEPTIONS
-
-    auto webOrigin = adoptNS([[WebSecurityOrigin alloc] _initWithWebCoreSecurityOrigin:&frame.document()->securityOrigin()]);
-    CallUIDelegate(m_webView, @selector(webView:frame:exceededDatabaseQuotaForSecurityOrigin:database:), kit(&frame), webOrigin.get(), (NSString *)databaseName);
-
-    END_BLOCK_OBJC_EXCEPTIONS
-}
-
 #if ENABLE(INPUT_TYPE_COLOR)
 
 RefPtr<ColorChooser> WebChromeClient::createColorChooser(ColorChooserClient& client, const Color& initialColor)

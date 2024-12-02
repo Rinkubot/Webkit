@@ -27,7 +27,6 @@
 #include "config.h"
 #include "SQLiteDatabase.h"
 
-#include "DatabaseAuthorizer.h"
 #include "Logging.h"
 #include "MemoryRelease.h"
 #include "SQLiteDatabaseTracker.h"
@@ -343,15 +342,8 @@ void SQLiteDatabase::setFullsync(bool fsync)
 int64_t SQLiteDatabase::maximumSize()
 {
     int64_t maxPageCount = 0;
-
-    {
-        Locker locker { m_authorizerLock };
-        enableAuthorizer(false);
-        auto statement = prepareStatement("PRAGMA max_page_count"_s);
-        maxPageCount = statement ? statement->columnInt64(0) : 0;
-        enableAuthorizer(true);
-    }
-
+    auto statement = prepareStatement("PRAGMA max_page_count"_s);
+    maxPageCount = statement ? statement->columnInt64(0) : 0;
     return maxPageCount * pageSize();
 }
 
@@ -364,16 +356,9 @@ void SQLiteDatabase::setMaximumSize(int64_t size)
 
     ASSERT(currentPageSize || !m_db);
     int64_t newMaxPageCount = currentPageSize ? size / currentPageSize : 0;
-    
-    Locker locker { m_authorizerLock };
-    enableAuthorizer(false);
-
     auto statement = prepareStatementSlow(makeString("PRAGMA max_page_count = "_s, newMaxPageCount));
     if (!statement || statement->step() != SQLITE_ROW)
         LOG_ERROR("Failed to set maximum size of database to %lli bytes", static_cast<long long>(size));
-
-    enableAuthorizer(true);
-
 }
 
 int SQLiteDatabase::pageSize()
@@ -381,13 +366,8 @@ int SQLiteDatabase::pageSize()
     // Since the page size of a database is locked in at creation and therefore cannot be dynamic, 
     // we can cache the value for future use
     if (m_pageSize == -1) {
-        Locker locker { m_authorizerLock };
-        enableAuthorizer(false);
-        
         auto statement = prepareStatement("PRAGMA page_size"_s);
         m_pageSize = statement ? statement->columnInt(0) : 0;
-        
-        enableAuthorizer(true);
     }
 
     return m_pageSize;
@@ -397,14 +377,9 @@ int64_t SQLiteDatabase::freeSpaceSize()
 {
     int64_t freelistCount = 0;
 
-    {
-        Locker locker { m_authorizerLock };
-        enableAuthorizer(false);
-        // Note: freelist_count was added in SQLite 3.4.1.
-        auto statement = prepareStatement("PRAGMA freelist_count"_s);
-        freelistCount = statement ? statement->columnInt64(0) : 0;
-        enableAuthorizer(true);
-    }
+    // Note: freelist_count was added in SQLite 3.4.1.
+    auto statement = prepareStatement("PRAGMA freelist_count"_s);
+    freelistCount = statement ? statement->columnInt64(0) : 0;
 
     return freelistCount * pageSize();
 }
@@ -412,14 +387,8 @@ int64_t SQLiteDatabase::freeSpaceSize()
 int64_t SQLiteDatabase::totalSize()
 {
     int64_t pageCount = 0;
-
-    {
-        Locker locker { m_authorizerLock };
-        enableAuthorizer(false);
-        auto statement = prepareStatement("PRAGMA page_count"_s);
-        pageCount = statement ? statement->columnInt64(0) : 0;
-        enableAuthorizer(true);
-    }
+    auto statement = prepareStatement("PRAGMA page_count"_s);
+    pageCount = statement ? statement->columnInt64(0) : 0;
 
     return pageCount * pageSize();
 }
@@ -527,13 +496,9 @@ int SQLiteDatabase::runVacuumCommand()
 
 int SQLiteDatabase::runIncrementalVacuumCommand()
 {
-    Locker locker { m_authorizerLock };
-    enableAuthorizer(false);
-
     if (!executeCommand("PRAGMA incremental_vacuum"_s))
         LOG(SQLDatabase, "Unable to run incremental vacuum - %s", lastErrorMsg());
 
-    enableAuthorizer(true);
     return lastError();
 }
 
@@ -578,105 +543,6 @@ void SQLiteDatabase::disableThreadingChecks()
     m_sharable = true;
 }
 #endif
-
-int SQLiteDatabase::authorizerFunction(void* userData, int actionCode, const char* parameter1, const char* parameter2, const char* /*databaseName*/, const char* /*trigger_or_view*/)
-{
-    DatabaseAuthorizer* auth = static_cast<DatabaseAuthorizer*>(userData);
-    ASSERT(auth);
-
-    auto parameter1String = String::fromLatin1(parameter1);
-    auto parameter2String = String::fromLatin1(parameter2);
-    switch (actionCode) {
-        case SQLITE_CREATE_INDEX:
-            return auth->createIndex(parameter1String, parameter2String);
-        case SQLITE_CREATE_TABLE:
-            return auth->createTable(parameter1String);
-        case SQLITE_CREATE_TEMP_INDEX:
-            return auth->createTempIndex(parameter1String, parameter2String);
-        case SQLITE_CREATE_TEMP_TABLE:
-            return auth->createTempTable(parameter1String);
-        case SQLITE_CREATE_TEMP_TRIGGER:
-            return auth->createTempTrigger(parameter1String, parameter2String);
-        case SQLITE_CREATE_TEMP_VIEW:
-            return auth->createTempView(parameter1String);
-        case SQLITE_CREATE_TRIGGER:
-            return auth->createTrigger(parameter1String, parameter2String);
-        case SQLITE_CREATE_VIEW:
-            return auth->createView(parameter1String);
-        case SQLITE_DELETE:
-            return auth->allowDelete(parameter1String);
-        case SQLITE_DROP_INDEX:
-            return auth->dropIndex(parameter1String, parameter2String);
-        case SQLITE_DROP_TABLE:
-            return auth->dropTable(parameter1String);
-        case SQLITE_DROP_TEMP_INDEX:
-            return auth->dropTempIndex(parameter1String, parameter2String);
-        case SQLITE_DROP_TEMP_TABLE:
-            return auth->dropTempTable(parameter1String);
-        case SQLITE_DROP_TEMP_TRIGGER:
-            return auth->dropTempTrigger(parameter1String, parameter2String);
-        case SQLITE_DROP_TEMP_VIEW:
-            return auth->dropTempView(parameter1String);
-        case SQLITE_DROP_TRIGGER:
-            return auth->dropTrigger(parameter1String, parameter2String);
-        case SQLITE_DROP_VIEW:
-            return auth->dropView(parameter1String);
-        case SQLITE_INSERT:
-            return auth->allowInsert(parameter1String);
-        case SQLITE_PRAGMA:
-            return auth->allowPragma(parameter1String, parameter2String);
-        case SQLITE_READ:
-            return auth->allowRead(parameter1String, parameter2String);
-        case SQLITE_SELECT:
-            return auth->allowSelect();
-        case SQLITE_TRANSACTION:
-            return auth->allowTransaction();
-        case SQLITE_UPDATE:
-            return auth->allowUpdate(parameter1String, parameter2String);
-        case SQLITE_ATTACH:
-            return auth->allowAttach(parameter1String);
-        case SQLITE_DETACH:
-            return auth->allowDetach(parameter1String);
-        case SQLITE_ALTER_TABLE:
-            return auth->allowAlterTable(parameter1String, parameter2String);
-        case SQLITE_REINDEX:
-            return auth->allowReindex(parameter1String);
-        case SQLITE_ANALYZE:
-            return auth->allowAnalyze(parameter1String);
-        case SQLITE_CREATE_VTABLE:
-            return auth->createVTable(parameter1String, parameter2String);
-        case SQLITE_DROP_VTABLE:
-            return auth->dropVTable(parameter1String, parameter2String);
-        case SQLITE_FUNCTION:
-            return auth->allowFunction(parameter2String);
-        default:
-            ASSERT_NOT_REACHED();
-            return SQLAuthDeny;
-    }
-}
-
-void SQLiteDatabase::setAuthorizer(DatabaseAuthorizer& authorizer)
-{
-    if (!m_db) {
-        LOG_ERROR("Attempt to set an authorizer on a non-open SQL database");
-        ASSERT_NOT_REACHED();
-        return;
-    }
-
-    Locker locker { m_authorizerLock };
-
-    m_authorizer = &authorizer;
-    
-    enableAuthorizer(true);
-}
-
-void SQLiteDatabase::enableAuthorizer(bool enable)
-{
-    if (m_authorizer && enable)
-        sqlite3_set_authorizer(m_db, SQLiteDatabase::authorizerFunction, m_authorizer.get());
-    else
-        sqlite3_set_authorizer(m_db, NULL, 0);
-}
 
 bool SQLiteDatabase::isAutoCommitOn() const
 {

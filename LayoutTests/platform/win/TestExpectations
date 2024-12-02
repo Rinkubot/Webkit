@@ -111,8 +111,6 @@ storage/storageinfo-request-quota.html [ Skip ]
 storage/storagequota-query-usage.html [ Skip ]
 storage/storagequota-request-quota.html [ Skip ]
 
-storage/websql [ Skip ]
-
 # SPEECH_SYNTHESIS is disabled
 fast/speechsynthesis [ Skip ]
 

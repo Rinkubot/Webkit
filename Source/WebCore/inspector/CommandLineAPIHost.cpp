@@ -31,11 +31,9 @@
 #include "config.h"
 #include "CommandLineAPIHost.h"
 
-#include "Database.h"
 #include "Document.h"
 #include "EventTarget.h"
 #include "InspectorDOMStorageAgent.h"
-#include "InspectorDatabaseAgent.h"
 #include "JSCommandLineAPIHost.h"
 #include "JSDOMGlobalObject.h"
 #include "JSEventListener.h"
@@ -189,15 +187,6 @@ JSC::JSValue CommandLineAPIHost::inspectedObject(JSC::JSGlobalObject& lexicalGlo
     JSC::JSLockHolder lock(&lexicalGlobalObject);
     auto scriptValue = m_inspectedObject->get(lexicalGlobalObject);
     return scriptValue ? scriptValue : jsUndefined();
-}
-
-String CommandLineAPIHost::databaseId(Database& database)
-{
-    if (m_instrumentingAgents) {
-        if (auto* databaseAgent = m_instrumentingAgents->enabledDatabaseAgent())
-            return databaseAgent->databaseId(database);
-    }
-    return { };
 }
 
 String CommandLineAPIHost::storageId(Storage& storage)

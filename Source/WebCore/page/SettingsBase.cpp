@@ -34,7 +34,6 @@
 #include "ChromeClient.h"
 #include "CookieStorage.h"
 #include "DOMTimer.h"
-#include "Database.h"
 #include "Document.h"
 #include "DocumentInlines.h"
 #include "FontCache.h"

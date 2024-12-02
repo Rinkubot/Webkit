@@ -1469,16 +1469,6 @@ public:
     [self _setBoolValue:newValue forKey:WebKitUseSiteSpecificSpoofingPreferenceKey];
 }
 
-- (BOOL)databasesEnabled
-{
-    return [self _boolValueForKey:WebKitDatabasesEnabledPreferenceKey];
-}
-
-- (void)setDatabasesEnabled:(BOOL)databasesEnabled
-{
-    [self _setBoolValue:databasesEnabled forKey:WebKitDatabasesEnabledPreferenceKey];
-}
-
 #if PLATFORM(IOS_FAMILY)
 - (BOOL)storageTrackerEnabled
 {
@@ -2705,16 +2695,6 @@ static RetainPtr<NSString>& classIBCreatorID()
     [self _setBoolValue:flag forKey:WebKitDebugInAppBrowserPrivacyEnabledPreferenceKey];
 }
 
-- (BOOL)webSQLEnabled
-{
-    return [self _boolValueForKey:WebKitWebSQLEnabledPreferenceKey];
-}
-
-- (void)setWebSQLEnabled:(BOOL)webSQLEnabled
-{
-    [self _setBoolValue:webSQLEnabled forKey:WebKitWebSQLEnabledPreferenceKey];
-}
-
 - (BOOL)siteSpecificQuirksModeEnabled
 {
     return [self _boolValueForKey:WebKitSiteSpecificQuirksModeEnabledPreferenceKey];
@@ -2993,6 +2973,24 @@ static RetainPtr<NSString>& classIBCreatorID()
 
 // The preferences in this category are deprecated and have no effect. They should
 // be removed when it is considered safe to do so.
+
+- (BOOL)webSQLEnabled
+{
+    return NO;
+}
+
+- (void)setWebSQLEnabled:(BOOL)webSQLEnabled
+{
+}
+
+- (BOOL)databasesEnabled
+{
+    return NO;
+}
+
+- (void)setDatabasesEnabled:(BOOL)databasesEnabled
+{
+}
 
 - (BOOL)constantPropertiesEnabled
 {

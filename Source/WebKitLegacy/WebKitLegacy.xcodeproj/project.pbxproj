@@ -116,8 +116,6 @@
 		4BF99F910AE050BC00815C2B /* WebEditorClient.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4BF99F8F0AE050BC00815C2B /* WebEditorClient.mm */; };
 		511F3FD50CECC88F00852565 /* WebDatabaseManager.mm in Sources */ = {isa = PBXBuildFile; fileRef = 511F3FD10CECC88F00852565 /* WebDatabaseManager.mm */; };
 		511F3FD60CECC88F00852565 /* WebDatabaseManagerPrivate.h in Headers */ = {isa = PBXBuildFile; fileRef = 511F3FD20CECC88F00852565 /* WebDatabaseManagerPrivate.h */; settings = {ATTRIBUTES = (Private, ); }; };
-		511F3FD70CECC88F00852565 /* WebDatabaseManagerClient.h in Headers */ = {isa = PBXBuildFile; fileRef = 511F3FD30CECC88F00852565 /* WebDatabaseManagerClient.h */; };
-		511F3FD80CECC88F00852565 /* WebDatabaseManagerClient.mm in Sources */ = {isa = PBXBuildFile; fileRef = 511F3FD40CECC88F00852565 /* WebDatabaseManagerClient.mm */; };
 		5120C82C1E54CE8A0025B250 /* WebKitVersionChecks.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5120C82B1E54CE8A0025B250 /* WebKitVersionChecks.mm */; };
 		512BDB531C471591006494DF /* WebDatabaseProvider.mm in Sources */ = {isa = PBXBuildFile; fileRef = 512BDB521C471591006494DF /* WebDatabaseProvider.mm */; };
 		5158F6EF106D862A00AF457C /* WebHistoryDelegate.h in Headers */ = {isa = PBXBuildFile; fileRef = 5158F6EE106D862A00AF457C /* WebHistoryDelegate.h */; };
@@ -797,8 +795,6 @@
 		4BF99F8F0AE050BC00815C2B /* WebEditorClient.mm */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.objcpp; path = WebEditorClient.mm; sourceTree = "<group>"; };
 		511F3FD10CECC88F00852565 /* WebDatabaseManager.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = WebDatabaseManager.mm; sourceTree = "<group>"; };
 		511F3FD20CECC88F00852565 /* WebDatabaseManagerPrivate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WebDatabaseManagerPrivate.h; sourceTree = "<group>"; };
-		511F3FD30CECC88F00852565 /* WebDatabaseManagerClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WebDatabaseManagerClient.h; sourceTree = "<group>"; };
-		511F3FD40CECC88F00852565 /* WebDatabaseManagerClient.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = WebDatabaseManagerClient.mm; sourceTree = "<group>"; };
 		5120C82B1E54CE8A0025B250 /* WebKitVersionChecks.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = WebKitVersionChecks.mm; sourceTree = "<group>"; };
 		512BDB521C471591006494DF /* WebDatabaseProvider.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = WebDatabaseProvider.mm; sourceTree = "<group>"; };
 		513D422E034CF55A00CA2ACD /* WebResourceLoadDelegate.h */ = {isa = PBXFileReference; fileEncoding = 30; indentWidth = 4; lastKnownFileType = sourcecode.c.h; path = WebResourceLoadDelegate.h; sourceTree = "<group>"; tabWidth = 8; usesTabs = 0; };
@@ -1755,8 +1751,6 @@
 				1A6B312F1A51F3A900422975 /* StorageTracker.h */,
 				1A6B31301A51F3A900422975 /* StorageTrackerClient.h */,
 				511F3FD10CECC88F00852565 /* WebDatabaseManager.mm */,
-				511F3FD30CECC88F00852565 /* WebDatabaseManagerClient.h */,
-				511F3FD40CECC88F00852565 /* WebDatabaseManagerClient.mm */,
 				51AEDEF00CECF45700854328 /* WebDatabaseManagerInternal.h */,
 				511F3FD20CECC88F00852565 /* WebDatabaseManagerPrivate.h */,
 				1AA83F811A5C4AE400026EC6 /* WebDatabaseProvider.cpp */,
@@ -2859,7 +2853,6 @@
 				939810160824BF01008DF038 /* WebCoreStatistics.h in Headers */,
 				E13E782C1E5A7365001849D1 /* WebCreateFragmentInternal.h in Headers */,
 				94077C782B967DB80012E357 /* WebCryptoClient.h in Headers */,
-				511F3FD70CECC88F00852565 /* WebDatabaseManagerClient.h in Headers */,
 				51AEDEF10CECF45700854328 /* WebDatabaseManagerInternal.h in Headers */,
 				511F3FD60CECC88F00852565 /* WebDatabaseManagerPrivate.h in Headers */,
 				1AA83F841A5C4AE400026EC6 /* WebDatabaseProvider.h in Headers */,
@@ -3427,7 +3420,6 @@
 				939810BF0824BF01008DF038 /* WebCoreStatistics.mm in Sources */,
 				94077C792B969B4A0012E357 /* WebCryptoClient.mm in Sources */,
 				511F3FD50CECC88F00852565 /* WebDatabaseManager.mm in Sources */,
-				511F3FD80CECC88F00852565 /* WebDatabaseManagerClient.mm in Sources */,
 				1AA83F831A5C4AE400026EC6 /* WebDatabaseProvider.cpp in Sources */,
 				512BDB531C471591006494DF /* WebDatabaseProvider.mm in Sources */,
 				A5DEFC1011D5343E00885273 /* WebDatabaseQuotaManager.mm in Sources */,

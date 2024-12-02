@@ -42,7 +42,6 @@ class JSValue;
 
 namespace WebCore {
 
-class Database;
 class EventTarget;
 class JSDOMGlobalObject;
 class Storage;
@@ -91,7 +90,6 @@ public:
     void gatherRTCLogs(JSC::JSGlobalObject&, RefPtr<RTCLogsCallback>&&);
 #endif
 
-    String databaseId(Database&);
     String storageId(Storage&);
 
     JSC::JSValue wrapper(JSC::JSGlobalObject*, JSDOMGlobalObject*);

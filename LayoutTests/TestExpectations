@@ -8090,6 +8090,18 @@ imported/w3c/web-platform-tests/WebIDL/idlharness.any.worker.html [ Skip ]
 webanimations/scroll-timeline-clamped-current-time-while-rubber-banding-mac.html [ Skip ]
 webanimations/scroll-timeline-clamped-current-time-while-rubber-banding-ios.html [ Skip ]
 
+# WebSQL is deprecated.
+storage/websql [ Skip ]
+fast/dom/MutationObserver/database-callback-delivery.html [ Skip ]
+http/tests/security/cross-origin-websql-allowed.html [ Skip ]
+http/tests/security/cross-origin-websql.html [ Skip ]
+http/tests/security/same-origin-websql-blocked.html [ Skip ]
+http/tests/security/storage-blocking-loosened-websql.html [ Skip ]
+http/tests/security/storage-blocking-strengthened-websql.html [ Skip ]
+http/tests/storage/callbacks-are-called-in-correct-context.html [ Skip ]
+fast/history/page-cache-webdatabase-no-transaction-db.html [ Skip ]
+fast/history/page-cache-webdatabase-pending-transaction.html [ Skip ]
+
 # macOS-only test.
 media/webkit-media-controls-not-visible-after-exiting-fullscreen.html [ Skip ]
 
