@@ -47,9 +47,9 @@ static bool readUInt32(SharedBuffer& buffer, size_t& offset, uint32_t& value)
     if (buffer.size() - offset < sizeof(value))
         return false;
 
-    WTF_ALLOW_UNSAFE_BUFFER_USAGE_BEGIN // GLib port
-    value = ntohl(*reinterpret_cast_ptr<const uint32_t*>(buffer.span().subspan(offset).data()));
-    WTF_ALLOW_UNSAFE_BUFFER_USAGE_END
+    uint32_t raw;
+    memcpy(&raw, buffer.span().subspan(offset, sizeof(value)).data(), sizeof(value));
+    value = ntohl(raw);
     offset += sizeof(value);
 
     return true;
@@ -61,9 +61,9 @@ static bool readUInt16(SharedBuffer& buffer, size_t& offset, uint16_t& value)
     if (buffer.size() - offset < sizeof(value))
         return false;
 
-    WTF_ALLOW_UNSAFE_BUFFER_USAGE_BEGIN // GLib port
-    value = ntohs(*reinterpret_cast_ptr<const uint16_t*>(buffer.span().subspan(offset).data()));
-    WTF_ALLOW_UNSAFE_BUFFER_USAGE_END
+    uint16_t raw;
+    memcpy(&raw, buffer.span().subspan(offset, sizeof(value)).data(), sizeof(value));
+    value = ntohs(raw);
     offset += sizeof(value);
 
     return true;
