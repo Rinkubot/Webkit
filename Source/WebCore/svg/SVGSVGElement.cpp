@@ -160,8 +160,6 @@ void SVGSVGElement::updateCurrentTranslate()
     }
 
     updateSVGRendererForElementChange();
-    if (parentNode() == &document() && document().renderView())
-        protectedDocument()->checkedRenderView()->repaint();
 }
 
 void SVGSVGElement::attributeChanged(const QualifiedName& name, const AtomString& oldValue, const AtomString& newValue, AttributeModificationReason attributeModificationReason)
