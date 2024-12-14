@@ -380,9 +380,9 @@ StyleRuleWithNesting::StyleRuleWithNesting(StyleRule&& styleRule)
     setType(StyleRuleType::StyleWithNesting);
 }
 
-Ref<StyleRuleWithNesting> StyleRuleWithNesting::create(Ref<StyleProperties>&& properties, bool hasDocumentSecurityOrigin, CSSSelectorList&& selectors, Vector<Ref<StyleRuleBase>>&& nestedRules)
+Ref<StyleRuleWithNesting> StyleRuleWithNesting::create(Ref<StyleProperties>&& properties, bool hasDocumentSecurityOrigin, CSSSelectorList&& originalSelectorList, CSSSelectorList&& resolvedSelectorList, Vector<Ref<StyleRuleBase>>&& nestedRules)
 {
-    return adoptRef(*new StyleRuleWithNesting(WTFMove(properties), hasDocumentSecurityOrigin, WTFMove(selectors), WTFMove(nestedRules)));
+    return adoptRef(*new StyleRuleWithNesting(WTFMove(properties), hasDocumentSecurityOrigin, WTFMove(originalSelectorList), WTFMove(resolvedSelectorList), WTFMove(nestedRules)));
 }
 
 Ref<StyleRuleWithNesting> StyleRuleWithNesting::create(StyleRule&& styleRule)
@@ -390,10 +390,10 @@ Ref<StyleRuleWithNesting> StyleRuleWithNesting::create(StyleRule&& styleRule)
     return adoptRef(*new StyleRuleWithNesting(WTFMove(styleRule)));
 }
 
-StyleRuleWithNesting::StyleRuleWithNesting(Ref<StyleProperties>&& properties, bool hasDocumentSecurityOrigin, CSSSelectorList&& selectors, Vector<Ref<StyleRuleBase>>&& nestedRules)
-    : StyleRule(WTFMove(properties), hasDocumentSecurityOrigin, WTFMove(selectors))
+StyleRuleWithNesting::StyleRuleWithNesting(Ref<StyleProperties>&& properties, bool hasDocumentSecurityOrigin, CSSSelectorList&& originalSelectorList, CSSSelectorList&& resolvedSelectorList, Vector<Ref<StyleRuleBase>>&& nestedRules)
+    : StyleRule(WTFMove(properties), hasDocumentSecurityOrigin, WTFMove(resolvedSelectorList))
     , m_nestedRules(WTFMove(nestedRules))
-    , m_originalSelectorList(selectorList())
+    , m_originalSelectorList(WTFMove(originalSelectorList))
 {
     setType(StyleRuleType::StyleWithNesting);
 }
@@ -412,8 +412,8 @@ StyleRulePage::StyleRulePage(const StyleRulePage& o)
 {
 }
 
-StyleRuleNestedDeclarations::StyleRuleNestedDeclarations(Ref<StyleProperties>&& properties)
-    : StyleRule(WTFMove(properties), false, { })
+StyleRuleNestedDeclarations::StyleRuleNestedDeclarations(Ref<StyleProperties>&& properties, CSSSelectorList&& selectors)
+    : StyleRule(WTFMove(properties), false, WTFMove(selectors))
 {
     setType(StyleRuleType::NestedDeclarations);
 }
@@ -620,9 +620,9 @@ Ref<StyleRuleProperty> StyleRuleProperty::create(Descriptor&& descriptor)
     return adoptRef(*new StyleRuleProperty(WTFMove(descriptor)));
 }
 
-Ref<StyleRuleScope> StyleRuleScope::create(CSSSelectorList&& scopeStart, CSSSelectorList&& scopeEnd, Vector<Ref<StyleRuleBase>>&& rules)
+Ref<StyleRuleScope> StyleRuleScope::create(CSSSelectorList&& originalScopeStart, CSSSelectorList&& originalScopeEnd, CSSSelectorList&& resolvedScopeStart, CSSSelectorList&& resolvedScopeEnd, Vector<Ref<StyleRuleBase>>&& rules)
 {
-    return adoptRef(*new StyleRuleScope(WTFMove(scopeStart), WTFMove(scopeEnd), WTFMove(rules)));
+    return adoptRef(*new StyleRuleScope(WTFMove(originalScopeStart), WTFMove(originalScopeEnd), WTFMove(resolvedScopeStart), WTFMove(resolvedScopeEnd), WTFMove(rules)));
 }
 
 StyleRuleScope::~StyleRuleScope() = default;
@@ -632,10 +632,12 @@ Ref<StyleRuleScope> StyleRuleScope::copy() const
     return adoptRef(*new StyleRuleScope(*this));
 }
 
-StyleRuleScope::StyleRuleScope(CSSSelectorList&& scopeStart, CSSSelectorList&& scopeEnd, Vector<Ref<StyleRuleBase>>&& rules)
+StyleRuleScope::StyleRuleScope(CSSSelectorList&& originalScopeStart, CSSSelectorList&& originalScopeEnd, CSSSelectorList&& resolvedScopeStart, CSSSelectorList&& resolvedScopeEnd, Vector<Ref<StyleRuleBase>>&& rules)
     : StyleRuleGroup(StyleRuleType::Scope, WTFMove(rules))
-    , m_originalScopeStart(WTFMove(scopeStart))
-    , m_originalScopeEnd(WTFMove(scopeEnd))
+    , m_scopeStart(WTFMove(resolvedScopeStart))
+    , m_scopeEnd(WTFMove(resolvedScopeEnd))
+    , m_originalScopeStart(WTFMove(originalScopeStart))
+    , m_originalScopeEnd(WTFMove(originalScopeEnd))
 {
 }
 
