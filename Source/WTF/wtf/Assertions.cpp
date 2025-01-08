@@ -355,7 +355,7 @@ void WTFPrintBacktrace(std::span<void* const> stack)
     WTFPrintBacktraceWithPrefixAndPrintStream(out, stack, "");
 }
 
-#if !defined(NDEBUG) || !(OS(DARWIN) || PLATFORM(PLAYSTATION))
+#if !defined(NDEBUG) || !(OS(DARWIN) || PLATFORM(PLAYSTATION) || OS(LINUX))
 void WTFCrash()
 {
 #if ASAN_ENABLED
@@ -645,7 +645,7 @@ void WTFInitializeLogChannelStatesFromString(WTFLogChannel* channels[], size_t c
 
 } // extern "C"
 
-#if (OS(DARWIN) || PLATFORM(PLAYSTATION)) && (CPU(X86_64) || CPU(ARM64))
+#if (OS(DARWIN) || PLATFORM(PLAYSTATION) || OS(LINUX)) && (CPU(X86_64) || CPU(ARM64) || CPU(ARM_THUMB2))
 
 void WTFCrashWithInfoImpl(int, const char*, const char*, int, uint64_t reason, uint64_t misc1, uint64_t misc2, uint64_t misc3, uint64_t misc4, uint64_t misc5, uint64_t misc6)
 {

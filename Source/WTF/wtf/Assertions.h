@@ -236,7 +236,7 @@ WTF_EXPORT_PRIVATE bool WTFIsDebuggerAttached(void);
 
 // This ordering was chosen to be consistent with JSC's JIT asserts. We probably shouldn't change this ordering
 // since it would make tooling crash reports much harder. If, for whatever reason, we decide to change the ordering
-// here we should update the abortWithuint64_t functions.
+// here we should update the abortWithReason functions.
 #define CRASH_ARG_GPR0 "rdi"
 #define CRASH_ARG_GPR1 "rsi"
 #define CRASH_ARG_GPR2 "rdx"
@@ -282,15 +282,31 @@ WTF_EXPORT_PRIVATE bool WTFIsDebuggerAttached(void);
 #define CRASH_GPR5 "x22"
 #define CRASH_GPR6 "x23"
 
-#endif // CPU(ARM64)
+#elif CPU(ARM_THUMB2)
+
+#define WTF_FATAL_CRASH_INST "udf #0x71"
+
+// See comment above on the ordering.
+#define CRASH_ARG_GPR0 "r0"
+#define CRASH_ARG_GPR1 "r1"
+#define CRASH_ARG_GPR2 "r2"
+#define CRASH_ARG_GPR3 "r3"
+
+#define CRASH_GPR0 "r12"
+#define CRASH_GPR1 "r6"
+#define CRASH_GPR2 "r4"
+#define CRASH_GPR3 "r5"
+#define CRASH_GPR4 "r6"
+#define CRASH_GPR5 "r10"
+#define CRASH_GPR6 "r11"
+
+#endif // CPU(X86_64) || CPU(X86)
 
 #if ASAN_ENABLED
 #define WTFBreakpointTrap()  __builtin_trap()
 #elif CPU(X86_64) || CPU(X86)
 #define WTFBreakpointTrap()  asm volatile (WTF_FATAL_CRASH_INST)
-#elif CPU(ARM_THUMB2)
-#define WTFBreakpointTrap()  asm volatile ("bkpt #0")
-#elif CPU(ARM64)
+#elif CPU(ARM64) || CPU(ARM_THUMB2)
 #define WTFBreakpointTrap()  asm volatile (WTF_FATAL_CRASH_INST)
 #else
 #define WTFBreakpointTrap() WTFCrash() // Not implemented.
@@ -300,7 +316,7 @@ WTF_EXPORT_PRIVATE bool WTFIsDebuggerAttached(void);
 
 #ifndef CRASH
 
-#if defined(NDEBUG) && (OS(DARWIN) || PLATFORM(PLAYSTATION))
+#if defined(NDEBUG) && (OS(DARWIN) || PLATFORM(PLAYSTATION) || OS(LINUX))
 // Crash with a SIGTRAP i.e EXC_BREAKPOINT.
 // We are not using __builtin_trap because it is only guaranteed to abort, but not necessarily
 // trigger a SIGTRAP. Instead, we use inline asm to ensure that we trigger the SIGTRAP.
@@ -833,7 +849,7 @@ WTF_EXPORT_PRIVATE NO_RETURN_DUE_TO_CRASH NOT_TAIL_CALLED void WTFCrashWithInfoI
 WTF_EXPORT_PRIVATE NO_RETURN_DUE_TO_CRASH NOT_TAIL_CALLED void WTFCrashWithInfoImpl(int line, const char* file, const char* function, int counter, uint64_t reason, uint64_t misc1, uint64_t misc2);
 WTF_EXPORT_PRIVATE NO_RETURN_DUE_TO_CRASH NOT_TAIL_CALLED void WTFCrashWithInfoImpl(int line, const char* file, const char* function, int counter, uint64_t reason, uint64_t misc1);
 WTF_EXPORT_PRIVATE NO_RETURN_DUE_TO_CRASH NOT_TAIL_CALLED void WTFCrashWithInfoImpl(int line, const char* file, const char* function, int counter, uint64_t reason);
-#if (OS(DARWIN) || PLATFORM(PLAYSTATION)) && (CPU(X86_64) || CPU(ARM64))
+#if (OS(DARWIN) || PLATFORM(PLAYSTATION) || OS(LINUX)) && (CPU(X86_64) || CPU(ARM64) || CPU(ARM_THUMB2))
 NO_RETURN_DUE_TO_CRASH ALWAYS_INLINE void WTFCrashWithInfo(int line, const char* file, const char* function, int counter);
 #else
 NO_RETURN_DUE_TO_CRASH NOT_TAIL_CALLED void WTFCrashWithInfo(int line, const char* file, const char* function, int counter);
@@ -887,7 +903,7 @@ NO_RETURN_DUE_TO_CRASH ALWAYS_INLINE void WTFCrashWithInfo(int line, const char*
     WTFCrashWithInfoImpl(line, file, function, counter, wtfCrashArg(reason), wtfCrashArg(misc1), wtfCrashArg(misc2), wtfCrashArg(misc3), wtfCrashArg(misc4), wtfCrashArg(misc5), wtfCrashArg(misc6));
 }
 
-#if (OS(DARWIN) || PLATFORM(PLAYSTATION)) && (CPU(X86_64) || CPU(ARM64))
+#if (OS(DARWIN) || PLATFORM(PLAYSTATION) || OS(LINUX)) && (CPU(X86_64) || CPU(ARM64) || CPU(ARM_THUMB2))
 
 NO_RETURN_DUE_TO_CRASH ALWAYS_INLINE void WTFCrashWithInfo(int line, const char* file, const char* function, int counter)
 {
