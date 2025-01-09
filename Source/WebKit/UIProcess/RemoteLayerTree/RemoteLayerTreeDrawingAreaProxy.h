@@ -76,10 +76,10 @@ public:
     void viewWillEndLiveResize() final;
 
 #if ENABLE(THREADED_ANIMATION_RESOLUTION)
+    void clearAnimationTimelines();
+    void setAnimationTimelinesCurrentTime(MonotonicTime);
     void animationsWereAddedToNode(RemoteLayerTreeNode&);
     void animationsWereRemovedFromNode(RemoteLayerTreeNode&);
-    Seconds acceleratedTimelineTimeOrigin(WebCore::ProcessIdentifier) const;
-    MonotonicTime animationCurrentTime(WebCore::ProcessIdentifier) const;
 #endif
 
     // For testing.
@@ -106,11 +106,6 @@ protected:
         CommitLayerTreeMessageState commitLayerTreeMessageState { Idle };
         TransactionID lastLayerTreeTransactionID;
         TransactionID pendingLayerTreeTransactionID;
-
-#if ENABLE(THREADED_ANIMATION_RESOLUTION)
-        Seconds acceleratedTimelineTimeOrigin;
-        MonotonicTime animationCurrentTime;
-#endif
     };
 
     ProcessState& processStateForConnection(IPC::Connection&);

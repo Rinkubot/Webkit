@@ -2718,6 +2718,7 @@
 		71025EE01F99F1EC004A250C /* JSDocumentTimeline.h in Headers */ = {isa = PBXBuildFile; fileRef = 71025EDC1F99F1A8004A250C /* JSDocumentTimeline.h */; };
 		71025EE21F99F1EC004A250C /* JSWebAnimation.h in Headers */ = {isa = PBXBuildFile; fileRef = 71025ED81F99F1A6004A250C /* JSWebAnimation.h */; };
 		7108EEE62418ED5A005C3DA7 /* WebAnimationTypes.h in Headers */ = {isa = PBXBuildFile; fileRef = 7108EEE42418ED53005C3DA7 /* WebAnimationTypes.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		710A119D2CCA39CF00A30879 /* AcceleratedTimeline.h in Headers */ = {isa = PBXBuildFile; fileRef = 710A11992CCA39BE00A30879 /* AcceleratedTimeline.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		710BB1032AFE585F005C3139 /* KeyframeInterpolation.h in Headers */ = {isa = PBXBuildFile; fileRef = 710BB1012AFE584F005C3139 /* KeyframeInterpolation.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		7111243E216FA71100EB7B67 /* CompositeOperationOrAuto.h in Headers */ = {isa = PBXBuildFile; fileRef = 7111243B216FA6E000EB7B67 /* CompositeOperationOrAuto.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		71112441216FA7CD00EB7B67 /* JSCompositeOperationOrAuto.h in Headers */ = {isa = PBXBuildFile; fileRef = 71112440216FA7BE00EB7B67 /* JSCompositeOperationOrAuto.h */; settings = {ATTRIBUTES = (Private, ); }; };
@@ -12976,6 +12977,8 @@
 		71025EDB1F99F1A8004A250C /* JSDocumentTimeline.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = JSDocumentTimeline.cpp; sourceTree = "<group>"; };
 		71025EDC1F99F1A8004A250C /* JSDocumentTimeline.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JSDocumentTimeline.h; sourceTree = "<group>"; };
 		7108EEE42418ED53005C3DA7 /* WebAnimationTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WebAnimationTypes.h; sourceTree = "<group>"; };
+		710A11992CCA39BE00A30879 /* AcceleratedTimeline.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AcceleratedTimeline.h; sourceTree = "<group>"; };
+		710A11A32CCA86EC00A30879 /* AcceleratedTimeline.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = AcceleratedTimeline.cpp; sourceTree = "<group>"; };
 		710BB1012AFE584F005C3139 /* KeyframeInterpolation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KeyframeInterpolation.h; sourceTree = "<group>"; };
 		710BB1022AFE5850005C3139 /* KeyframeInterpolation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = KeyframeInterpolation.cpp; sourceTree = "<group>"; };
 		710FA74B1DEE576D004C715E /* controls-bar.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = "controls-bar.js"; sourceTree = "<group>"; };
@@ -26052,6 +26055,8 @@
 				71BF4C2E29B098A7008344FC /* AcceleratedEffectStack.mm */,
 				7164D2CA29AFA0F5000AC8DA /* AcceleratedEffectValues.cpp */,
 				7164D2CB29AFA0F5000AC8DA /* AcceleratedEffectValues.h */,
+				710A11A32CCA86EC00A30879 /* AcceleratedTimeline.cpp */,
+				710A11992CCA39BE00A30879 /* AcceleratedTimeline.h */,
 				49E912A50EFAC906009D0CAF /* Animation.cpp */,
 				49E912A60EFAC906009D0CAF /* Animation.h */,
 				49E912A70EFAC906009D0CAF /* AnimationList.cpp */,
@@ -39528,6 +39533,7 @@
 				71BF4C3529B098A8008344FC /* AcceleratedEffectStack.h in Headers */,
 				715FCD1729B09B0E002CE6A7 /* AcceleratedEffectStackUpdater.h in Headers */,
 				7164D2CF29AFA0F6000AC8DA /* AcceleratedEffectValues.h in Headers */,
+				710A119D2CCA39CF00A30879 /* AcceleratedTimeline.h in Headers */,
 				29A8122E0FBB9C1D00510293 /* AccessibilityARIAGridCell.h in Headers */,
 				29A812330FBB9C1D00510293 /* AccessibilityARIAGridRow.h in Headers */,
 				2914E3081CAB5A440049966F /* AccessibilityAttachment.h in Headers */,

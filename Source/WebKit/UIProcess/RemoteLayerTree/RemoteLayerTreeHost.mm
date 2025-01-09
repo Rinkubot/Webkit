@@ -207,6 +207,10 @@ bool RemoteLayerTreeHost::updateLayerTree(const IPC::Connection& connection, con
             rootNode->addToHostingNode(*remoteRootNode);
     }
 
+#if ENABLE(THREADED_ANIMATION_RESOLUTION)
+    bool hasFoundNodeWithChangedAnimations = false;
+#endif
+
     for (auto& changedLayer : transaction.changedLayerProperties()) {
         auto layerID = changedLayer.key;
         const auto& properties = *changedLayer.value;
@@ -222,6 +226,13 @@ bool RemoteLayerTreeHost::updateLayerTree(const IPC::Connection& connection, con
 
         if (properties.changedProperties.contains(LayerChange::ClonedContentsChanged) && properties.clonedLayerID)
             clonesToUpdate.append({ layerID, *properties.clonedLayerID });
+
+#if ENABLE(THREADED_ANIMATION_RESOLUTION)
+        if (!hasFoundNodeWithChangedAnimations && properties.changedProperties.contains(LayerChange::AnimationsChanged)) {
+            hasFoundNodeWithChangedAnimations = true;
+            m_drawingArea->clearAnimationTimelines();
+        }
+#endif
 
         RemoteLayerTreePropertyApplier::applyProperties(*node, this, properties, m_nodes, layerContentsType);
 
@@ -515,16 +526,6 @@ void RemoteLayerTreeHost::animationsWereAddedToNode(RemoteLayerTreeNode& node)
 void RemoteLayerTreeHost::animationsWereRemovedFromNode(RemoteLayerTreeNode& node)
 {
     m_drawingArea->animationsWereRemovedFromNode(node);
-}
-
-Seconds RemoteLayerTreeHost::acceleratedTimelineTimeOrigin(WebCore::ProcessIdentifier processIdentifier) const
-{
-    return m_drawingArea->acceleratedTimelineTimeOrigin(processIdentifier);
-}
-
-MonotonicTime RemoteLayerTreeHost::animationCurrentTime(WebCore::ProcessIdentifier processIdentifier) const
-{
-    return m_drawingArea->animationCurrentTime(processIdentifier);
 }
 #endif
 
