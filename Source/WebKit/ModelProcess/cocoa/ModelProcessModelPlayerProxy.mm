@@ -35,8 +35,6 @@
 #import "ModelProcessModelPlayerMessages.h"
 #import "RealityKitBridging.h"
 #import "WKModelProcessModelLayer.h"
-#import <RealitySystemSupport/RealitySystemSupport.h>
-#import <SurfBoardServices/SurfBoardServices.h>
 #import <WebCore/Color.h>
 #import <WebCore/LayerHostingContextIdentifier.h>
 #import <WebCore/Model.h>
@@ -55,8 +53,6 @@
 #import <wtf/RetainPtr.h>
 #import <wtf/TZoneMallocInlines.h>
 #import <wtf/text/TextStream.h>
-
-#import "WebKitSwiftSoftLink.h"
 
 @interface WKModelProcessModelPlayerProxyObjCAdapter : NSObject<WKSRKEntityDelegate>
 - (instancetype)initWithModelProcessModelPlayerProxy:(NakedRef<WebKit::ModelProcessModelPlayerProxy>)modelProcessModelPlayerProxy;
@@ -81,6 +77,17 @@
 }
 
 @end
+
+#if PLATFORM(VISION)
+#import <RealitySystemSupport/RealitySystemSupport.h>
+#import <SurfBoardServices/SurfBoardServices.h>
+#endif
+
+#import "WebKitSwiftSoftLink.h"
+
+#if !PLATFORM(VISION) && __has_include(<pal/cocoa/CoreRESoftLink.h>)
+#include <pal/cocoa/CoreRESoftLink.h>
+#endif
 
 namespace WebKit {
 
@@ -324,10 +331,12 @@ void ModelProcessModelPlayerProxy::animationPlaybackStateDidUpdate()
 }
 // MARK: - WebCore::RELoaderClient
 
+#if PLATFORM(VISION)
 static RECALayerService *webDefaultLayerService(void)
 {
     return REServiceLocatorGetCALayerService(REEngineGetServiceLocator(REEngineGetShared()));
 }
+#endif
 
 void ModelProcessModelPlayerProxy::didFinishLoading(WebCore::REModelLoader& loader, Ref<WebCore::REModel> model)
 {
@@ -346,9 +355,12 @@ void ModelProcessModelPlayerProxy::didFinishLoading(WebCore::REModelLoader& load
     REPtr<REEntityRef> hostingEntity = adoptRE(REEntityCreate());
     REEntitySetName(hostingEntity.get(), "WebKit:EntityWithRootComponent");
 
+#if PLATFORM(VISION)
     REPtr<REComponentRef> layerComponent = adoptRE(RECALayerServiceCreateRootComponent(webDefaultLayerService(), CALayerGetContext(m_layer.get()), hostingEntity.get(), nil));
+#endif
     RESceneAddEntity(m_scene.get(), hostingEntity.get());
 
+#if PLATFORM(VISION)
     CALayer *contextEntityLayer = RECALayerClientComponentGetCALayer(layerComponent.get());
     [contextEntityLayer setSeparatedState:kCALayerSeparatedStateSeparated];
 
@@ -357,6 +369,7 @@ void ModelProcessModelPlayerProxy::didFinishLoading(WebCore::REModelLoader& load
     auto clientComponent = RECALayerGetCALayerClientComponent(m_layer.get());
     auto clientComponentEntity = REComponentGetEntity(clientComponent);
     REEntitySetName(clientComponentEntity, "WebKit:ClientComponentEntity");
+#endif
     REEntitySetName(m_model->rootEntity(), "WebKit:ModelRootEntity");
 
     // FIXME: Clipping workaround for rdar://125188888 (blocked by rdar://123516357 -> rdar://124718417).
@@ -366,7 +379,9 @@ void ModelProcessModelPlayerProxy::didFinishLoading(WebCore::REModelLoader& load
     REPtr<REEntityRef> containerEntity = adoptRE(REEntityCreate());
     REEntitySetName(containerEntity.get(), "WebKit:ContainerEntity");
 
+#if PLATFORM(VISION)
     REEntitySetParent(containerEntity.get(), clientComponentEntity);
+#endif
     REEntitySetParent(m_model->rootEntity(), containerEntity.get());
 
     REEntitySubtreeAddNetworkComponentRecursive(containerEntity.get());
@@ -379,8 +394,10 @@ void ModelProcessModelPlayerProxy::didFinishLoading(WebCore::REModelLoader& load
         simd_make_float3(clippingBoxHalfSize, clippingBoxHalfSize, 0) };
     REClippingPrimitiveComponentClipToBox(clipComponent, clipBounds);
 
+#if PLATFORM(VISION)
     RENetworkMarkEntityMetadataDirty(clientComponentEntity);
     RENetworkMarkEntityMetadataDirty(m_model->rootEntity());
+#endif
 
     updateBackgroundColor();
     computeTransform();
