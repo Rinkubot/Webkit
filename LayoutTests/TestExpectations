@@ -450,7 +450,6 @@ imported/w3c/web-platform-tests/service-workers/service-worker/dedicated-worker-
 webkit.org/b/201665 imported/w3c/web-platform-tests/service-workers/service-worker/fetch-canvas-tainting-video.https.html [ Skip ]
 imported/w3c/web-platform-tests/service-workers/service-worker/multipart-image.https.html [ Skip ]
 imported/w3c/web-platform-tests/service-workers/service-worker/worker-in-sandboxed-iframe-by-csp-fetch-event.https.html [ Skip ]
-imported/w3c/web-platform-tests/service-workers/service-worker/fetch-event-worker-timing-frame.tentative.https.html [ Skip ]
 imported/w3c/web-platform-tests/service-workers/service-worker/claim-worker-fetch.https.html [ Skip ]
 imported/w3c/web-platform-tests/service-workers/service-worker/client-navigate.https.html [ Skip ]
 imported/w3c/web-platform-tests/service-workers/service-worker/update-bytecheck-cors-import.https.html [ Skip ]
