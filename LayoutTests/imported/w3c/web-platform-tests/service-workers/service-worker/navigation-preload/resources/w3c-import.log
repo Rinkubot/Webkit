@@ -31,4 +31,7 @@ List of files:
 /LayoutTests/imported/w3c/web-platform-tests/service-workers/service-worker/navigation-preload/resources/request-headers-worker.js
 /LayoutTests/imported/w3c/web-platform-tests/service-workers/service-worker/navigation-preload/resources/resource-timing-scope.py
 /LayoutTests/imported/w3c/web-platform-tests/service-workers/service-worker/navigation-preload/resources/resource-timing-worker.js
+/LayoutTests/imported/w3c/web-platform-tests/service-workers/service-worker/navigation-preload/resources/samesite-iframe.html
+/LayoutTests/imported/w3c/web-platform-tests/service-workers/service-worker/navigation-preload/resources/samesite-sw-helper.html
+/LayoutTests/imported/w3c/web-platform-tests/service-workers/service-worker/navigation-preload/resources/samesite-worker.js
 /LayoutTests/imported/w3c/web-platform-tests/service-workers/service-worker/navigation-preload/resources/wait-for-activate-worker.js
