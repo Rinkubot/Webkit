@@ -25,11 +25,15 @@
 
 #pragma once
 
+#include "CloseWatcher.h"
 #include "HTMLElement.h"
 #include "ToggleEventTask.h"
 
 namespace WebCore {
 
+class Event;
+class EventListener;
+class ScriptExecutionContext;
 class ToggleEventTask;
 
 class HTMLDialogElement final : public HTMLElement {
@@ -60,6 +64,19 @@ public:
     void queueDialogToggleEventTask(ToggleState oldState, ToggleState newState);
 
 private:
+    class DialogCloseWatcherEventListener final : public EventListener {
+    public:
+        static Ref<DialogCloseWatcherEventListener> create(HTMLDialogElement& dialog)
+        {
+            return adoptRef(*new DialogCloseWatcherEventListener(dialog));
+        }
+        void handleEvent(ScriptExecutionContext&, Event&) final;
+    private:
+        explicit DialogCloseWatcherEventListener(HTMLDialogElement&);
+
+        WeakPtr<HTMLDialogElement, WeakPtrImplWithEventTargetData> m_dialog;
+    };
+
     HTMLDialogElement(const QualifiedName&, Document&);
 
     void removedFromAncestor(RemovalType, ContainerNode& oldParentOfRemovedTree) final;
@@ -69,6 +86,7 @@ private:
     String m_returnValue;
     bool m_isModal { false };
     WeakPtr<Element, WeakPtrImplWithEventTargetData> m_previouslyFocusedElement;
+    RefPtr<CloseWatcher> m_closeWatcher;
 
     RefPtr<ToggleEventTask> m_toggleEventTask;
 };
