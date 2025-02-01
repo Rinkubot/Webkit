@@ -1624,6 +1624,21 @@ StyleMedia& LocalDOMWindow::styleMedia()
 
 Ref<CSSStyleDeclaration> LocalDOMWindow::getComputedStyle(Element& element, const String& pseudoElt) const
 {
+    if (!element.isConnected() || element.hasDisplayNone() || element.shadowRoot())
+        return CSSComputedStyleDeclaration::createEmpty(element);
+
+    for (Node* ancestor = element.parentElement(); ancestor; ancestor = ancestor->parentNode()) {
+        if (ancestor->shadowRoot())
+            return CSSComputedStyleDeclaration::createEmpty(element);
+    }
+
+    if (element.renderer()) {
+        auto& frame = element.renderer()->frame();
+        auto* ownerElement = frame.ownerElement();
+        if (ownerElement && !ownerElement->renderer())
+            return CSSComputedStyleDeclaration::createEmpty(element);
+    }
+
     if (!pseudoElt.startsWith(':'))
         return CSSComputedStyleDeclaration::create(element, std::nullopt);
 
