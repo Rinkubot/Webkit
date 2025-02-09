@@ -175,7 +175,7 @@ void PingLoad::didReceiveResponse(ResourceResponse&& response, NegotiatedLegacyT
     didFinish({ }, response);
 }
 
-void PingLoad::didReceiveData(const SharedBuffer&)
+void PingLoad::didReceiveData(const SharedBuffer&, uint64_t)
 {
     PING_RELEASE_LOG("didReceiveData");
     ASSERT_NOT_REACHED();

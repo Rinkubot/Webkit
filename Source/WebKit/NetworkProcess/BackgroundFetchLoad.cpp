@@ -178,7 +178,7 @@ void BackgroundFetchLoad::didReceiveResponse(ResourceResponse&& response, Negoti
     m_client->didReceiveResponse(WTFMove(response));
 }
 
-void BackgroundFetchLoad::didReceiveData(const SharedBuffer& data)
+void BackgroundFetchLoad::didReceiveData(const SharedBuffer& data, uint64_t)
 {
     BGLOAD_RELEASE_LOG("didReceiveData");
     m_client->didReceiveResponseBodyChunk(data);

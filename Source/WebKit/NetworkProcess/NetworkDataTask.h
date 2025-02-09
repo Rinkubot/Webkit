@@ -67,7 +67,7 @@ public:
     virtual void didReceiveChallenge(WebCore::AuthenticationChallenge&&, NegotiatedLegacyTLS, ChallengeCompletionHandler&&) = 0;
     virtual void didReceiveInformationalResponse(WebCore::ResourceResponse&&) { };
     virtual void didReceiveResponse(WebCore::ResourceResponse&&, NegotiatedLegacyTLS, PrivateRelayed, ResponseCompletionHandler&&) = 0;
-    virtual void didReceiveData(const WebCore::SharedBuffer&) = 0;
+    virtual void didReceiveData(const WebCore::SharedBuffer&, uint64_t encodedDataLength) = 0;
     virtual void didCompleteWithError(const WebCore::ResourceError&, const WebCore::NetworkLoadMetrics&) = 0;
     virtual void didSendData(uint64_t totalBytesSent, uint64_t totalBytesExpectedToSend) = 0;
     virtual void wasBlocked() = 0;

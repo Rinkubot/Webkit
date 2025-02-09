@@ -1139,10 +1139,8 @@ void NetworkResourceLoader::didFinishLoading(const NetworkLoadMetrics& networkLo
     if (isSynchronous())
         sendReplyToSynchronousRequest(*m_synchronousLoadData, m_bufferedData.get().get(), networkLoadMetrics);
     else {
-        if (!m_bufferedData.isEmpty()) {
-            // FIXME: Pass a real value or remove the encoded data size feature.
-            sendBuffer(*m_bufferedData.get(), -1);
-        }
+        if (!m_bufferedData.isEmpty())
+            sendBuffer(*m_bufferedData.get(), 0);
 #if ENABLE(CONTENT_FILTERING)
         if (m_contentFilter) {
             if (!m_contentFilter->continueAfterNotifyFinished(m_parameters.request.url()))
@@ -1726,7 +1724,7 @@ void NetworkResourceLoader::sendResultForCacheEntry(std::unique_ptr<NetworkCache
 #endif
 
     RefPtr buffer = entry->protectedBuffer();
-    sendBuffer(*buffer, buffer->size());
+    sendBuffer(*buffer, 0);
 #if ENABLE(CONTENT_FILTERING)
     if (m_contentFilter) {
         m_contentFilter->continueAfterNotifyFinished(m_parameters.request.url());

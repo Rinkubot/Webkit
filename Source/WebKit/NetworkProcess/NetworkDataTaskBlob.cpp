@@ -396,7 +396,7 @@ void NetworkDataTaskBlob::consumeData(std::span<const uint8_t> data)
                 return;
         } else {
             ASSERT(m_client);
-            m_client->didReceiveData(SharedBuffer::create(data));
+            m_client->didReceiveData(SharedBuffer::create(data), 0);
         }
     }
 

@@ -393,12 +393,12 @@ void NetworkDataTaskCocoa::didCompleteWithError(const WebCore::ResourceError& er
         m_client->didCompleteWithError(error, networkLoadMetrics);
 }
 
-void NetworkDataTaskCocoa::didReceiveData(const WebCore::SharedBuffer& data)
+void NetworkDataTaskCocoa::didReceiveData(const WebCore::SharedBuffer& data, uint64_t encodedDataLength)
 {
     WTFEmitSignpost(m_task.get(), DataTask, "received %zd bytes", data.size());
 
     if (m_client)
-        m_client->didReceiveData(data);
+        m_client->didReceiveData(data, encodedDataLength);
 }
 
 void NetworkDataTaskCocoa::didReceiveResponse(WebCore::ResourceResponse&& response, NegotiatedLegacyTLS negotiatedLegacyTLS, PrivateRelayed privateRelayed, WebKit::ResponseCompletionHandler&& completionHandler)

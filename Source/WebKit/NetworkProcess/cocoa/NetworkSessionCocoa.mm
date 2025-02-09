@@ -1164,7 +1164,7 @@ ALLOW_DEPRECATED_DECLARATIONS_END
 - (void)URLSession:(NSURLSession *)session dataTask:(NSURLSessionDataTask *)dataTask didReceiveData:(NSData *)data
 {
     if (auto networkDataTask = [self existingTask:dataTask])
-        networkDataTask->didReceiveData(WebCore::SharedBuffer::create(data));
+        networkDataTask->didReceiveData(WebCore::SharedBuffer::create(data), data.length);
 }
 
 - (void)URLSession:(NSURLSession *)nsSession downloadTask:(NSURLSessionDownloadTask *)downloadTask didFinishDownloadingToURL:(NSURL *)location
@@ -2043,7 +2043,7 @@ private:
         });
     }
 
-    void didReceiveData(const WebCore::SharedBuffer& buffer)
+    void didReceiveData(const WebCore::SharedBuffer& buffer, uint64_t)
     {
         if (!m_connection)
             return;
@@ -2106,7 +2106,7 @@ void NetworkSessionCocoa::loadImageForDecoding(WebCore::ResourceRequest&& reques
         {
             completionHandler(WebCore::PolicyAction::Use);
         }
-        void didReceiveData(const WebCore::SharedBuffer& buffer) final
+        void didReceiveData(const WebCore::SharedBuffer& buffer, uint64_t) final
         {
             m_buffer.append(buffer);
             if (m_buffer.size() > m_maximumBytesFromNetwork)

@@ -211,7 +211,7 @@ void NetworkDataTaskCurl::curlDidReceiveData(CurlRequest&, Ref<SharedBuffer>&& b
         return;
     }
 
-    m_client->didReceiveData(buffer.get());
+    m_client->didReceiveData(buffer.get(), buffer->size());
 }
 
 void NetworkDataTaskCurl::curlDidComplete(CurlRequest&, NetworkLoadMetrics&& networkLoadMetrics)
