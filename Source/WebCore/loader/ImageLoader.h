@@ -83,8 +83,6 @@ public:
 
     void setLoadManually(bool loadManually) { m_loadManually = loadManually; }
 
-    // FIXME: Delete this code. beforeload event no longer exists.
-    bool hasPendingBeforeLoadEvent() const { return m_hasPendingBeforeLoadEvent; }
     bool hasPendingActivity() const;
 
     void dispatchPendingEvent(ImageEventSender*, const AtomString& eventType);
@@ -110,7 +108,6 @@ private:
     void updatedHasPendingEvent();
     void didUpdateCachedImage(RelevantMutation, CachedResourceHandle<CachedImage>&&);
 
-    void dispatchPendingBeforeLoadEvent();
     void dispatchPendingLoadEvent();
     void dispatchPendingErrorEvent();
 
@@ -136,7 +133,6 @@ private:
     AtomString m_failedLoadURL;
     AtomString m_pendingURL;
     Vector<RefPtr<DeferredPromise>> m_decodingPromises;
-    bool m_hasPendingBeforeLoadEvent : 1;
     bool m_hasPendingLoadEvent : 1;
     bool m_hasPendingErrorEvent : 1;
     bool m_imageComplete : 1;
