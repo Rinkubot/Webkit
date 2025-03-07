@@ -83,17 +83,17 @@ CloseWatcher::CloseWatcher(Document& document)
 
 void CloseWatcher::requestClose()
 {
-    requestToClose();
+    requestToClose(RequireHistoryActionActivation::No);
 }
 
-bool CloseWatcher::requestToClose()
+bool CloseWatcher::requestToClose(RequireHistoryActionActivation requireHistoryActionActivation)
 {
     if (!canBeClosed())
         return true;
 
     RefPtr document = dynamicDowncast<Document>(scriptExecutionContext());
     Ref manager = document->protectedWindow()->closeWatcherManager();
-    bool canPreventClose = manager->canPreventClose() && document->protectedWindow()->hasHistoryActionActivation();
+    bool canPreventClose = requireHistoryActionActivation == RequireHistoryActionActivation::No || (manager->canPreventClose() && document->protectedWindow()->hasHistoryActionActivation());
     Ref cancelEvent = Event::create(eventNames().cancelEvent, Event::CanBubble::No, canPreventClose ? Event::IsCancelable::Yes : Event::IsCancelable::No);
     m_isRunningCancelAction = true;
     dispatchEvent(cancelEvent);

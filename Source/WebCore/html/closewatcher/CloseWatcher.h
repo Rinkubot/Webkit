@@ -36,6 +36,8 @@ namespace WebCore {
 
 class KeyboardEvent;
 
+enum class RequireHistoryActionActivation : bool { No, Yes };
+
 class CloseWatcher final : public RefCounted<CloseWatcher>, public EventTarget, public ActiveDOMObject {
     WTF_MAKE_TZONE_ALLOCATED(CloseWatcher);
 public:
@@ -50,7 +52,7 @@ public:
     bool isActive() const { return m_active; }
 
     void requestClose();
-    bool requestToClose();
+    bool requestToClose(RequireHistoryActionActivation = RequireHistoryActionActivation::Yes);
     void close();
     void destroy();
 
