@@ -97,6 +97,9 @@ Builder::Builder(RenderStyle& style, BuilderContext&& context, const MatchResult
     : m_cascade(matchResult, cascadeLevel, includedProperties, animatedPropertes, positionTryFallbackProperties(context))
     , m_state(*this, style, WTFMove(context))
 {
+    applyProperty(CSSPropertyAppearance);
+    if (m_state.style().appearance() == StyleAppearance::Base)
+        m_cascade.addBaseAppearanceStyles();
 }
 
 Builder::~Builder() = default;

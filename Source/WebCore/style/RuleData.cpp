@@ -166,17 +166,17 @@ static inline PropertyAllowlist determinePropertyAllowlist(const CSSSelector* se
     return PropertyAllowlist::None;
 }
 
-RuleData::RuleData(const StyleRule& styleRule, unsigned selectorIndex, unsigned selectorListIndex, unsigned position, IsStartingStyle isStartingStyle)
+RuleData::RuleData(const StyleRule& styleRule, unsigned selectorIndex, unsigned selectorListIndex, unsigned position, OptionSet<UsedRuleType> usedRuleTypes)
     : m_styleRuleWithSelectorIndex(&styleRule, static_cast<uint16_t>(selectorIndex))
     , m_selectorListIndex(selectorListIndex)
-    , m_position(position)
     , m_matchBasedOnRuleHash(enumToUnderlyingType(computeMatchBasedOnRuleHash(*selector())))
     , m_canMatchPseudoElement(selectorCanMatchPseudoElement(*selector()))
     , m_containsUncommonAttributeSelector(computeContainsUncommonAttributeSelector(*selector()))
     , m_linkMatchType(SelectorChecker::determineLinkMatchType(selector()))
     , m_propertyAllowlist(enumToUnderlyingType(determinePropertyAllowlist(selector())))
-    , m_isStartingStyle(enumToUnderlyingType(isStartingStyle))
+    , m_usedRuleTypes(usedRuleTypes.toRaw())
     , m_isEnabled(true)
+    , m_position(position)
     , m_descendantSelectorIdentifierHashes(SelectorFilter::collectHashes(*selector()))
 {
     ASSERT(m_position == position);
