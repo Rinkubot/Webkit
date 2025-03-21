@@ -275,7 +275,7 @@ void WebProcessPool::setMediaAccessibilityPreferences(WebProcessProxy& process)
     static dispatch_queue_t mediaAccessibilityQueue;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        mediaAccessibilityQueue = dispatch_queue_create("MediaAccessibility queue", DISPATCH_QUEUE_SERIAL);
+        mediaAccessibilityQueue = dispatch_queue_create("MediaAccessibility queue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
     });
 
     dispatch_async(mediaAccessibilityQueue, [weakProcess = WeakPtr { process }] {

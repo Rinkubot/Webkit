@@ -52,7 +52,7 @@
     if (!(self = [super init]))
         return nil;
 
-    _deviceObserverTokenQueue = adoptOSObject(dispatch_queue_create("WKMouseDeviceObserver _deviceObserverTokenQueue", DISPATCH_QUEUE_SERIAL));
+    _deviceObserverTokenQueue = adoptOSObject(dispatch_queue_create("WKMouseDeviceObserver _deviceObserverTokenQueue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL));
 
     return self;
 }

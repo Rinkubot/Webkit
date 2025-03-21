@@ -4065,6 +4065,14 @@ def check_language(filename, clean_lines, line_number, file_extension, include_s
         error(line_number, 'runtime/dispatch_set_target_queue', 5,
               'Never use dispatch_set_target_queue.  Use dispatch_queue_create_with_target instead.')
 
+    if search(r'\bDISPATCH_QUEUE_SERIAL\b', line):
+        error(line_number, 'runtime/dispatch_queue_serial', 5,
+              'Use DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL instead of DISPATCH_QUEUE_SERIAL so each work item gets its own autorelease pool.')
+
+    if search(r'\bDISPATCH_QUEUE_CONCURRENT\b', line):
+        error(line_number, 'runtime/dispatch_queue_concurrent', 5,
+              'Use DISPATCH_QUEUE_CONCURRENT_WITH_AUTORELEASE_POOL instead of DISPATCH_QUEUE_CONCURRENT so each work item gets its own autorelease pool.')
+
     matched = search(r'\b(RetainPtr<.*)', line)
     if matched:
         match_line = matched.group(1)

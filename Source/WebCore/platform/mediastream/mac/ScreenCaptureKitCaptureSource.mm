@@ -657,7 +657,7 @@ void ScreenCaptureKitCaptureSource::streamDidOutputVideoSampleBuffer(RetainPtr<C
 dispatch_queue_t ScreenCaptureKitCaptureSource::captureQueue()
 {
     if (!m_captureQueue)
-        m_captureQueue = adoptOSObject(dispatch_queue_create("CGDisplayStreamCaptureSource Capture Queue", DISPATCH_QUEUE_SERIAL));
+        m_captureQueue = adoptOSObject(dispatch_queue_create("CGDisplayStreamCaptureSource Capture Queue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL));
 
     return m_captureQueue.get();
 }

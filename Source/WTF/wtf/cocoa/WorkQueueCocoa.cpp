@@ -80,7 +80,7 @@ WorkQueueBase::WorkQueueBase(OSObjectPtr<dispatch_queue_t>&& dispatchQueue)
 
 void WorkQueueBase::platformInitialize(ASCIILiteral name, Type type, QOS qos)
 {
-    dispatch_queue_attr_t attr = type == Type::Concurrent ? DISPATCH_QUEUE_CONCURRENT : DISPATCH_QUEUE_SERIAL;
+    dispatch_queue_attr_t attr = type == Type::Concurrent ? DISPATCH_QUEUE_CONCURRENT_WITH_AUTORELEASE_POOL : DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL;
     attr = dispatch_queue_attr_make_with_qos_class(attr, Thread::dispatchQOSClass(qos), 0);
     m_dispatchQueue = adoptOSObject(dispatch_queue_create(name, attr));
     dispatch_set_context(m_dispatchQueue.get(), this);

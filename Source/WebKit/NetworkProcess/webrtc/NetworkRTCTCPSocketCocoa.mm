@@ -52,7 +52,7 @@ static dispatch_queue_t tcpSocketQueue()
     static dispatch_queue_t queue;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        queue = dispatch_queue_create("WebRTC TCP socket queue", DISPATCH_QUEUE_CONCURRENT);
+        queue = dispatch_queue_create("WebRTC TCP socket queue", DISPATCH_QUEUE_CONCURRENT_WITH_AUTORELEASE_POOL);
     });
     return queue;
 }

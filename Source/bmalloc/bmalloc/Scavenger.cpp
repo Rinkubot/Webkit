@@ -79,7 +79,7 @@ Scavenger::Scavenger(const LockHolder&)
     BASSERT(!Environment::get()->isDebugHeapEnabled());
 
 #if BOS(DARWIN)
-    auto queue = dispatch_queue_create("WebKit Malloc Memory Pressure Handler", DISPATCH_QUEUE_SERIAL);
+    auto queue = dispatch_queue_create("WebKit Malloc Memory Pressure Handler", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
     m_pressureHandlerDispatchSource = dispatch_source_create(DISPATCH_SOURCE_TYPE_MEMORYPRESSURE, 0, DISPATCH_MEMORYPRESSURE_CRITICAL, queue);
     dispatch_source_set_event_handler(m_pressureHandlerDispatchSource, ^{
         scavenge();

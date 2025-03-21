@@ -1885,11 +1885,25 @@ class CppStyleTest(CppStyleTestBase):
     def test_dispatch_set_target_queue(self):
         self.assert_lint(
             '''\
-            globalQueue = dispatch_queue_create("My Serial Queue", DISPATCH_QUEUE_SERIAL);
+            globalQueue = dispatch_queue_create("My Serial Queue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
             dispatch_set_target_queue(globalQueue, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0));''',
             'Never use dispatch_set_target_queue.  Use dispatch_queue_create_with_target instead.'
             '  [runtime/dispatch_set_target_queue] [5]')
-        self.assert_lint('globalQueue = dispatch_queue_create_with_target("My Serial Queue", DISPATCH_QUEUE_SERIAL, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0));', '')
+        self.assert_lint('globalQueue = dispatch_queue_create_with_target("My Serial Queue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL, dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0));', '')
+
+    def test_dispatch_queue_serial_without_autorelease_pool(self):
+        self.assert_lint(
+            'globalQueue = dispatch_queue_create(0, DISPATCH_QUEUE_SERIAL)',
+            'Use DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL instead of DISPATCH_QUEUE_SERIAL so each work item gets its own autorelease pool.'
+            '  [runtime/dispatch_queue_serial] [4]')
+        self.assert_lint('globalQueue = dispatch_queue_create(0, DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL)', '')
+
+    def test_dispatch_queue_concurrent_without_autorelease_pool(self):
+        self.assert_lint(
+            'globalQueue = dispatch_queue_create(0, DISPATCH_QUEUE_CONCURRENT)'
+            'Use DISPATCH_QUEUE_CONCURRENT_WITH_AUTORELEASE_POOL instead of DISPATCH_QUEUE_CONCURRENT so each work item gets its own autorelease pool.'
+            '  [runtime/dispatch_queue_concurrent] [4]')
+        self.assert_lint('globalQueue = dispatch_queue_create(0, DISPATCH_QUEUE_CONCURRENT_WITH_AUTORELEASE_POOL)', '')
 
     def test_retainptr_pointer(self):
         self.assert_lint(

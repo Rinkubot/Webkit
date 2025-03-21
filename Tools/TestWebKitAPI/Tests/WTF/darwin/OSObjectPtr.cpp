@@ -47,7 +47,7 @@ namespace TestWebKitAPI {
 
 TEST(OS_OBJECT_PTR_TEST_NAME, AdoptOSObject)
 {
-    OSObjectPtr<dispatch_queue_t> foo = adoptOSObject(dispatch_queue_create(0, DISPATCH_QUEUE_SERIAL));
+    OSObjectPtr<dispatch_queue_t> foo = adoptOSObject(dispatch_queue_create(0, DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL));
     uintptr_t fooPtr;
     AUTORELEASEPOOL_FOR_ARC_DEBUG {
         fooPtr = reinterpret_cast<uintptr_t>(foo.get());
@@ -57,7 +57,7 @@ TEST(OS_OBJECT_PTR_TEST_NAME, AdoptOSObject)
 
 TEST(OS_OBJECT_PTR_TEST_NAME, RetainRelease)
 {
-    dispatch_queue_t foo = dispatch_queue_create(0, DISPATCH_QUEUE_SERIAL);
+    dispatch_queue_t foo = dispatch_queue_create(0, DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
     auto fooPtr = reinterpret_cast<uintptr_t>(foo);
     EXPECT_EQ(1, CFGetRetainCount((CFTypeRef)fooPtr));
 
@@ -76,7 +76,7 @@ TEST(OS_OBJECT_PTR_TEST_NAME, RetainRelease)
 
 TEST(OS_OBJECT_PTR_TEST_NAME, LeakRef)
 {
-    OSObjectPtr<dispatch_queue_t> foo = adoptOSObject(dispatch_queue_create(0, DISPATCH_QUEUE_SERIAL));
+    OSObjectPtr<dispatch_queue_t> foo = adoptOSObject(dispatch_queue_create(0, DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL));
     uintptr_t fooPtr;
     AUTORELEASEPOOL_FOR_ARC_DEBUG {
         fooPtr = reinterpret_cast<uintptr_t>(foo.get());

@@ -123,7 +123,7 @@ static dispatch_queue_t globalOutputDelegateQueue()
     static dispatch_queue_t globalQueue;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
-        globalQueue = dispatch_queue_create("WebQueuedVideoOutputDelegate queue", DISPATCH_QUEUE_SERIAL);
+        globalQueue = dispatch_queue_create("WebQueuedVideoOutputDelegate queue", DISPATCH_QUEUE_SERIAL_WITH_AUTORELEASE_POOL);
     });
     return globalQueue;
 }
