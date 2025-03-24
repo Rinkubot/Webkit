@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006-2008, 2016 Apple Inc.  All rights reserved.
+ * Copyright (C) 2024 Igalia S.L.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -20,17 +20,23 @@
  * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
  * OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
  * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "config.h"
+#pragma once
+
 #include "FontCascade.h"
 
 namespace WebCore {
 
-bool FontCascade::canUseGlyphDisplayList(const RenderStyle&)
+inline constexpr bool FontCascade::canReturnFallbackFontsForComplexText()
 {
-    return true;
+    return false;
 }
 
-} // namespace WebCore
+inline constexpr bool FontCascade::canExpandAroundIdeographsInComplexText()
+{
+    return false;
+}
+
+}

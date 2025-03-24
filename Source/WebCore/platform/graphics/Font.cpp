@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2005-2023 Apple Inc. All rights reserved.
+ * Copyright (C) 2005-2025 Apple Inc. All rights reserved.
  * Copyright (C) 2006 Alexey Proskuryakov
  *
  * Redistribution and use in source and binary forms, with or without
@@ -175,7 +175,7 @@ void Font::platformGlyphInit()
     } else
         m_fontMetrics.setIdeogramWidth(platformData().size());
 
-    m_spaceWidth = widthForGlyph(m_spaceGlyph, SyntheticBoldInclusion::Exclude); // spaceWidth() handles adding in the synthetic bold.
+    m_spaceWidth = widthForGlyph<Font::SyntheticBoldInclusion::Exclude>(m_spaceGlyph); // spaceWidth() handles adding in the synthetic bold.
     auto amountToAdjustLineGap = std::min(m_fontMetrics.lineGap(), 0.0f);
     m_fontMetrics.setLineGap(m_fontMetrics.lineGap() - amountToAdjustLineGap);
     m_fontMetrics.setLineSpacing(m_fontMetrics.lineSpacing() - amountToAdjustLineGap);

@@ -29,6 +29,7 @@
 #include "DisplayListRecorderImpl.h"
 #include "FloatRect.h"
 #include "FontCache.h"
+#include "FontCascadeInlines.h"
 #include "GlyphBuffer.h"
 #include "GraphicsContext.h"
 #include "LayoutRect.h"
@@ -313,7 +314,7 @@ float FontCascade::width(const TextRun& run, SingleThreadWeakHashSet<const Font>
     CodePath codePathToUse = codePath(run);
     if (codePathToUse != CodePath::Complex) {
         // The complex path is more restrictive about returning fallback fonts than the simple path, so we need an explicit test to make their behaviors match.
-        if (!canReturnFallbackFontsForComplexText())
+        if constexpr (!canReturnFallbackFontsForComplexText())
             fallbackFonts = nullptr;
         // The simple path can optimize the case where glyph overflow is not observable.
         if (codePathToUse != CodePath::SimpleWithGlyphOverflow && (glyphOverflow && !glyphOverflow->computeBounds))
@@ -339,6 +340,25 @@ float FontCascade::width(const TextRun& run, SingleThreadWeakHashSet<const Font>
         *cacheEntry = result;
     return result;
 }
+
+#if USE(CORE_TEXT)
+template <typename T>
+ALWAYS_INLINE void processCharacterSpan(GlyphBuffer& glyphBuffer, const Font& font, std::span<T> characters)
+{
+    if (characters.size() == 1) {
+        auto glyph = font.glyphForCharacter(characters[0]);
+        glyphBuffer.add(glyph, font, font.widthForGlyph(glyph), 0);
+        return;
+    }
+
+    auto glyphsNeedingMeasurement = font.glyphsForCharacters(characters);
+    auto glyphWidths = font.widthsForGlyphs(glyphsNeedingMeasurement.span());
+
+    for (size_t i = 0; i < glyphsNeedingMeasurement.size(); ++i)
+        glyphBuffer.add(glyphsNeedingMeasurement[i], font, glyphWidths[i], i);
+}
+#endif
+
 NEVER_INLINE float FontCascade::widthForSimpleTextSlow(StringView text, TextDirection textDirection, float* cacheEntry) const
 {
     GlyphBuffer glyphBuffer;
@@ -346,10 +366,14 @@ NEVER_INLINE float FontCascade::widthForSimpleTextSlow(StringView text, TextDire
     ASSERT(!font->syntheticBoldOffset()); // This function should only be called when RenderText::computeCanUseSimplifiedTextMeasuring() returns true, and that function requires no synthetic bold.
 
     auto addGlyphsFromText = [&](GlyphBuffer& glyphBuffer, const Font& font, auto characters) {
+#if USE(CORE_TEXT)
+        processCharacterSpan(glyphBuffer, font, characters);
+#else
         for (size_t i = 0; i < characters.size(); ++i) {
             auto glyph = font.glyphForCharacter(characters[i]);
             glyphBuffer.add(glyph, font, font.widthForGlyph(glyph), i);
         }
+#endif
     };
 
     if (text.is8Bit())

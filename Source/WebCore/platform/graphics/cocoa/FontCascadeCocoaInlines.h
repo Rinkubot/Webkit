@@ -2,7 +2,7 @@
  * Copyright (C) 1999 Lars Knoll (knoll@kde.org)
  *           (C) 1999 Antti Koivisto (koivisto@kde.org)
  *           (C) 2000 Dirk Mueller (mueller@kde.org)
- * Copyright (C) 2003, 2006-2021, 2016 Apple Inc.
+ * Copyright (C) 2025 Apple Inc.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -20,17 +20,16 @@
  * Boston, MA 02110-1301, USA.
  */
 
-#include "config.h"
-#include "FontCascade.h"
+#pragma once
 
 namespace WebCore {
 
-bool FontCascade::canReturnFallbackFontsForComplexText()
+inline constexpr bool FontCascade::canReturnFallbackFontsForComplexText()
 {
     return true;
 }
 
-bool FontCascade::canExpandAroundIdeographsInComplexText()
+inline constexpr bool FontCascade::canExpandAroundIdeographsInComplexText()
 {
     return true;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2024 Apple Inc. All rights reserved.
+ * Copyright (C) 2018-2025 Apple Inc. All rights reserved.
  * Copyright (C) 2014 Google Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -158,9 +158,10 @@ static void fallbackFontsForRunWithIterator(SingleThreadWeakHashSet<const Font>&
                 auto isIgnored = isDefaultIgnorableCodePoint(character);
 
                 // If we include the synthetic bold expansion, then even zero-width glyphs will have their fonts added.
-                if (isNonSpacingMark || glyphData.font->widthForGlyph(glyphData.glyph, Font::SyntheticBoldInclusion::Exclude))
+                if (isNonSpacingMark || glyphData.font->template widthForGlyph<Font::SyntheticBoldInclusion::Exclude>(glyphData.glyph)) {
                     if (!isIgnored)
                         fallbackFonts.add(*glyphData.font);
+                }
             }
         };
         addFallbackFontForCharacterIfApplicable(currentCharacter);

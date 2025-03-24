@@ -23,14 +23,20 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
 
-#include "config.h"
+#pragma once
+
 #include "FontCascade.h"
 
 namespace WebCore {
 
-bool FontCascade::canUseGlyphDisplayList(const RenderStyle&)
+inline constexpr bool FontCascade::canReturnFallbackFontsForComplexText()
 {
     return true;
 }
 
-} // namespace WebCore
+inline constexpr bool FontCascade::canExpandAroundIdeographsInComplexText()
+{
+    return false;
+}
+
+}

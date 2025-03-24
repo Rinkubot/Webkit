@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2003-2023 Apple Inc. All rights reserved.
+ * Copyright (C) 2003-2025 Apple Inc. All rights reserved.
  * Copyright (C) 2008 Holger Hans Peter Freyther
  *
  * This library is free software; you can redistribute it and/or
@@ -25,6 +25,7 @@
 #include "ComposedCharacterClusterTextIterator.h"
 #include "Font.h"
 #include "FontCascade.h"
+#include "FontCascadeInlines.h"
 #include "GlyphBuffer.h"
 #include "Latin1TextIterator.h"
 #include "SurrogatePairAwareTextIterator.h"
@@ -462,11 +463,11 @@ inline void WidthIterator::advanceInternal(TextIterator& textIterator, GlyphBuff
             continue;
         }
 
-        width = Ref { * advanceInternalState.nextRangeFont }->widthForGlyph(glyph, Font::SyntheticBoldInclusion::Exclude); // We apply synthetic bold after shaping, in applyCSSVisibilityRules().
+        width = Ref { * advanceInternalState.nextRangeFont }->widthForGlyph<Font::SyntheticBoldInclusion::Exclude>(glyph); // We apply synthetic bold after shaping, in applyCSSVisibilityRules().
         advanceInternalState.widthOfCurrentFontRange += width;
 
         if (FontCascade::treatAsSpace(characterToWrite))
-            advanceInternalState.charactersTreatedAsSpace.constructAndAppend(advanceInternalState.currentCharacterIndex, characterToWrite == space, characterToWrite == tabCharacter ? width : advanceInternalState.nextRangeFont->spaceWidth(Font::SyntheticBoldInclusion::Exclude));
+            advanceInternalState.charactersTreatedAsSpace.constructAndAppend(advanceInternalState.currentCharacterIndex, characterToWrite == space, characterToWrite == tabCharacter ? width : advanceInternalState.nextRangeFont->spaceWidth<Font::SyntheticBoldInclusion::Exclude>());
 
         if (m_accountForGlyphBounds) {
             bounds = Ref { *advanceInternalState.nextRangeFont }->boundsForGlyph(glyph);
