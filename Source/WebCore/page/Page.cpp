@@ -4172,6 +4172,13 @@ void Page::setUseColorAppearance(bool useDarkAppearance, bool useElevatedUserInt
 
     appearanceDidChange();
 #endif
+
+    forEachRenderableDocument([useDarkAppearance, useElevatedUserInterfaceLevel] (Document& document) {
+        for (auto& image : document.protectedCachedResourceLoader()->allCachedSVGImages()) {
+            if (RefPtr page = image->internalPage())
+                page->setUseColorAppearance(useDarkAppearance, useElevatedUserInterfaceLevel);
+        }
+    });
 }
 
 bool Page::useDarkAppearance() const

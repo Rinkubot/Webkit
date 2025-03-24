@@ -59,6 +59,8 @@ imported/w3c/web-platform-tests/css/css-properties-values-api/ [ Skip ]
 css-custom-properties-api [ Skip ]
 css-typedom [ Skip ]
 css-dark-mode [ Skip ]
+svg/custom/svg-image-dark-mode-dynamic.html [ Skip ]
+svg/custom/svg-image-dark-mode-initial.html [ Skip ]
 
 media/audioSession [ Skip ]
 

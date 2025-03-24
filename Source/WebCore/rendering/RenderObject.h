@@ -393,6 +393,7 @@ public:
     RenderFragmentedFlow* enclosingFragmentedFlow() const;
 
     WEBCORE_EXPORT bool useDarkAppearance() const;
+    bool useSystemDarkAppearance() const final;
     WEBCORE_EXPORT OptionSet<StyleColorOptions> styleColorOptions() const;
 
 #if ASSERT_ENABLED
