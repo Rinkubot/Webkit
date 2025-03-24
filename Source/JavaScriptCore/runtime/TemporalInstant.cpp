@@ -256,19 +256,15 @@ ISO8601::Duration TemporalInstant::difference(JSGlobalObject* globalObject, Temp
 
     std::optional<double> maxIncrement = maximumRoundingIncrement(smallestUnit);
     ASSERT(maxIncrement && *maxIncrement <= 1000); // unbounded increments are impossible with Temporal.Instant
-    unsigned increment = temporalRoundingIncrement(globalObject, options, maxIncrement, false);
+    double incrementDouble = doubleNumberOption(globalObject, options, vm.propertyNames->roundingIncrement, 1);
+    RETURN_IF_EXCEPTION(scope, { });
+    unsigned increment = temporalRoundingIncrement(globalObject, incrementDouble, maxIncrement, false);
     RETURN_IF_EXCEPTION(scope, { });
 
-    Int128 roundedDiff = exactTime().difference(other->exactTime(), increment, smallestUnit, roundingMode);
-    // NOTE: Duration fields are currently doubles, and the total number of
-    // nanoseconds may not fit in a double. This may need to change if the
-    // internal representation of Duration changes.
-    ASSERT(roundedDiff / 1'000'000'000 < INT64_MAX);
-    double seconds { static_cast<double>(static_cast<int64_t>(roundedDiff / 1'000'000'000)) };
-    double nanosecondsRemainder { static_cast<double>(static_cast<int64_t>(roundedDiff % 1'000'000'000)) };
-    ISO8601::Duration result { 0, 0, 0, 0, 0, 0, seconds, 0, 0, nanosecondsRemainder };
-
-    TemporalDuration::balance(result, largestUnit);
+    ISO8601::InternalDuration internalDuration = exactTime().difference(globalObject, other->exactTime(), increment, smallestUnit, roundingMode);
+    RETURN_IF_EXCEPTION(scope, { });
+    ISO8601::Duration result = TemporalDuration::temporalDurationFromInternal(internalDuration, largestUnit);
+    // Omitted step 6 as it's already in order
     return result;
 }
 
@@ -329,10 +325,17 @@ ISO8601::ExactTime TemporalInstant::round(JSGlobalObject* globalObject, JSValue 
     RoundingMode roundingMode = temporalRoundingMode(globalObject, options, RoundingMode::HalfExpand);
     RETURN_IF_EXCEPTION(scope, { });
 
-    double increment = temporalRoundingIncrement(globalObject, options, maximumIncrement(smallestUnit), true);
+    double increment = doubleNumberOption(globalObject, options, vm.propertyNames->roundingIncrement, 1);
+    RETURN_IF_EXCEPTION(scope, { });
+    increment = temporalRoundingIncrement(globalObject, increment, maximumIncrement(smallestUnit), true);
     RETURN_IF_EXCEPTION(scope, { });
 
-    return exactTime().round(increment, smallestUnit, roundingMode);
+    auto result = exactTime().round(increment, smallestUnit, roundingMode);
+    if (!result) {
+        throwRangeError(globalObject, scope, "rounding increment out of range"_s);
+        return { };
+    }
+    return result.value();
 }
 
 // Temporal.Instant.prototype.toString( [ options ] )
@@ -366,7 +369,12 @@ String TemporalInstant::toString(JSGlobalObject* globalObject, JSValue optionsVa
     if (std::get<0>(data.precision) == Precision::Auto && roundingMode == RoundingMode::Trunc)
         return toString(timeZone);
 
-    ISO8601::ExactTime newExactTime { exactTime().round(data.increment, data.unit, roundingMode) };
+    auto maybeRounded = exactTime().round(data.increment, data.unit, roundingMode);
+    if (!maybeRounded) {
+        throwRangeError(globalObject, scope, "rounding increment out of range"_s);
+        return { };
+    }
+    ISO8601::ExactTime newExactTime { maybeRounded.value() };
 
     // FIXME: Missing, relies on TimeZone:
     // 1. Let roundedInstant be ! CreateTemporalInstant(roundedNs).

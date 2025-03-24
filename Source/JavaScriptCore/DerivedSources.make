@@ -222,8 +222,12 @@ OBJECT_LUT_HEADERS = \
     TemporalPlainDatePrototype.lut.h \
     TemporalPlainDateTimeConstructor.lut.h \
     TemporalPlainDateTimePrototype.lut.h \
+    TemporalPlainMonthDayConstructor.lut.h \
+    TemporalPlainMonthDayPrototype.lut.h \
     TemporalPlainTimeConstructor.lut.h \
     TemporalPlainTimePrototype.lut.h \
+    TemporalPlainYearMonthConstructor.lut.h \
+    TemporalPlainYearMonthPrototype.lut.h \
     TemporalTimeZoneConstructor.lut.h \
     TemporalTimeZonePrototype.lut.h \
     WebAssemblyArrayConstructor.lut.h \

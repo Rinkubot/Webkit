@@ -250,8 +250,12 @@
 #include "TemporalPlainDatePrototype.h"
 #include "TemporalPlainDateTime.h"
 #include "TemporalPlainDateTimePrototype.h"
+#include "TemporalPlainMonthDay.h"
+#include "TemporalPlainMonthDayPrototype.h"
 #include "TemporalPlainTime.h"
 #include "TemporalPlainTimePrototype.h"
+#include "TemporalPlainYearMonth.h"
+#include "TemporalPlainYearMonthPrototype.h"
 #include "TemporalTimeZone.h"
 #include "TemporalTimeZonePrototype.h"
 #include "VMTrapsInlines.h"
@@ -1472,11 +1476,25 @@ capitalName ## Constructor* lowerName ## Constructor = featureFlag ? capitalName
                 init.set(TemporalPlainDateTime::createStructure(init.vm, globalObject, plainDateTimePrototype));
             });
 
+        m_plainMonthDayStructure.initLater(
+            [] (const Initializer<Structure>& init) {
+                auto* globalObject = jsCast<JSGlobalObject*>(init.owner);
+                auto* plainMonthDayPrototype = TemporalPlainMonthDayPrototype::create(init.vm, globalObject, TemporalPlainMonthDayPrototype::createStructure(init.vm, globalObject, globalObject->objectPrototype()));
+                init.set(TemporalPlainMonthDay::createStructure(init.vm, globalObject, plainMonthDayPrototype));
+            });
+
         m_plainTimeStructure.initLater(
             [] (const Initializer<Structure>& init) {
                 auto* globalObject = jsCast<JSGlobalObject*>(init.owner);
                 auto* plainTimePrototype = TemporalPlainTimePrototype::create(init.vm, globalObject, TemporalPlainTimePrototype::createStructure(init.vm, globalObject, globalObject->objectPrototype()));
                 init.set(TemporalPlainTime::createStructure(init.vm, globalObject, plainTimePrototype));
+            });
+
+        m_plainYearMonthStructure.initLater(
+            [] (const Initializer<Structure>& init) {
+                auto* globalObject = jsCast<JSGlobalObject*>(init.owner);
+                auto* plainYearMonthPrototype = TemporalPlainYearMonthPrototype::create(init.vm, globalObject, TemporalPlainYearMonthPrototype::createStructure(init.vm, globalObject, globalObject->objectPrototype()));
+                init.set(TemporalPlainYearMonth::createStructure(init.vm, globalObject, plainYearMonthPrototype));
             });
 
         m_timeZoneStructure.initLater(
@@ -2600,7 +2618,9 @@ void JSGlobalObject::visitChildrenImpl(JSCell* cell, Visitor& visitor)
     thisObject->m_instantStructure.visit(visitor);
     thisObject->m_plainDateStructure.visit(visitor);
     thisObject->m_plainDateTimeStructure.visit(visitor);
+    thisObject->m_plainMonthDayStructure.visit(visitor);
     thisObject->m_plainTimeStructure.visit(visitor);
+    thisObject->m_plainYearMonthStructure.visit(visitor);
     thisObject->m_timeZoneStructure.visit(visitor);
 
     visitor.append(thisObject->m_nullGetterFunction);

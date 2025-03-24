@@ -31,7 +31,7 @@
 
 namespace JSC {
 
-class TemporalPlainDate final : public JSNonFinalObject {
+class TemporalPlainMonthDay final : public JSNonFinalObject {
 public:
     using Base = JSNonFinalObject;
 
@@ -41,57 +41,47 @@ public:
         return vm.temporalPlainDateSpace<mode>();
     }
 
-    static TemporalPlainDate* create(VM&, Structure*, ISO8601::PlainDate&&);
-    static TemporalPlainDate* tryCreateIfValid(JSGlobalObject*, Structure*, ISO8601::PlainDate&&);
-    static TemporalPlainDate* tryCreateIfValid(JSGlobalObject*, Structure*, ISO8601::Duration&&);
+    static TemporalPlainMonthDay* create(VM&, Structure*, ISO8601::PlainMonthDay&&);
+    static TemporalPlainMonthDay* tryCreateIfValid(JSGlobalObject*, Structure*, ISO8601::PlainDate&&);
     static Structure* createStructure(VM&, JSGlobalObject*, JSValue);
 
     DECLARE_INFO;
 
-    static ISO8601::PlainDate toPlainDate(JSGlobalObject*, const ISO8601::Duration&);
-    static std::array<std::optional<double>, numberOfTemporalPlainDateUnits> toPartialDate(JSGlobalObject*, JSObject*);
-    static std::array<std::optional<double>, numberOfTemporalPlainYearMonthUnits> toYearMonth(JSGlobalObject*, JSObject*);
+    static ISO8601::PlainMonthDay toPlainMonthDay(JSGlobalObject*, const ISO8601::Duration&);
 
-    static TemporalPlainDate* from(JSGlobalObject*, JSValue, std::variant<JSObject*, TemporalOverflow>);
+    static TemporalPlainMonthDay* from(JSGlobalObject*, JSValue, std::optional<JSValue>);
+    static TemporalPlainMonthDay* from(JSGlobalObject*, WTF::String);
 
     TemporalCalendar* calendar() { return m_calendar.get(this); }
-    ISO8601::PlainDate plainDate() const { return m_plainDate; }
+    ISO8601::PlainMonthDay plainMonthDay() const { return m_plainMonthDay; }
 
-#define JSC_DEFINE_TEMPORAL_PLAIN_DATE_FIELD(name, capitalizedName) \
-    decltype(auto) name() const { return m_plainDate.name(); }
-    JSC_TEMPORAL_PLAIN_DATE_UNITS(JSC_DEFINE_TEMPORAL_PLAIN_DATE_FIELD);
-#undef JSC_DEFINE_TEMPORAL_PLAIN_DATE_FIELD
+#define JSC_DEFINE_TEMPORAL_PLAIN_MONTH_DAY_FIELD(name, capitalizedName) \
+    decltype(auto) name() const { return m_plainMonthDay.name(); }
+    JSC_TEMPORAL_PLAIN_MONTH_DAY_UNITS(JSC_DEFINE_TEMPORAL_PLAIN_MONTH_DAY_FIELD);
+#undef JSC_DEFINE_TEMPORAL_PLAIN_MONTH_DAY_FIELD
 
-    ISO8601::PlainDate with(JSGlobalObject*, JSObject* temporalDateLike, JSValue options);
+    ISO8601::PlainDate with(JSGlobalObject*, JSObject*, JSValue);
 
     String monthCode() const;
-    uint8_t dayOfWeek() const;
-    uint16_t dayOfYear() const;
-    uint8_t weekOfYear() const;
 
     String toString(JSGlobalObject*, JSValue options) const;
     String toString() const
     {
-        return ISO8601::temporalDateToString(m_plainDate);
+        return ISO8601::temporalMonthDayToString(m_plainMonthDay, ""_s);
     }
-
-    ISO8601::Duration until(JSGlobalObject*, TemporalPlainDate*, JSValue options);
-    ISO8601::Duration since(JSGlobalObject*, TemporalPlainDate*, JSValue options);
 
     DECLARE_VISIT_CHILDREN;
 
 private:
-    TemporalPlainDate(VM&, Structure*, ISO8601::PlainDate&&);
+    TemporalPlainMonthDay(VM&, Structure*, ISO8601::PlainMonthDay&&);
     void finishCreation(VM&);
 
     template<typename CharacterType>
-    static std::optional<ISO8601::PlainDate> parse(StringParsingBuffer<CharacterType>&);
-    static ISO8601::PlainDate fromObject(JSGlobalObject*, JSObject*);
+    static std::optional<ISO8601::PlainMonthDay> parse(StringParsingBuffer<CharacterType>&);
+    static ISO8601::PlainMonthDay fromObject(JSGlobalObject*, JSObject*);
 
-    ISO8601::Duration differenceTemporalPlainDate(JSGlobalObject*, bool, TemporalPlainDate*, TemporalUnit, TemporalUnit, RoundingMode, double);
-
-    ISO8601::PlainDate m_plainDate;
-    LazyProperty<TemporalPlainDate, TemporalCalendar> m_calendar;
+    ISO8601::PlainMonthDay m_plainMonthDay;
+    LazyProperty<TemporalPlainMonthDay, TemporalCalendar> m_calendar;
 };
 
 } // namespace JSC

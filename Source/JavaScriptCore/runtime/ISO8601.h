@@ -72,6 +72,8 @@ public:
     template<TemporalUnit unit>
     std::optional<Int128> totalNanoseconds() const;
 
+    int32_t sign() const;
+
     Duration operator-() const
     {
         Duration result(*this);
@@ -85,6 +87,8 @@ public:
 private:
     std::array<double, numberOfTemporalUnits> m_data { };
 };
+
+class InternalDuration;
 
 class ExactTime {
     WTF_MAKE_TZONE_ALLOCATED(ExactTime);
@@ -168,8 +172,8 @@ public:
     }
 
     std::optional<ExactTime> add(Duration) const;
-    Int128 difference(ExactTime other, unsigned increment, TemporalUnit, RoundingMode) const;
-    ExactTime round(unsigned increment, TemporalUnit, RoundingMode) const;
+    InternalDuration difference(JSGlobalObject*, ExactTime other, unsigned increment, TemporalUnit, RoundingMode) const;
+    std::optional<ExactTime> round(unsigned increment, TemporalUnit, RoundingMode) const;
 
     static ExactTime now();
 
@@ -181,9 +185,46 @@ private:
         builder.append(static_cast<LChar>(static_cast<unsigned>(value % 10) + '0'));
     }
 
-    static Int128 round(Int128 quantity, unsigned increment, TemporalUnit, RoundingMode);
+    static std::optional<Int128> round(Int128 quantity, unsigned increment, TemporalUnit, RoundingMode);
 
     Int128 m_epochNanoseconds { };
+};
+
+// https://tc39.es/proposal-temporal/#sec-temporal-internal-duration-records
+// Represents a duration as an ISO8601::Duration (in which all time fields
+// are ignored) along with an Int128 time duration that represents the sum
+// of all time fields. Used to avoid losing precision in intermediate calculations.
+class InternalDuration final {
+public:
+    InternalDuration(Duration d, Int128 t)
+        : m_dateDuration(d), m_time(t) { }
+    InternalDuration()
+        : m_dateDuration(Duration()), m_time(0) { }
+    static constexpr Int128 maxTimeDuration = 9'007'199'254'740'992 * ExactTime::nsPerSecond - 1;
+
+    int32_t sign() const;
+
+    int32_t timeDurationSign() const
+    {
+        return m_time < 0 ? -1 : m_time > 0 ? 1 : 0;
+    }
+
+    Int128 time() const { return m_time; }
+
+    Duration dateDuration() const { return m_dateDuration; }
+
+    static InternalDuration combineDateAndTimeDuration(JSGlobalObject*, Duration, Int128);
+private:
+
+    // Time fields are ignored
+    Duration m_dateDuration;
+
+/* A time duration is an integer in the inclusive interval from -maxTimeDuration
+   to maxTimeDuration, where
+   maxTimeDuration = 2**53 × 10**9 - 1 = 9,007,199,254,740,991,999,999,999.
+   It represents the portion of a Temporal.Duration object that deals with time
+   units, but as a combined value of total nanoseconds.  */
+    Int128 m_time;
 };
 
 class PlainTime {
@@ -248,11 +289,74 @@ public:
     uint8_t day() const { return m_day; }
 
 private:
-    int32_t m_year : 21; // ECMAScript max / min date's year can be represented <= 20 bits.
+    // It would be tempting to write m_year : 21 because
+    // ECMAScript max / min date's year can be represented <= 20 bits.
+    // However, this type must be usable to represent any valid ISO date;
+    // this comes up when detecting errors,
+    // such as in test262 test
+    // Temporal/PlainDate/prototype/since/throws-if-rounded-date-outside-valid-iso-range.js .
+    int32_t m_year;
     int32_t m_month : 5; // Starts with 1.
     int32_t m_day : 6; // Starts with 1.
 };
-static_assert(sizeof(PlainDate) == sizeof(int32_t));
+
+class PlainYearMonth {
+    WTF_MAKE_TZONE_ALLOCATED(PlainYearMonth);
+public:
+    constexpr PlainYearMonth()
+        : m_isoPlainDate(0, 1, 1)
+    {
+    }
+
+    constexpr PlainYearMonth(int32_t year, unsigned month)
+        : m_isoPlainDate(year, month, 1)
+    {
+    }
+
+    constexpr PlainYearMonth(PlainDate&& d)
+        : m_isoPlainDate(d)
+    {
+    }
+
+    friend bool operator==(const PlainYearMonth&, const PlainYearMonth&) = default;
+
+    int32_t year() const { return m_isoPlainDate.year(); }
+    uint8_t month() const { return m_isoPlainDate.month(); }
+
+    const PlainDate& isoPlainDate() const { return m_isoPlainDate; }
+private:
+    PlainDate m_isoPlainDate;
+};
+static_assert(sizeof(PlainYearMonth) == sizeof(PlainDate));
+
+class PlainMonthDay {
+    WTF_MAKE_TZONE_ALLOCATED(PlainMonthDay);
+public:
+    constexpr PlainMonthDay()
+        : m_isoPlainDate(0, 1, 1)
+    {
+    }
+
+    constexpr PlainMonthDay(unsigned month, int32_t day)
+        : m_isoPlainDate(2, month, day)
+    {
+    }
+
+    constexpr PlainMonthDay(PlainDate&& d)
+        : m_isoPlainDate(d)
+    {
+    }
+
+    friend bool operator==(const PlainMonthDay&, const PlainMonthDay&) = default;
+
+    uint8_t month() const { return m_isoPlainDate.month(); }
+    uint32_t day() const { return m_isoPlainDate.day(); }
+
+    const PlainDate& isoPlainDate() const { return m_isoPlainDate; }
+private:
+    PlainDate m_isoPlainDate;
+};
+static_assert(sizeof(PlainYearMonth) == sizeof(PlainDate));
 
 using TimeZone = std::variant<TimeZoneID, int64_t>;
 
@@ -278,8 +382,8 @@ std::optional<int64_t> parseUTCOffsetInMinutes(StringView);
 enum class ValidateTimeZoneID : bool { No, Yes };
 std::optional<std::tuple<PlainTime, std::optional<TimeZoneRecord>>> parseTime(StringView);
 std::optional<std::tuple<PlainTime, std::optional<TimeZoneRecord>, std::optional<CalendarRecord>>> parseCalendarTime(StringView);
-std::optional<std::tuple<PlainDate, std::optional<PlainTime>, std::optional<TimeZoneRecord>>> parseDateTime(StringView);
-std::optional<std::tuple<PlainDate, std::optional<PlainTime>, std::optional<TimeZoneRecord>, std::optional<CalendarRecord>>> parseCalendarDateTime(StringView);
+std::optional<std::tuple<PlainDate, std::optional<PlainTime>, std::optional<TimeZoneRecord>>> parseDateTime(StringView, TemporalDateFormat);
+std::optional<std::tuple<PlainDate, std::optional<PlainTime>, std::optional<TimeZoneRecord>, std::optional<CalendarRecord>>> parseCalendarDateTime(StringView, TemporalDateFormat);
 uint8_t dayOfWeek(PlainDate);
 uint16_t dayOfYear(PlainDate);
 uint8_t weeksInYear(int32_t year);
@@ -290,15 +394,23 @@ String formatTimeZoneOffsetString(int64_t);
 String temporalTimeToString(PlainTime, std::tuple<Precision, unsigned>);
 String temporalDateToString(PlainDate);
 String temporalDateTimeToString(PlainDate, PlainTime, std::tuple<Precision, unsigned>);
+String temporalYearMonthToString(PlainYearMonth, StringView);
+String temporalMonthDayToString(PlainMonthDay, StringView);
 String monthCode(uint32_t);
+bool validMonthCode(StringView);
 uint8_t monthFromCode(StringView);
 
 bool isValidDuration(const Duration&);
+bool isValidISODate(double, double, double);
+PlainDate createISODateRecord(double, double, double);
 
 std::optional<ExactTime> parseInstant(StringView);
 
 bool isDateTimeWithinLimits(int32_t year, uint8_t month, uint8_t day, unsigned hour, unsigned minute, unsigned second, unsigned millisecond, unsigned microsecond, unsigned nanosecond);
+bool isYearMonthWithinLimits(double year, double month);
 bool isYearWithinLimits(double year);
+
+std::optional<Int128> roundTimeDuration(Int128 timeDuration, unsigned increment, TemporalUnit, RoundingMode);
 
 } // namespace ISO8601
 } // namespace JSC
