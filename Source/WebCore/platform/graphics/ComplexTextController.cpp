@@ -27,6 +27,7 @@
 
 #include "FloatSize.h"
 #include "FontCascade.h"
+#include "FontCascadeInlines.h"
 #include "GlyphBuffer.h"
 #include "RenderBlock.h"
 #include "RenderText.h"
@@ -698,7 +699,7 @@ void ComplexTextController::adjustGlyphsAndAdvances()
         auto advances = complexTextRun.baseAdvances();
 
         // Lower in this function, synthetic bold is blanket-applied to everything, so no need to double-apply it here.
-        float spaceWidth = font.spaceWidth(Font::SyntheticBoldInclusion::Exclude);
+        float spaceWidth = font.spaceWidth<Font::SyntheticBoldInclusion::Exclude>();
         auto charactersSpan = complexTextRun.characters();
         FloatPoint glyphOrigin;
         unsigned previousCharacterIndex = m_run.ltr() ? std::numeric_limits<unsigned>::min() : std::numeric_limits<unsigned>::max();
@@ -913,7 +914,7 @@ ComplexTextController::ComplexTextRun::ComplexTextRun(const Font& font, std::spa
     // Synthesize a run of missing glyphs.
     m_glyphs.fill(0, m_glyphCount);
     // Synthetic bold will be handled later in adjustGlyphsAndAdvances().
-    m_baseAdvances.fill(FloatSize(m_font.widthForGlyph(0, Font::SyntheticBoldInclusion::Exclude), 0), m_glyphCount);
+    m_baseAdvances.fill(FloatSize(m_font.widthForGlyph<Font::SyntheticBoldInclusion::Exclude>(0), 0), m_glyphCount);
 }
 
 ComplexTextController::ComplexTextRun::ComplexTextRun(const Vector<FloatSize>& advances, const Vector<FloatPoint>& origins, const Vector<Glyph>& glyphs, const Vector<unsigned>& stringIndices, FloatSize initialAdvance, const Font& font, std::span<const UChar> characters, unsigned stringLocation, unsigned indexBegin, unsigned indexEnd, bool ltr)

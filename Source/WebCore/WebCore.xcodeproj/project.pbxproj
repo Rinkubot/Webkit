@@ -2943,6 +2943,7 @@
 		7A293F5229945A430033D744 /* FontCustomPlatformData.h in Headers */ = {isa = PBXBuildFile; fileRef = 7A293F5129945A100033D744 /* FontCustomPlatformData.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		7A29F57218C69514004D0F81 /* OutOfBandTextTrackPrivateAVF.h in Headers */ = {isa = PBXBuildFile; fileRef = 7A29F57118C69514004D0F81 /* OutOfBandTextTrackPrivateAVF.h */; };
 		7A45033018DB717200377B34 /* BufferedLineReader.h in Headers */ = {isa = PBXBuildFile; fileRef = 7A45032E18DB717200377B34 /* BufferedLineReader.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		7A520EB32D91DCF200F2A612 /* FontCascadeCocoaInlines.h in Headers */ = {isa = PBXBuildFile; fileRef = 7A520EB22D91DCF200F2A612 /* FontCascadeCocoaInlines.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		7A54858014E02D51006AE05A /* InspectorHistory.h in Headers */ = {isa = PBXBuildFile; fileRef = 7A54857E14E02D51006AE05A /* InspectorHistory.h */; };
 		7A54881714E432A1006AE05A /* DOMPatchSupport.h in Headers */ = {isa = PBXBuildFile; fileRef = 7A54881514E432A1006AE05A /* DOMPatchSupport.h */; };
 		7A5515F5191830A3009687D2 /* YouTubePluginReplacement.h in Headers */ = {isa = PBXBuildFile; fileRef = 7A5515F3191830A3009687D2 /* YouTubePluginReplacement.h */; settings = {ATTRIBUTES = (Private, ); }; };
@@ -13705,6 +13706,7 @@
 		7A3EBEAA21BF054C000D043D /* JSSVGViewSpecCustom.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = JSSVGViewSpecCustom.cpp; sourceTree = "<group>"; };
 		7A45032D18DB717200377B34 /* BufferedLineReader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BufferedLineReader.cpp; sourceTree = "<group>"; };
 		7A45032E18DB717200377B34 /* BufferedLineReader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BufferedLineReader.h; sourceTree = "<group>"; };
+		7A520EB22D91DCF200F2A612 /* FontCascadeCocoaInlines.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FontCascadeCocoaInlines.h; sourceTree = "<group>"; };
 		7A54857D14E02D51006AE05A /* InspectorHistory.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = InspectorHistory.cpp; sourceTree = "<group>"; };
 		7A54857E14E02D51006AE05A /* InspectorHistory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InspectorHistory.h; sourceTree = "<group>"; };
 		7A54881514E432A1006AE05A /* DOMPatchSupport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DOMPatchSupport.h; sourceTree = "<group>"; };
@@ -17513,7 +17515,6 @@
 		B2A1F2A50CEF0ABF00442F6A /* SVGGlyphElement.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = SVGGlyphElement.h; sourceTree = "<group>"; };
 		B2A1F2A70CEF0ABF00442F6A /* SVGMissingGlyphElement.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = SVGMissingGlyphElement.cpp; sourceTree = "<group>"; };
 		B2A1F2A80CEF0ABF00442F6A /* SVGMissingGlyphElement.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = SVGMissingGlyphElement.h; sourceTree = "<group>"; };
-		B2AFFC780D00A5C10030074D /* FontCascadeCocoa.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.objcpp; path = FontCascadeCocoa.cpp; sourceTree = "<group>"; };
 		B2AFFC8C0D00A5DF0030074D /* TextBoundaries.mm */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.objcpp; path = TextBoundaries.mm; sourceTree = "<group>"; };
 		B2B1F7140D00CAA8004AEA64 /* PointerEventsHitRules.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = PointerEventsHitRules.cpp; sourceTree = "<group>"; };
 		B2B1F7150D00CAA8004AEA64 /* PointerEventsHitRules.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = PointerEventsHitRules.h; sourceTree = "<group>"; };
@@ -34384,7 +34385,7 @@
 				1C16B86C284D73EF00318FEC /* FontCacheCocoa.mm */,
 				1C3969CF1B74211E002BCFA7 /* FontCacheCoreText.cpp */,
 				C2458E611FE8979E00594759 /* FontCacheCoreText.h */,
-				B2AFFC780D00A5C10030074D /* FontCascadeCocoa.cpp */,
+				7A520EB22D91DCF200F2A612 /* FontCascadeCocoaInlines.h */,
 				1C6FD8B0250A35F100D6E920 /* FontCocoa.cpp */,
 				F4A064C6277E48C600B06A17 /* FontCocoa.h */,
 				325905DD274DE1E3007B7B65 /* FontDatabase.cpp */,
@@ -41318,6 +41319,7 @@
 				C2458E631FE897B000594759 /* FontCacheCoreText.h in Headers */,
 				B2C3DA610D006CD600EF6F26 /* FontCascade.h in Headers */,
 				32EAFB8D274C5EA600650557 /* FontCascadeCache.h in Headers */,
+				7A520EB32D91DCF200F2A612 /* FontCascadeCocoaInlines.h in Headers */,
 				E4E8B4F5216B956500B8834D /* FontCascadeDescription.h in Headers */,
 				B2C3DA680D006CD600EF6F26 /* FontCascadeFonts.h in Headers */,
 				F4A064C8277E48C900B06A17 /* FontCocoa.h in Headers */,

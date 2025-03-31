@@ -187,13 +187,21 @@ public:
         Yes
     };
 
-    float widthForGlyph(Glyph, SyntheticBoldInclusion = SyntheticBoldInclusion::Incorporate) const;
+    template <Font::SyntheticBoldInclusion syntheticBoldInclusion = Font::SyntheticBoldInclusion::Incorporate>
+    float widthForGlyph(Glyph) const;
+#if USE(CORE_TEXT)
+    template <Font::SyntheticBoldInclusion syntheticBoldInclusion = Font::SyntheticBoldInclusion::Incorporate>
+    Vector<float, inlineGlyphRunCapacity> widthsForGlyphs(std::span<const Glyph>) const;
+#endif
 
     Path pathForGlyph(Glyph) const;
 
-    float spaceWidth(SyntheticBoldInclusion SyntheticBoldInclusion = SyntheticBoldInclusion::Incorporate) const
+    template <Font::SyntheticBoldInclusion syntheticBoldInclusion = Font::SyntheticBoldInclusion::Incorporate>
+    float spaceWidth() const
     {
-        return m_spaceWidth + (SyntheticBoldInclusion == SyntheticBoldInclusion::Incorporate ? syntheticBoldOffset() : 0);
+        if constexpr (syntheticBoldInclusion == SyntheticBoldInclusion::Incorporate)
+            return m_spaceWidth + syntheticBoldOffset();
+        return m_spaceWidth;
     }
 
     float syntheticBoldOffset() const { return m_syntheticBoldOffset; }
@@ -204,6 +212,21 @@ public:
 
     GlyphData glyphDataForCharacter(char32_t) const;
     Glyph glyphForCharacter(char32_t) const;
+
+#if USE(CORE_TEXT)
+    template<typename charType>
+    ALWAYS_INLINE Vector<Glyph, inlineGlyphRunCapacity> glyphsForCharacters(std::span<charType> characters) const
+    {
+        Vector<Glyph, inlineGlyphRunCapacity> glyphs;
+        for (auto character : characters)
+            glyphs.append(glyphForCharacter(character));
+        return glyphs;
+    }
+
+    template<IsInterstitial isInterstitial = IsInterstitial::No>
+    void traverseGlyphs(std::span<const Glyph>, float syntheticBoldOffset, Vector<float, inlineGlyphRunCapacity>& glyphWidths, Vector<Glyph, Font::inlineGlyphRunCapacity>& glyphsNeedingMeasurement, Vector<size_t, Font::inlineGlyphRunCapacity>& positionsNeedingMeasurement) const;
+#endif
+
     bool supportsCodePoint(char32_t) const;
     bool platformSupportsCodePoint(char32_t, std::optional<char32_t> variation = std::nullopt) const;
 
@@ -285,6 +308,9 @@ private:
     Vector<FloatRect, inlineGlyphRunCapacity> platformBoundsForGlyphs(const Vector<Glyph, inlineGlyphRunCapacity>&) const;
 #endif
     float platformWidthForGlyph(Glyph) const;
+#if USE(CORE_TEXT)
+    Vector<float, inlineGlyphRunCapacity> platformWidthsForGlyphs(const Vector<Glyph, inlineGlyphRunCapacity>&) const;
+#endif
     Path platformPathForGlyph(Glyph) const;
 
 #if PLATFORM(COCOA)
@@ -484,7 +510,8 @@ ALWAYS_INLINE Vector<FloatRect, Font::inlineGlyphRunCapacity> Font::boundsForGly
 }
 #endif
 
-ALWAYS_INLINE float Font::widthForGlyph(Glyph glyph, SyntheticBoldInclusion SyntheticBoldInclusion) const
+template <Font::SyntheticBoldInclusion syntheticBoldInclusion>
+ALWAYS_INLINE float Font::widthForGlyph(Glyph glyph) const
 {
     // The optimization of returning 0 for the zero-width-space glyph is incorrect for the LastResort font,
     // used in place of the actual font when isLoading() is true on both macOS and iOS.
@@ -494,8 +521,11 @@ ALWAYS_INLINE float Font::widthForGlyph(Glyph glyph, SyntheticBoldInclusion Synt
         return 0;
 
     float width = m_glyphToWidthMap.metricsForGlyph(glyph);
-    if (width != cGlyphSizeUnknown)
-        return width + (SyntheticBoldInclusion == SyntheticBoldInclusion::Incorporate ? syntheticBoldOffset() : 0);
+    if (width != cGlyphSizeUnknown) {
+        if constexpr (syntheticBoldInclusion == SyntheticBoldInclusion::Incorporate)
+            return width + syntheticBoldOffset();
+        return width;
+    }
 
 #if ENABLE(OPENTYPE_VERTICAL)
     if (m_verticalData)
@@ -505,8 +535,73 @@ ALWAYS_INLINE float Font::widthForGlyph(Glyph glyph, SyntheticBoldInclusion Synt
         width = platformWidthForGlyph(glyph);
 
     m_glyphToWidthMap.setMetricsForGlyph(glyph, width);
-    return width + (SyntheticBoldInclusion == SyntheticBoldInclusion::Incorporate ? syntheticBoldOffset() : 0);
+    if constexpr (syntheticBoldInclusion == SyntheticBoldInclusion::Incorporate)
+        return width + syntheticBoldOffset();
+    return width;
 }
+
+#if USE(CORE_TEXT)
+template<Font::IsInterstitial interstitialState>
+ALWAYS_INLINE void Font::traverseGlyphs(std::span<const Glyph> glyphs, float syntheticBoldOffset, Vector<float, inlineGlyphRunCapacity>& glyphWidths, Vector<Glyph, Font::inlineGlyphRunCapacity>& glyphsNeedingMeasurement, Vector<size_t, Font::inlineGlyphRunCapacity>& positionsNeedingMeasurement) const
+{
+    for (size_t glyphIndex = 0; glyphIndex < glyphs.size(); ++glyphIndex) {
+        const auto& glyph = glyphs[glyphIndex];
+        if constexpr (interstitialState == IsInterstitial::No) {
+            if (isZeroWidthSpaceGlyph(glyph))
+                continue;
+        }
+
+        float width = m_glyphToWidthMap.metricsForGlyph(glyph);
+        if (width != cGlyphSizeUnknown) {
+            glyphWidths[glyphIndex] = width + syntheticBoldOffset;
+            continue;
+        }
+
+        glyphsNeedingMeasurement.append(glyph);
+        positionsNeedingMeasurement.append(glyphIndex);
+    }
+}
+
+template <Font::SyntheticBoldInclusion syntheticBoldInclusion>
+ALWAYS_INLINE Vector<float, Font::inlineGlyphRunCapacity> Font::widthsForGlyphs(std::span<const Glyph> glyphs) const
+{
+    const auto glyphCount = glyphs.size();
+    if (UNLIKELY(!glyphCount))
+        return { };
+
+    if (glyphCount == 1)
+        return { widthForGlyph<syntheticBoldInclusion>(glyphs[0]) };
+
+    Vector<Glyph, inlineGlyphRunCapacity> glyphsNeedingMeasurement;
+    Vector<size_t, inlineGlyphRunCapacity> positionsNeedingMeasurement;
+    Vector<float, inlineGlyphRunCapacity> glyphWidths(glyphs.size(), 0);
+
+    float syntheticBoldOffset = 0;
+    if constexpr (syntheticBoldInclusion == SyntheticBoldInclusion::Incorporate)
+        syntheticBoldOffset = this->syntheticBoldOffset();
+
+    if (isInterstitial())
+        traverseGlyphs<IsInterstitial::Yes>(glyphs, syntheticBoldOffset, glyphWidths, glyphsNeedingMeasurement, positionsNeedingMeasurement);
+    else
+        traverseGlyphs<IsInterstitial::No>(glyphs, syntheticBoldOffset, glyphWidths, glyphsNeedingMeasurement, positionsNeedingMeasurement);
+
+    if (glyphsNeedingMeasurement.isEmpty())
+        return glyphWidths;
+
+    auto measuredWidths = platformWidthsForGlyphs(glyphsNeedingMeasurement);
+
+    size_t index = 0;
+    for (auto& width : measuredWidths) {
+        const auto measuredGlyph = glyphsNeedingMeasurement[index];
+        const auto measuredGlyphPosition = positionsNeedingMeasurement[index];
+
+        m_glyphToWidthMap.setMetricsForGlyph(measuredGlyph, width);
+        glyphWidths[measuredGlyphPosition] = width + syntheticBoldOffset;
+        ++index;
+    }
+    return glyphWidths;
+}
+#endif
 
 #if !LOG_DISABLED
 WEBCORE_EXPORT TextStream& operator<<(TextStream&, const Font&);

@@ -596,6 +596,21 @@ float Font::platformWidthForGlyph(Glyph glyph) const
     return advance.width;
 }
 
+Vector<float, Font::inlineGlyphRunCapacity> Font::platformWidthsForGlyphs(const Vector<Glyph, inlineGlyphRunCapacity>& glyphs) const
+{
+    Vector<CGSize, Font::inlineGlyphRunCapacity> advancesForGlyphs(glyphs.size(), CGSizeZero);
+
+    if (platformData().size()) {
+        bool horizontal = platformData().orientation() == FontOrientation::Horizontal;
+        CTFontOrientation orientation = horizontal || m_isBrokenIdeographFallback ? kCTFontOrientationHorizontal : kCTFontOrientationVertical;
+        CTFontGetAdvancesForGlyphs(getCTFont(), orientation, glyphs.data(), advancesForGlyphs.data(), advancesForGlyphs.size());
+    }
+
+    return advancesForGlyphs.map<Vector<float, inlineGlyphRunCapacity>>([&](const auto& advance) -> auto {
+        return advance.width;
+    });
+}
+
 GlyphBufferAdvance Font::applyTransforms(GlyphBuffer& glyphBuffer, unsigned beginningGlyphIndex, unsigned beginningStringIndex, bool enableKerning, bool requiresShaping, const AtomString& locale, StringView text, TextDirection textDirection) const
 {
     UNUSED_PARAM(requiresShaping);
