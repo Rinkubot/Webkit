@@ -94,6 +94,9 @@ private:
     // @position-try descriptors.
     bool parsePositionTryDescriptor(CSSPropertyID, bool important);
 
+    // @-internal-base-appearance descriptors.
+    bool parseInternalBaseAppearanceDescriptor(CSSPropertyID, bool important);
+
     void addProperty(CSSPropertyID longhand, CSSPropertyID shorthand, RefPtr<CSSValue>&&, bool important, bool implicit = false);
     void addExpandedProperty(CSSPropertyID shorthand, RefPtr<CSSValue>&&, bool important, bool implicit = false);
 
