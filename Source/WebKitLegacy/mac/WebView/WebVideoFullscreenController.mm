@@ -243,11 +243,13 @@ static WebAVPlayerView *allocWebAVPlayerViewInstance()
     UNUSED_PARAM(notification);
     NSWindow* fullscreenWindow = [self fullscreenWindow];
 
+    NSScreen *firstScreen = [[NSScreen screens] firstObject];
+    RELEASE_ASSERT_WITH_MESSAGE(firstScreen, "No screens found, possibly due to no WindowServer session. This configuration is not supported.");
     // Replicate the QuickTime Player (X) behavior when losing active application status:
     // Is the fullscreen screen the main screen? (Note: this covers the case where only a
     // single screen is available.)  Is the fullscreen screen on the current space? IFF so,
     // then exit fullscreen mode.
-    if (fullscreenWindow.screen == [NSScreen screens][0] && fullscreenWindow.onActiveSpace)
+    if (fullscreenWindow.screen == firstScreen && fullscreenWindow.onActiveSpace)
         [self _requestExit];
 }
 

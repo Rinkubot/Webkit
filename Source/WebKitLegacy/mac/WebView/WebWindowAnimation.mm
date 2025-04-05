@@ -106,7 +106,9 @@ using WebCore::narrowPrecisionToFloat;
 
 static void flipRect(NSRect* rect)
 {
-    rect->origin.y = NSMaxY([(NSScreen *)[[NSScreen screens] objectAtIndex:0] frame]) - NSMaxY(*rect);
+    RetainPtr<NSScreen> firstScreen = [[NSScreen screens] firstObject];
+    RELEASE_ASSERT_WITH_MESSAGE(firstScreen, "No screens found, possibly due to no WindowServer session. This configuration is not supported.");
+    rect->origin.y = NSMaxY([firstScreen frame]) - NSMaxY(*rect);
 }
 
 static CGSConnectionID mainWindowServerConnectionID()

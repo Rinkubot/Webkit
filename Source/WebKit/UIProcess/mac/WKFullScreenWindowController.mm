@@ -239,8 +239,10 @@ static RetainPtr<CGImageRef> createImageWithCopiedData(CGImageRef sourceImage)
     NSRect screenFrame = WebCore::safeScreenFrame(screen.get());
     NSRect webViewFrame = convertRectToScreen([_webView window], [_webView convertRect:[_webView frame] toView:nil]);
 
+    NSScreen *firstScreen = [[NSScreen screens] firstObject];
+    RELEASE_ASSERT_WITH_MESSAGE(firstScreen, "No screens found, possibly due to no WindowServer session. This configuration is not supported.");
     // Flip coordinate system:
-    webViewFrame.origin.y = NSMaxY([[[NSScreen screens] objectAtIndex:0] frame]) - NSMaxY(webViewFrame);
+    webViewFrame.origin.y = NSMaxY([firstScreen frame]) - NSMaxY(webViewFrame);
 
     CGWindowID windowID = [[_webView window] windowNumber];
     RetainPtr webViewContents = WebCore::cgWindowListCreateImage(NSRectToCGRect(webViewFrame), kCGWindowListOptionIncludingWindow, windowID, kCGWindowImageShouldBeOpaque);
@@ -515,7 +517,10 @@ static RetainPtr<CGImageRef> takeWindowSnapshot(CGSWindowID windowID, bool captu
     [CATransaction begin];
     [CATransaction setDisableActions:YES];
     NSRect exitPlaceholderScreenRect = _initialFrame;
-    exitPlaceholderScreenRect.origin.y = NSMaxY(WebCore::safeScreenFrame([[NSScreen screens] objectAtIndex:0])) - NSMaxY(exitPlaceholderScreenRect);
+
+    NSScreen *firstScreen = [[NSScreen screens] firstObject];
+    ASSERT_WITH_MESSAGE(firstScreen, "No screens found, possibly due to no WindowServer session. This configuration is not supported.");
+    exitPlaceholderScreenRect.origin.y = NSMaxY([firstScreen frame]) - NSMaxY(exitPlaceholderScreenRect);
 
     RetainPtr<CGImageRef> webViewContents = takeWindowSnapshot([[_webView window] windowNumber], true);
     webViewContents = adoptCF(CGImageCreateWithImageInRect(webViewContents.get(), NSRectToCGRect(exitPlaceholderScreenRect)));
