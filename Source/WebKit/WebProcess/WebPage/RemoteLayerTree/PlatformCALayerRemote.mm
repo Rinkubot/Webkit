@@ -294,15 +294,18 @@ void PlatformCALayerRemote::ensureBackingStore()
 
 DestinationColorSpace PlatformCALayerRemote::displayColorSpace() const
 {
+    std::optional<DestinationColorSpace> displayColorSpace;
+
 #if PLATFORM(IOS_FAMILY)
-    if (auto displayColorSpace = contentsFormatExtendedColorSpace(contentsFormat()))
-        return displayColorSpace.value();
+    displayColorSpace = contentsFormatExtendedColorSpace(contentsFormat());
 #else
-    if (auto displayColorSpace = m_context ? m_context->displayColorSpace() : std::nullopt)
-        return displayColorSpace.value();
+    if (!m_acceleratesDrawing)
+        displayColorSpace = contentsFormatExtendedColorSpace(contentsFormat());
+    else if (m_context)
+        displayColorSpace = m_context->displayColorSpace();
 #endif
 
-    return DestinationColorSpace::SRGB();
+    return displayColorSpace.value_or(DestinationColorSpace::SRGB());
 }
 
 #if ENABLE(RE_DYNAMIC_CONTENT_SCALING)

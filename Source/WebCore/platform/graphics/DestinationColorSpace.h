@@ -62,6 +62,7 @@ public:
     PlatformColorSpace serializableColorSpace() const { return m_platformColorSpace; }
 
     WEBCORE_EXPORT std::optional<DestinationColorSpace> asRGB() const;
+    WEBCORE_EXPORT std::optional<DestinationColorSpace> asExtendedRange() const;
 
     WEBCORE_EXPORT bool supportsOutput() const;
 
