@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2023 Apple Inc. All rights reserved.
+ * Copyright (C) 2011-2025 Apple Inc. All rights reserved.
  * Copyright (C) 2013 Google Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -48,12 +48,9 @@ namespace WebCore {
 
 WTF_MAKE_TZONE_ALLOCATED_IMPL(CSSFilter);
 
-RefPtr<CSSFilter> CSSFilter::create(RenderElement& renderer, const FilterOperations& operations, OptionSet<FilterRenderingMode> preferredFilterRenderingModes, const FloatSize& filterScale, const FloatRect& targetBoundingBox, const GraphicsContext& destinationContext)
+RefPtr<CSSFilter> CSSFilter::create(RenderElement& renderer, const FilterOperations& operations, OptionSet<FilterRenderingMode> preferredFilterRenderingModes, const FloatSize& filterScale, const FloatRect& filterRegion, const FloatRect& targetBoundingBox, const GraphicsContext& destinationContext)
 {
-    bool hasFilterThatMovesPixels = operations.hasFilterThatMovesPixels();
-    bool hasFilterThatShouldBeRestrictedBySecurityOrigin = operations.hasFilterThatShouldBeRestrictedBySecurityOrigin();
-
-    auto filter = adoptRef(*new CSSFilter(filterScale, hasFilterThatMovesPixels, hasFilterThatShouldBeRestrictedBySecurityOrigin));
+    auto filter = adoptRef(*new CSSFilter(filterScale, filterRegion));
 
     if (!filter->buildFilterFunctions(renderer, operations, preferredFilterRenderingModes, targetBoundingBox, destinationContext)) {
         LOG_WITH_STREAM(Filters, stream << "CSSFilter::create: failed to build filters " << operations);
@@ -81,10 +78,8 @@ Ref<CSSFilter> CSSFilter::create(Vector<Ref<FilterFunction>>&& functions, Option
     return filter;
 }
 
-CSSFilter::CSSFilter(const FloatSize& filterScale, bool hasFilterThatMovesPixels, bool hasFilterThatShouldBeRestrictedBySecurityOrigin)
-    : Filter(Filter::Type::CSSFilter, filterScale)
-    , m_hasFilterThatMovesPixels(hasFilterThatMovesPixels)
-    , m_hasFilterThatShouldBeRestrictedBySecurityOrigin(hasFilterThatShouldBeRestrictedBySecurityOrigin)
+CSSFilter::CSSFilter(const FloatSize& filterScale, const FloatRect& filterRegion)
+    : Filter(Filter::Type::CSSFilter, filterScale, filterRegion)
 {
 }
 
@@ -244,6 +239,11 @@ static RefPtr<SVGFilter> createReferenceFilter(CSSFilter& filter, const Style::R
         return nullptr;
 
     auto filterRegion = SVGLengthContext::resolveRectangle<SVGFilterElement>(filterElement.get(), filterElement->filterUnits(), targetBoundingBox);
+    auto filterScale = filter.filterScale();
+
+    // Ensure the reference SVGFilter has the same clamping ratio as the parent CSSFilter.
+    if (ImageBuffer::sizeNeedsClamping(filterRegion.size(), filterScale))
+        filterRegion = filter.filterRegion();
 
     return SVGFilter::create(*filterElement, preferredFilterRenderingModes, filter.filterScale(), filterRegion, targetBoundingBox, destinationContext);
 }
@@ -391,12 +391,6 @@ FilterStyleVector CSSFilter::createFilterStyles(GraphicsContext& context, const 
     }
 
     return styles;
-}
-
-void CSSFilter::setFilterRegion(const FloatRect& filterRegion)
-{
-    Filter::setFilterRegion(filterRegion);
-    clampFilterRegionIfNeeded();
 }
 
 bool CSSFilter::isIdentity(RenderElement& renderer, const FilterOperations& operations)

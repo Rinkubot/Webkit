@@ -1,7 +1,7 @@
 /*
  * Copyright (C) 2009 Dirk Schulze <krit@webkit.org>
  * Copyright (C) 2013 Google Inc. All rights reserved.
- * Copyright (C) 2021-2023 Apple Inc. All rights reserved.
+ * Copyright (C) 2021-2025 Apple Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -22,7 +22,6 @@
 #pragma once
 
 #include <WebCore/Filter.h>
-#include <WebCore/FilterResults.h>
 #include <WebCore/FloatRect.h>
 #include <WebCore/SVGFilterExpression.h>
 #include <WebCore/SVGUnitTypes.h>
@@ -51,8 +50,6 @@ public:
 
     FilterEffectVector effectsOfType(FilterFunction::Type) const final;
 
-    WEBCORE_EXPORT FilterResults& ensureResults(NOESCAPE const FilterResultsCreator&);
-    void clearEffectResult(FilterEffect&);
     WEBCORE_EXPORT void mergeEffects(const FilterEffectVector&);
 
     RefPtr<FilterImage> apply(FilterImage* sourceImage, FilterResults&) final;
@@ -84,8 +81,6 @@ private:
 
     SVGFilterExpression m_expression;
     FilterEffectVector m_effects;
-
-    std::unique_ptr<FilterResults> m_results;
 };
 
 } // namespace WebCore
