@@ -1,5 +1,4 @@
 AutomationBackendDispatchers.cpp
-AutomationFrontendDispatchers.cpp
 AutomationProtocolObjects.h
 GeneratedSerializers.mm
 NetworkConnectionToWebProcessMessages.h
@@ -80,7 +79,6 @@ UIProcess/API/Cocoa/_WKUserStyleSheet.mm
 UIProcess/API/Cocoa/_WKWebAuthenticationAssertionResponse.mm
 UIProcess/API/Cocoa/_WKWebsiteDataStoreConfiguration.mm
 WebDriverBidiBackendDispatchers.cpp
-WebDriverBidiFrontendDispatchers.cpp
 WebDriverBidiProtocolObjects.h
 WebProcess/ApplePay/WebPaymentCoordinator.cpp
 WebProcess/Automation/WebAutomationDOMWindowObserver.cpp

@@ -345,6 +345,7 @@ void Network1BackendDispatcher::loadResource(long protocol_requestId, RefPtr<JSO
 #pragma once
 
 #include "TestProtocolObjects.h"
+#include <wtf/CheckedRef.h>
 #include <wtf/JSONValues.h>
 #include <wtf/text/WTFString.h>
 
@@ -355,10 +356,11 @@ class FrontendRouter;
 class Network3FrontendDispatcher {
     WTF_MAKE_FAST_ALLOCATED;
 public:
-    Network3FrontendDispatcher(FrontendRouter& frontendRouter) : m_frontendRouter(frontendRouter) { }
+    Network3FrontendDispatcher(FrontendRouter&);
+    ~Network3FrontendDispatcher();
     void resourceLoaded();
 private:
-    FrontendRouter& m_frontendRouter;
+    const CheckedRef<FrontendRouter> m_frontendRouter;
 };
 
 } // namespace Inspector
@@ -401,12 +403,16 @@ private:
 
 namespace Inspector {
 
+Network3FrontendDispatcher::Network3FrontendDispatcher(FrontendRouter& frontendRouter) : m_frontendRouter(frontendRouter) { }
+
+Network3FrontendDispatcher::~Network3FrontendDispatcher() = default;
+
 void Network3FrontendDispatcher::resourceLoaded()
 {
     auto protocol_jsonMessage = JSON::Object::create();
     protocol_jsonMessage->setString("method"_s, "Network3.resourceLoaded"_s);
 
-    m_frontendRouter.sendEvent(protocol_jsonMessage->toJSONString());
+    m_frontendRouter->sendEvent(protocol_jsonMessage->toJSONString());
 }
 
 } // namespace Inspector

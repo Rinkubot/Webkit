@@ -247,6 +247,7 @@ namespace Inspector {
 #pragma once
 
 #include "TestProtocolObjects.h"
+#include <wtf/CheckedRef.h>
 #include <wtf/JSONValues.h>
 #include <wtf/text/WTFString.h>
 
@@ -1063,7 +1064,7 @@ using namespace Inspector;
 
 - (void)setType:(TestProtocolRuntimeKeyPathType)type
 {
-    [super setString:toProtocolString(type) forKey:@"type"];
+    [super setString:toProtocolString(type).createNSString().get() forKey:@"type"];
 }
 
 - (TestProtocolRuntimeKeyPathType)type

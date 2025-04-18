@@ -82,7 +82,6 @@ inspector/ConsoleMessage.cpp
 inspector/InjectedScriptManager.cpp
 inspector/InspectorBackendDispatcher.cpp
 inspector/InspectorBackendDispatchers.cpp
-inspector/InspectorFrontendDispatchers.cpp
 inspector/InspectorProtocolObjects.h
 inspector/JSGlobalObjectInspectorController.cpp
 inspector/JSInjectedScriptHost.cpp
@@ -96,7 +95,6 @@ inspector/agents/InspectorConsoleAgent.cpp
 inspector/agents/InspectorDebuggerAgent.cpp
 inspector/agents/InspectorHeapAgent.cpp
 inspector/agents/InspectorScriptProfilerAgent.cpp
-inspector/agents/InspectorTargetAgent.cpp
 inspector/agents/JSGlobalObjectRuntimeAgent.cpp
 inspector/remote/cocoa/RemoteInspectorCocoa.mm
 interpreter/Interpreter.cpp
