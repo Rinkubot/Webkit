@@ -487,6 +487,26 @@ void ProcessLauncher::finishLaunchingProcess(ASCIILiteral name)
             return;
         }
 
+#if ENABLE(LOGD_BLOCKING_IN_WEBCONTENT)
+        auto messageName = xpcDictionaryGetString(event, "message-name"_s);
+        if (messageName == "log-message"_s) {
+            auto subsystem = xpcDictionaryGetString(event, "subsystem");
+            auto category = xpcDictionaryGetString(event, "category");
+            auto message_string = xpcDictionaryGetString(event, "message-string");
+            auto logType = xpc_dictionary_get_uint64(event, "log-type");
+            auto pid = xpc_dictionary_get_uint64(event, "pid");
+
+            auto osLog = OSObjectPtr<os_log_t>();
+            if (!subsystem.isEmpty() && !category.isEmpty())
+                osLog = adoptOSObject(os_log_create(subsystem.utf8().data(), category.utf8().data()));
+
+            auto osLogPointer = osLog.get() ? osLog.get() : OS_LOG_DEFAULT;
+            os_log_with_type(osLogPointer, static_cast<os_log_type_t>(logType), "WP[%d] %{public}s", static_cast<int>(pid), message_string.utf8().data());
+
+            return;
+        }
+#endif
+
         if (xpcEventHandler) {
             RunLoop::protectedMain()->dispatch([xpcEventHandler = xpcEventHandler, event = OSObjectPtr(event)] {
                 xpcEventHandler->handleXPCEvent(event.get());

@@ -27,6 +27,7 @@
 
 #import "Logging.h"
 #import "WKCrashReporter.h"
+#import "XPCEndpoint.h"
 #import "XPCEndpointMessages.h"
 #import "XPCServiceEntryPoint.h"
 #import "XPCUtilities.h"
@@ -84,11 +85,39 @@ static void initializeCFPrefs()
 #endif // ENABLE(CFPREFS_DIRECT_MODE)
 }
 
-static void initializeLogd(bool disableLogging)
+#if ENABLE(LOGD_BLOCKING_IN_WEBCONTENT)
+static void registerLogHook(xpc_connection_t connection)
+{
+    os_log_set_hook(OS_LOG_TYPE_DEFAULT, makeBlockPtr([connection = RetainPtr { connection }](os_log_type_t type, os_log_message_t msg) {
+        if (type & OS_LOG_TYPE_DEBUG)
+            return;
+
+        if (type == OS_LOG_TYPE_FAULT)
+            type = OS_LOG_TYPE_ERROR;
+
+        if (char* messageString = os_log_copy_message_string(msg)) {
+            auto message = adoptOSObject(xpc_dictionary_create(nullptr, nullptr, 0));
+            xpc_dictionary_set_string(message.get(), XPCEndpoint::xpcMessageNameKey, "log-message");
+            if (auto* subsystem = msg->subsystem)
+                xpc_dictionary_set_string(message.get(), "subsystem", subsystem);
+            if (auto* category = msg->category)
+                xpc_dictionary_set_string(message.get(), "category", category);
+            xpc_dictionary_set_string(message.get(), "message-string", messageString);
+            xpc_dictionary_set_uint64(message.get(), "log-type", type);
+            xpc_dictionary_set_uint64(message.get(), "pid", getpid());
+            xpc_connection_send_message(connection.get(), message.get());
+            free(messageString);
+        }
+    }).get());
+}
+#endif
+
+static void initializeLogd(bool disableLogging, xpc_connection_t connection)
 {
 #if ENABLE(LOGD_BLOCKING_IN_WEBCONTENT)
     if (disableLogging) {
         os_trace_set_mode(OS_TRACE_MODE_OFF);
+        registerLogHook(connection);
         return;
     }
 #else
@@ -164,7 +193,7 @@ void XPCServiceEventHandler(xpc_connection_t peer)
             WTF::initialize();
 
             bool disableLogging = xpc_dictionary_get_bool(event, "disable-logging");
-            initializeLogd(disableLogging);
+            initializeLogd(disableLogging, retainedPeerConnection.get());
 
             if (RetainPtr languages = xpc_dictionary_get_value(event, "OverrideLanguages")) {
                 Vector<String> newLanguages;
