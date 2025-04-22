@@ -187,10 +187,6 @@ public:
     unsigned stackSize() const { return m_stack.size(); }
 
 #if USE(CG)
-    // FIXME: Should these really be public GraphicsContext methods?
-    virtual void applyStrokePattern() = 0;
-    virtual void applyFillPattern() = 0;
-
     // FIXME: Can we make this a why instead of a what, and then have it exist cross-platform?
     virtual bool isCALayerContext() const = 0;
 #endif
@@ -312,7 +308,7 @@ public:
     WEBCORE_EXPORT virtual void drawEmphasisMarks(const FontCascade&, const TextRun&, const AtomString& mark, const FloatPoint&, unsigned from = 0, std::optional<unsigned> to = std::nullopt);
     WEBCORE_EXPORT virtual void drawBidiText(const FontCascade&, const TextRun&, const FloatPoint&, FontCascade::CustomFontNotReadyAction = FontCascade::CustomFontNotReadyAction::DoNotPaintIfFontNotReady);
 
-    WEBCORE_EXPORT virtual void drawGlyphs(const Font&, std::span<const GlyphBufferGlyph>, std::span<const GlyphBufferAdvance>, const FloatPoint&, FontSmoothingMode);
+    WEBCORE_EXPORT virtual void drawGlyphs(const Font&, std::span<const GlyphBufferGlyph>, std::span<const GlyphBufferAdvance>, const FloatPoint&, FontSmoothingMode) = 0;
     WEBCORE_EXPORT virtual void drawDecomposedGlyphs(const Font&, const DecomposedGlyphs&);
 
     WEBCORE_EXPORT void drawDisplayList(const DisplayList::DisplayList&);

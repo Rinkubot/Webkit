@@ -89,6 +89,8 @@ public:
     bool repeatX() const { return m_parameters.repeatX; }
     bool repeatY() const { return m_parameters.repeatY; }
 
+    Ref<Pattern> scaled(float scale);
+
 private:
     Pattern(SourceImage&&, const Parameters&);
 
@@ -96,5 +98,13 @@ private:
     Parameters m_parameters;
 };
 
+inline Ref<Pattern> Pattern::scaled(float scale)
+{
+    if (scale == 1.)
+        return Ref { *this };
+    Ref newPattern = Pattern::create(SourceImage { m_tileImage }, m_parameters);
+    newPattern->m_parameters.patternSpaceTransform.scale(scale);
+    return newPattern;
+}
 
 } //namespace
