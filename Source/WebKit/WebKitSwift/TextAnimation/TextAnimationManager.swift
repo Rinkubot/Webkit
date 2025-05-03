@@ -54,8 +54,8 @@ import UIKit_SPI
             let newEffect = self.effectView.addEffect(UITextEffectView.ReplacementTextEffect(chunk: TextEffectChunk(uuid: uuid), view: self.effectView, delegate:self) as UITextEffectView.TextEffect)
             self.chunkToEffect[uuid] = newEffect
         case .final:
-            break
-            // Discard `.final` since we don't manually start the 2nd part of the animation on iOS.
+            let newEffect = self.effectView.addEffect(UITextEffectView.PonderingEffect(chunk: TextEffectChunk(uuid: uuid), view: self.effectView) as UITextEffectView.TextEffect)
+            self.chunkToEffect[uuid] = newEffect
         }
     }
     
