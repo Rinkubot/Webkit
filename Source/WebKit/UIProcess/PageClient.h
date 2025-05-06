@@ -839,6 +839,12 @@ public:
     virtual void beginPointerLockMouseTracking() { }
     virtual void endPointerLockMouseTracking() { }
 #endif
+
+#if ENABLE(WPE_PLATFORM)
+    virtual void requestAudioSinkSocket(CompletionHandler<void(String)> &&) = 0;
+    virtual void audioSinkStarted(const String &) = 0;
+    virtual void audioSinkStopped(const String &) = 0;
+#endif
 };
 
 } // namespace WebKit

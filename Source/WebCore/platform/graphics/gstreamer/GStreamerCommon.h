@@ -268,7 +268,7 @@ bool isGStreamerPluginAvailable(ASCIILiteral name);
 bool gstElementFactoryEquals(GstElement*, ASCIILiteral name);
 
 GstElement* createAutoAudioSink(const String& role);
-GstElement* createPlatformAudioSink(const String& role);
+GstElement* createPlatformAudioSink(const String& role, String&& sharedMemory = { });
 
 bool webkitGstSetElementStateSynchronously(GstElement*, GstState, Function<bool(GstMessage*)>&& = [](GstMessage*) -> bool {
     return true;

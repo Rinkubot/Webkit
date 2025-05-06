@@ -574,6 +574,12 @@ private:
 
     void setNeedsFixedContainerEdgesUpdate() final;
 
+#if ENABLE(WPE_PLATFORM)
+    String requestAudioSinkSocket() final;
+    void audioSinkStarted(const String&) final;
+    void audioSinkStopped(const String&) final;
+#endif
+
     bool usePluginRendererScrollableArea(WebCore::LocalFrame&) const final;
 
     mutable bool m_cachedMainFrameHasHorizontalScrollbar { false };

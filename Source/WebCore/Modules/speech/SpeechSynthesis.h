@@ -88,6 +88,11 @@ private:
     void didFinishSpeaking(PlatformSpeechSynthesisUtterance&) override;
     void speakingErrorOccurred(PlatformSpeechSynthesisUtterance&) override;
     void boundaryEventOccurred(PlatformSpeechSynthesisUtterance&, SpeechBoundary, unsigned charIndex, unsigned charLength) override;
+#if USE(GSTREAMER) && ENABLE(WPE_PLATFORM)
+    String requestAudioSinkSocket() override;
+    void audioSinkStarted(const String&) override;
+    void audioSinkStopped(const String&) override;
+#endif
 
     // SpeechSynthesisClientObserver
     void didStartSpeaking() override;
@@ -122,6 +127,10 @@ private:
     BehaviorRestrictions m_restrictions;
     WeakPtr<SpeechSynthesisClient> m_speechSynthesisClient;
     bool m_hasEventListener { false };
+
+#if USE(GSTREAMER) && ENABLE(WPE_PLATFORM)
+    WeakPtr<ScriptExecutionContext> m_context;
+#endif
 };
 
 } // namespace WebCore

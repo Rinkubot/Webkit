@@ -167,8 +167,8 @@ GstElement* GStreamerQuirksManager::createWebAudioSink()
         return sink;
     }
 
-    GST_DEBUG("Quirks didn't specify a WebAudioSink, falling back to default sink");
-    return createPlatformAudioSink("music"_s);
+    GST_DEBUG("Quirks didn't specify a WebAudioSink, letting the client create a default sink");
+    return nullptr;
 }
 
 GstElement* GStreamerQuirksManager::createHolePunchVideoSink(bool isLegacyPlaybin, const MediaPlayer* player)

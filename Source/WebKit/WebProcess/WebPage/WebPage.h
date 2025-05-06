@@ -2053,6 +2053,12 @@ public:
     bool shouldDisableModelLoadDelaysForTesting() const;
 #endif
 
+#if ENABLE(WPE_PLATFORM)
+    String requestAudioSinkSocket();
+    void audioSinkStarted(const String&);
+    void audioSinkStopped(const String&);
+#endif
+
     std::unique_ptr<FrameInfoData> takeMainFrameNavigationInitiator();
 
 #if PLATFORM(MAC)
