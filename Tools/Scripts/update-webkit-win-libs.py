@@ -34,6 +34,7 @@ download = importlib.import_module('download-github-release')
 repo = 'WebKitForWindows/WebKitRequirements'
 file = 'WebKitRequirementsWin64.zip'
 output = os.getenv('WEBKIT_LIBRARIES', 'WebKitLibraries/win')
+release_tag = 'v2025.04.02'
 options = [repo, file, '-o', output]
 
 if os.getenv('GITHUB_TOKEN'):
@@ -43,7 +44,9 @@ if os.getenv('GITHUB_TOKEN'):
 config_path = os.path.join(output, file) + '.config'
 if os.path.exists(config_path):
     with open(config_path) as config_file:
-        options += ['-r', json.load(config_file)['tag_name']]
+        release_tag = json.load(config_file)['tag_name']
+
+options += ['-r', release_tag]
 
 result = download.main(options)
 
