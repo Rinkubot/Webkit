@@ -358,6 +358,7 @@ void NetworkBackendDispatcher::loadResource(long protocol_requestId, RefPtr<JSON
 #pragma once
 
 #include "TestProtocolObjects.h"
+#include <wtf/CheckedRef.h>
 #include <wtf/JSONValues.h>
 #include <wtf/text/WTFString.h>
 
@@ -369,12 +370,13 @@ class FrontendRouter;
 class NetworkFrontendDispatcher {
     WTF_MAKE_FAST_ALLOCATED;
 public:
-    NetworkFrontendDispatcher(FrontendRouter& frontendRouter) : m_frontendRouter(frontendRouter) { }
+    NetworkFrontendDispatcher(FrontendRouter&);
+    ~NetworkFrontendDispatcher();
 #if EVENT-MAC
     void resourceLoaded();
 #endif // EVENT-MAC
 private:
-    FrontendRouter& m_frontendRouter;
+    const CheckedRef<FrontendRouter> m_frontendRouter;
 };
 #endif // DOMAIN-MAC
 
@@ -419,13 +421,17 @@ private:
 namespace Inspector {
 
 #if DOMAIN-MAC
+NetworkFrontendDispatcher::NetworkFrontendDispatcher(FrontendRouter& frontendRouter) : m_frontendRouter(frontendRouter) { }
+
+NetworkFrontendDispatcher::~NetworkFrontendDispatcher() = default;
+
 #if EVENT-MAC
 void NetworkFrontendDispatcher::resourceLoaded()
 {
     auto protocol_jsonMessage = JSON::Object::create();
     protocol_jsonMessage->setString("method"_s, "Network.resourceLoaded"_s);
 
-    m_frontendRouter.sendEvent(protocol_jsonMessage->toJSONString());
+    m_frontendRouter->sendEvent(protocol_jsonMessage->toJSONString());
 }
 #endif // EVENT-MAC
 #endif // DOMAIN-MAC

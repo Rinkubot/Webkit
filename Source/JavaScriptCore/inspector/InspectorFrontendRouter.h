@@ -26,6 +26,7 @@
 #pragma once
 
 #include "JSExportMacros.h"
+#include <wtf/CheckedRef.h>
 #include <wtf/Vector.h>
 #include <wtf/text/WTFString.h>
 
@@ -33,7 +34,9 @@ namespace Inspector {
 
 class FrontendChannel;
 
-class FrontendRouter : public RefCounted<FrontendRouter> {
+class FrontendRouter final : public RefCounted<FrontendRouter>, public CanMakeThreadSafeCheckedPtr<FrontendRouter> {
+    WTF_MAKE_FAST_ALLOCATED;
+    WTF_OVERRIDE_DELETE_FOR_CHECKED_PTR(FrontendRouter);
 public:
     JS_EXPORT_PRIVATE static Ref<FrontendRouter> create();
 

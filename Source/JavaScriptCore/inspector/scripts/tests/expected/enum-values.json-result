@@ -384,6 +384,7 @@ void CommandDomainBackendDispatcher::command(long protocol_requestId, RefPtr<JSO
 #pragma once
 
 #include "TestProtocolObjects.h"
+#include <wtf/CheckedRef.h>
 #include <wtf/JSONValues.h>
 #include <wtf/text/WTFString.h>
 
@@ -394,7 +395,8 @@ class FrontendRouter;
 class EventDomainFrontendDispatcher {
     WTF_MAKE_FAST_ALLOCATED;
 public:
-    EventDomainFrontendDispatcher(FrontendRouter& frontendRouter) : m_frontendRouter(frontendRouter) { }
+    EventDomainFrontendDispatcher(FrontendRouter&);
+    ~EventDomainFrontendDispatcher();
         // Named after parameter 'parameterRequired' while generating command/event event.
         enum class ParameterRequired {
             Shared = 0,
@@ -409,7 +411,7 @@ public:
         }; // enum class ParameterOptional
     void event(Protocol::TypeDomain::Enum enumRequired, std::optional<Protocol::TypeDomain::Enum>&& opt_enumOptional, const String& parameterRequired, const String& opt_parameterOptional);
 private:
-    FrontendRouter& m_frontendRouter;
+    const CheckedRef<FrontendRouter> m_frontendRouter;
 };
 
 } // namespace Inspector
@@ -452,6 +454,10 @@ private:
 
 namespace Inspector {
 
+EventDomainFrontendDispatcher::EventDomainFrontendDispatcher(FrontendRouter& frontendRouter) : m_frontendRouter(frontendRouter) { }
+
+EventDomainFrontendDispatcher::~EventDomainFrontendDispatcher() = default;
+
 void EventDomainFrontendDispatcher::event(Protocol::TypeDomain::Enum enumRequired, std::optional<Protocol::TypeDomain::Enum>&& opt_enumOptional, const String& parameterRequired, const String& opt_parameterOptional)
 {
     auto protocol_jsonMessage = JSON::Object::create();
@@ -465,7 +471,7 @@ void EventDomainFrontendDispatcher::event(Protocol::TypeDomain::Enum enumRequire
         protocol_paramsObject->setString("parameterOptional"_s, opt_parameterOptional);
     protocol_jsonMessage->setObject("params"_s, WTFMove(protocol_paramsObject));
 
-    m_frontendRouter.sendEvent(protocol_jsonMessage->toJSONString());
+    m_frontendRouter->sendEvent(protocol_jsonMessage->toJSONString());
 }
 
 } // namespace Inspector
@@ -762,12 +768,12 @@ void ObjCInspectorCommandDomainBackendDispatcher::command(long protocol_requestI
 
     id successCallback = ^(TestProtocolTypeDomainEnum out_enumRequired, TestProtocolTypeDomainEnum *out_opt_enumOptional, TestProtocolCommandDomain(anonymous) out_returnRequired, TestProtocolCommandDomain(anonymous) *out_opt_returnOptional) {
         auto protocol_jsonMessage = JSON::Object::create();
-        protocol_jsonMessage->setString("enumRequired"_s, toProtocolString(out_enumRequired));
+        protocol_jsonMessage->setString("enumRequired"_s, toProtocolString(out_enumRequired).createNSString().get());
         if (!!out_opt_enumOptional)
-            protocol_jsonMessage->setString("enumOptional"_s, toProtocolString(*out_opt_enumOptional));
-        protocol_jsonMessage->setString("returnRequired"_s, toProtocolString(out_returnRequired));
+            protocol_jsonMessage->setString("enumOptional"_s, toProtocolString(*out_opt_enumOptional).createNSString().get());
+        protocol_jsonMessage->setString("returnRequired"_s, toProtocolString(out_returnRequired).createNSString().get());
         if (!!out_opt_returnOptional)
-            protocol_jsonMessage->setString("returnOptional"_s, toProtocolString(*out_opt_returnOptional));
+            protocol_jsonMessage->setString("returnOptional"_s, toProtocolString(*out_opt_returnOptional).createNSString().get());
         backendDispatcher()->sendResponse(protocol_requestId, WTFMove(protocol_jsonMessage), false);
     };
 
@@ -981,12 +987,12 @@ using namespace Inspector;
     auto protocol_jsonMessage = JSON::Object::create();
     protocol_jsonMessage->setString("method"_s, "EventDomain.event"_s);
     auto protocol_paramsObject = JSON::Object::create();
-    protocol_paramsObject->setString("enumRequired"_s, toProtocolString(enumRequired));
+    protocol_paramsObject->setString("enumRequired"_s, toProtocolString(enumRequired).createNSString().get());
     if (enumOptional)
-        protocol_paramsObject->setString("enumOptional"_s, toProtocolString((*enumOptional)));
-    protocol_paramsObject->setString("parameterRequired"_s, toProtocolString(parameterRequired));
+        protocol_paramsObject->setString("enumOptional"_s, toProtocolString((*enumOptional)).createNSString().get());
+    protocol_paramsObject->setString("parameterRequired"_s, toProtocolString(parameterRequired).createNSString().get());
     if (parameterOptional)
-        protocol_paramsObject->setString("parameterOptional"_s, toProtocolString((*parameterOptional)));
+        protocol_paramsObject->setString("parameterOptional"_s, toProtocolString((*parameterOptional)).createNSString().get());
     protocol_jsonMessage->setObject("params"_s, WTFMove(protocol_paramsObject));
     router.sendEvent(protocol_jsonMessage->toJSONString());
 }

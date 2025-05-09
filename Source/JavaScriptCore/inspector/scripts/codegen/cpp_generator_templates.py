@@ -189,10 +189,11 @@ ${returnAssignments}
 """${classAndExportMacro} ${domainName}FrontendDispatcher {
     WTF_MAKE_FAST_ALLOCATED;
 public:
-    ${domainName}FrontendDispatcher(FrontendRouter& frontendRouter) : m_frontendRouter(frontendRouter) { }
+    ${domainName}FrontendDispatcher(FrontendRouter&);
+    ~${domainName}FrontendDispatcher();
 ${eventDeclarations}
 private:
-    FrontendRouter& m_frontendRouter;
+    const CheckedRef<FrontendRouter> m_frontendRouter;
 };""")
 
     ProtocolObjectBuilderDeclarationPrelude = (

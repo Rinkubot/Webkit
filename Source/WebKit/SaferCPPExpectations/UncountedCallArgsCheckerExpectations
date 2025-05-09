@@ -1,5 +1,4 @@
 AutomationBackendDispatchers.cpp
-AutomationFrontendDispatchers.cpp
 AutomationProtocolObjects.h
 GeneratedSerializers.mm
 NetworkConnectionToWebProcessMessages.h
@@ -97,7 +96,6 @@ UIProcess/WebPageProxy.cpp
 UIProcess/mac/ViewGestureControllerMac.mm
 UIProcess/mac/WebViewImpl.mm
 WebDriverBidiBackendDispatchers.cpp
-WebDriverBidiFrontendDispatchers.cpp
 WebDriverBidiProtocolObjects.h
 WebProcess/ApplePay/WebPaymentCoordinator.cpp
 WebProcess/Automation/WebAutomationDOMWindowObserver.cpp
