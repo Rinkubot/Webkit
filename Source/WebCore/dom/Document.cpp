@@ -3568,8 +3568,6 @@ void Document::willBeRemovedFromFrame()
     if (m_wheelEventTargets && !m_wheelEventTargets->isEmptyIgnoringNullReferences() && parentDocument())
         protectedParentDocument()->didRemoveEventTargetNode(*this);
 
-    if (RefPtr mediaQueryMatcher = m_mediaQueryMatcher)
-        mediaQueryMatcher->documentDestroyed();
 
 #if ENABLE(WIRELESS_PLAYBACK_TARGET)
     if (!m_clientToIDMap.isEmpty() && page()) {
