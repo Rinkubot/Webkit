@@ -40,11 +40,13 @@ ModuleAnalyzer::ModuleAnalyzer(JSGlobalObject* globalObject, const Identifier& m
 {
 }
 
-void ModuleAnalyzer::appendRequestedModule(const Identifier& specifier, RefPtr<ScriptFetchParameters>&& attributes)
+void ModuleAnalyzer::appendRequestedModule(const Identifier& specifier, JSModuleRecord::ModulePhase phase, RefPtr<ScriptFetchParameters>&& attributes)
 {
-    auto result = m_requestedModules.add(specifier.impl());
-    if (result.isNewEntry)
-        moduleRecord()->appendRequestedModule(specifier, WTFMove(attributes));
+    auto result = m_requestedModules.add(specifier.impl(), static_cast<int>(phase));
+    if (result.isNewEntry || result.iterator->value == static_cast<int>(JSModuleRecord::ModulePhase::Defer)) {
+        moduleRecord()->appendRequestedModule(specifier, phase, WTFMove(attributes));
+        m_requestedModules.set(specifier.impl(), static_cast<int>(phase));
+    }
 }
 
 void ModuleAnalyzer::exportVariable(ModuleProgramNode& moduleProgramNode, const RefPtr<UniquedStringImpl>& localName, const VariableEnvironmentEntry& variable)

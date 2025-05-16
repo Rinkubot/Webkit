@@ -45,10 +45,10 @@ public:
         return vm.moduleNamespaceObjectSpace<mode>();
     }
 
-    static JSModuleNamespaceObject* create(JSGlobalObject* globalObject, Structure* structure, AbstractModuleRecord* moduleRecord, Vector<std::pair<Identifier, AbstractModuleRecord::Resolution>>&& resolutions)
+    static JSModuleNamespaceObject* create(JSGlobalObject* globalObject, Structure* structure, AbstractModuleRecord* moduleRecord, Vector<std::pair<Identifier, AbstractModuleRecord::Resolution>>&& resolutions, bool isDeferred)
     {
         VM& vm = getVM(globalObject);
-        JSModuleNamespaceObject* object = new (NotNull, allocateCell<JSModuleNamespaceObject>(vm)) JSModuleNamespaceObject(vm, structure);
+        JSModuleNamespaceObject* object = new (NotNull, allocateCell<JSModuleNamespaceObject>(vm)) JSModuleNamespaceObject(vm, structure, isDeferred);
         object->finishCreation(globalObject, moduleRecord, WTFMove(resolutions));
         return object;
     }
@@ -69,10 +69,13 @@ public:
     AbstractModuleRecord* moduleRecord() { return m_moduleRecord.get(); }
 
 private:
-    JS_EXPORT_PRIVATE JSModuleNamespaceObject(VM&, Structure*);
+    JS_EXPORT_PRIVATE JSModuleNamespaceObject(VM&, Structure*, bool);
     JS_EXPORT_PRIVATE void finishCreation(JSGlobalObject*, AbstractModuleRecord*, Vector<std::pair<Identifier, AbstractModuleRecord::Resolution>>&&);
     DECLARE_VISIT_CHILDREN;
     bool getOwnPropertySlotCommon(JSGlobalObject*, PropertyName, PropertySlot&);
+    void ensureDeferredNamespaceEvaluation(JSGlobalObject*);
+    bool isSymbolLikeNamespaceKey(VM&, PropertyName);
+    bool moduleExportsListContains(JSGlobalObject*, RefPtr<UniquedStringImpl>);
 
     struct ExportEntry {
         Identifier localName;
@@ -84,6 +87,7 @@ private:
     ExportMap m_exports;
     FixedVector<Identifier> m_names;
     WriteBarrier<AbstractModuleRecord> m_moduleRecord;
+    bool m_isDeferred;
 
     friend size_t cellSize(JSCell*);
 };

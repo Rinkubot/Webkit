@@ -83,7 +83,8 @@ bool ImportDeclarationNode::analyzeModule(ModuleAnalyzer& analyzer)
         return false;
     }
 
-    analyzer.appendRequestedModule(m_moduleName->moduleName(), WTFMove(result.value()));
+    auto phase = m_type == ImportType::Normal ? JSModuleRecord::ModulePhase::Evaluation : JSModuleRecord::ModulePhase::Defer;
+    analyzer.appendRequestedModule(m_moduleName->moduleName(), phase, WTFMove(result.value()));
     for (auto* specifier : m_specifierList->specifiers()) {
         analyzer.moduleRecord()->addImportEntry(JSModuleRecord::ImportEntry {
             specifier->importedName() == analyzer.vm().propertyNames->timesIdentifier
@@ -91,6 +92,7 @@ bool ImportDeclarationNode::analyzeModule(ModuleAnalyzer& analyzer)
             m_moduleName->moduleName(),
             specifier->importedName(),
             specifier->localName(),
+            phase,
         });
     }
     return true;
@@ -104,7 +106,7 @@ bool ExportAllDeclarationNode::analyzeModule(ModuleAnalyzer& analyzer)
         return false;
     }
 
-    analyzer.appendRequestedModule(m_moduleName->moduleName(), WTFMove(result.value()));
+    analyzer.appendRequestedModule(m_moduleName->moduleName(), JSModuleRecord::ModulePhase::Evaluation, WTFMove(result.value()));
     analyzer.moduleRecord()->addStarExportEntry(m_moduleName->moduleName());
     return true;
 }
@@ -128,7 +130,7 @@ bool ExportNamedDeclarationNode::analyzeModule(ModuleAnalyzer& analyzer)
             return false;
         }
 
-        analyzer.appendRequestedModule(m_moduleName->moduleName(), WTFMove(result.value()));
+        analyzer.appendRequestedModule(m_moduleName->moduleName(), JSModuleRecord::ModulePhase::Evaluation, WTFMove(result.value()));
     }
 
     for (auto* specifier : m_specifierList->specifiers()) {

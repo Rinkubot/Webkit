@@ -51,6 +51,7 @@ namespace JSC {
 
 static JSC_DECLARE_HOST_FUNCTION(moduleLoaderParseModule);
 static JSC_DECLARE_HOST_FUNCTION(moduleLoaderRequestedModules);
+static JSC_DECLARE_HOST_FUNCTION(moduleLoaderRequestedModulePhases);
 static JSC_DECLARE_HOST_FUNCTION(moduleLoaderRequestedModuleParameters);
 static JSC_DECLARE_HOST_FUNCTION(moduleLoaderEvaluate);
 static JSC_DECLARE_HOST_FUNCTION(moduleLoaderModuleDeclarationInstantiation);
@@ -78,9 +79,10 @@ void JSModuleLoader::finishCreation(JSGlobalObject* globalObject, VM& vm)
     JSMap* map = JSMap::create(vm, globalObject->mapStructure());
     putDirect(vm, Identifier::fromString(vm, "registry"_s), map);
 
-    JSC_NATIVE_FUNCTION_WITHOUT_TRANSITION("getModuleNamespaceObject"_s, moduleLoaderGetModuleNamespaceObject, static_cast<unsigned>(PropertyAttribute::DontEnum), 1, ImplementationVisibility::Private);
+    JSC_NATIVE_FUNCTION_WITHOUT_TRANSITION("getModuleNamespaceObject"_s, moduleLoaderGetModuleNamespaceObject, static_cast<unsigned>(PropertyAttribute::DontEnum), 2, ImplementationVisibility::Private);
     JSC_NATIVE_FUNCTION_WITHOUT_TRANSITION("parseModule"_s, moduleLoaderParseModule, static_cast<unsigned>(PropertyAttribute::DontEnum), 2, ImplementationVisibility::Private);
     JSC_NATIVE_FUNCTION_WITHOUT_TRANSITION("requestedModules"_s, moduleLoaderRequestedModules, static_cast<unsigned>(PropertyAttribute::DontEnum), 1, ImplementationVisibility::Private);
+    JSC_NATIVE_FUNCTION_WITHOUT_TRANSITION("requestedModulePhases"_s, moduleLoaderRequestedModulePhases, static_cast<unsigned>(PropertyAttribute::DontEnum), 1, ImplementationVisibility::Private);
     JSC_NATIVE_FUNCTION_WITHOUT_TRANSITION("requestedModuleParameters"_s, moduleLoaderRequestedModuleParameters, static_cast<unsigned>(PropertyAttribute::DontEnum), 1, ImplementationVisibility::Private);
     JSC_NATIVE_FUNCTION_WITHOUT_TRANSITION("resolve"_s, moduleLoaderResolve, static_cast<unsigned>(PropertyAttribute::DontEnum), 2, ImplementationVisibility::Private);
     JSC_NATIVE_FUNCTION_WITHOUT_TRANSITION("fetch"_s, moduleLoaderFetch, static_cast<unsigned>(PropertyAttribute::DontEnum), 3, ImplementationVisibility::Private);
@@ -95,6 +97,7 @@ void JSModuleLoader::finishCreation(JSGlobalObject* globalObject, VM& vm)
     JSC_BUILTIN_FUNCTION_WITHOUT_TRANSITION(vm.propertyNames->builtinNames().linkPublicName(), moduleLoaderLinkCodeGenerator, static_cast<unsigned>(PropertyAttribute::DontEnum));
     JSC_BUILTIN_FUNCTION_WITHOUT_TRANSITION(vm.propertyNames->builtinNames().moduleEvaluationPublicName(), moduleLoaderModuleEvaluationCodeGenerator, static_cast<unsigned>(PropertyAttribute::DontEnum));
     JSC_BUILTIN_FUNCTION_WITHOUT_TRANSITION(vm.propertyNames->builtinNames().asyncModuleEvaluationPublicName(), moduleLoaderAsyncModuleEvaluationCodeGenerator, static_cast<unsigned>(PropertyAttribute::DontEnum));
+    JSC_BUILTIN_FUNCTION_WITHOUT_TRANSITION(vm.propertyNames->builtinNames().asyncModuleDeferredEvaluationPublicName(), moduleLoaderAsyncModuleDeferredEvaluationCodeGenerator, static_cast<unsigned>(PropertyAttribute::DontEnum));
     JSC_BUILTIN_FUNCTION_WITHOUT_TRANSITION(vm.propertyNames->builtinNames().provideFetchPublicName(), moduleLoaderProvideFetchCodeGenerator, static_cast<unsigned>(PropertyAttribute::DontEnum));
     JSC_BUILTIN_FUNCTION_WITHOUT_TRANSITION(vm.propertyNames->builtinNames().loadAndEvaluateModulePublicName(), moduleLoaderLoadAndEvaluateModuleCodeGenerator, static_cast<unsigned>(PropertyAttribute::DontEnum));
     JSC_BUILTIN_FUNCTION_WITHOUT_TRANSITION(vm.propertyNames->builtinNames().loadModulePublicName(), moduleLoaderLoadModuleCodeGenerator, static_cast<unsigned>(PropertyAttribute::DontEnum));
@@ -309,7 +312,7 @@ JSValue JSModuleLoader::evaluateNonVirtual(JSGlobalObject* globalObject, JSValue
     return jsUndefined();
 }
 
-JSModuleNamespaceObject* JSModuleLoader::getModuleNamespaceObject(JSGlobalObject* globalObject, JSValue moduleRecordValue)
+JSModuleNamespaceObject* JSModuleLoader::getModuleNamespaceObject(JSGlobalObject* globalObject, JSValue moduleRecordValue, JSValue phaseValue)
 {
     VM& vm = globalObject->vm();
     auto scope = DECLARE_THROW_SCOPE(vm);
@@ -320,7 +323,15 @@ JSModuleNamespaceObject* JSModuleLoader::getModuleNamespaceObject(JSGlobalObject
         return nullptr;
     }
 
-    RELEASE_AND_RETURN(scope, moduleRecord->getModuleNamespace(globalObject));
+    auto modulePhase = AbstractModuleRecord::ModulePhase::Evaluation;
+    if (!phaseValue.isUInt32()) {
+        throwTypeError(globalObject, scope, "expected a module phase value"_s);
+        return nullptr;
+    }
+    if (static_cast<Phase>(phaseValue.asUInt32()) == Phase::Defer)
+        modulePhase = AbstractModuleRecord::ModulePhase::Defer;
+
+    RELEASE_AND_RETURN(scope, moduleRecord->getModuleNamespace(globalObject, modulePhase));
 }
 
 // ------------------------------ Functions --------------------------------
@@ -401,6 +412,24 @@ JSC_DEFINE_HOST_FUNCTION(moduleLoaderRequestedModules, (JSGlobalObject* globalOb
     return JSValue::encode(result);
 }
 
+JSC_DEFINE_HOST_FUNCTION(moduleLoaderRequestedModulePhases, (JSGlobalObject* globalObject, CallFrame* callFrame))
+{
+    VM& vm = globalObject->vm();
+    auto scope = DECLARE_THROW_SCOPE(vm);
+    auto* moduleRecord = jsDynamicCast<AbstractModuleRecord*>(callFrame->argument(0));
+    if (!moduleRecord)
+        RELEASE_AND_RETURN(scope, JSValue::encode(constructEmptyArray(globalObject, nullptr)));
+
+    JSArray* result = constructEmptyArray(globalObject, nullptr, moduleRecord->requestedModules().size());
+    RETURN_IF_EXCEPTION(scope, encodedJSValue());
+    size_t i = 0;
+    for (auto& request : moduleRecord->requestedModules()) {
+        result->putDirectIndex(globalObject, i++, jsNumber(static_cast<uint32_t>(request.m_phase == AbstractModuleRecord::ModulePhase::Evaluation ? JSModuleLoader::Phase::Evaluation : JSModuleLoader::Phase::Defer)));
+        RETURN_IF_EXCEPTION(scope, encodedJSValue());
+    }
+    return JSValue::encode(result);
+}
+
 JSC_DEFINE_HOST_FUNCTION(moduleLoaderRequestedModuleParameters, (JSGlobalObject* globalObject, CallFrame* callFrame))
 {
     VM& vm = globalObject->vm();
@@ -474,7 +503,7 @@ JSC_DEFINE_HOST_FUNCTION(moduleLoaderGetModuleNamespaceObject, (JSGlobalObject* 
     auto* loader = jsDynamicCast<JSModuleLoader*>(callFrame->thisValue());
     if (!loader)
         return JSValue::encode(jsUndefined());
-    auto* moduleNamespaceObject = loader->getModuleNamespaceObject(globalObject, callFrame->argument(0));
+    auto* moduleNamespaceObject = loader->getModuleNamespaceObject(globalObject, callFrame->argument(0), callFrame->argument(1));
     RETURN_IF_EXCEPTION(scope, encodedJSValue());
     return JSValue::encode(moduleNamespaceObject);
 }

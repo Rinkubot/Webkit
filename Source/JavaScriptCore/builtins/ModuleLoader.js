@@ -101,6 +101,8 @@ function newRegistryEntry(key)
         evaluated: false,
         then: @undefined,
         isAsync: false,
+        hasTopLevelAwait: false,
+        phase: @ModulePhaseEvaluation,
     };
 }
 
@@ -209,13 +211,15 @@ function requestInstantiate(entry, parameters, fetcher)
         var moduleRecord = await this.parseModule(key, source);
         var dependenciesMap = moduleRecord.dependenciesMap;
         var requestedModules = this.requestedModules(moduleRecord);
+        var dependencyPhases = this.requestedModulePhases(moduleRecord);
         var dependencies = @newArrayWithSize(requestedModules.length);
         for (var i = 0, length = requestedModules.length; i < length; ++i) {
             var depName = requestedModules[i];
             var depKey = this.resolve(depName, key, fetcher);
-            var depEntry = this.ensureRegistered(depKey);
+            var depRecord = this.ensureRegistered(depKey);
+            var depEntry = { "record": depRecord, "phase": dependencyPhases[i] };
             @putByValDirect(dependencies, i, depEntry);
-            dependenciesMap.@set(depName, depEntry);
+            dependenciesMap.@set(depName, depRecord);
         }
         entry.dependencies = dependencies;
         entry.module = moduleRecord;
@@ -372,7 +376,7 @@ function requestSatisfyUtil(entry, parameters, fetcher, visited, satisfyingEntri
         var depLoads = this.requestedModuleParameters(entry.module);
         for (var i = 0, length = entry.dependencies.length; i < length; ++i) {
             var parameters = depLoads[i];
-            var depEntry = entry.dependencies[i];
+            var depEntry = entry.dependencies[i].record;
             var promise;
 
             // Recursive resolving. The dependencies of this entry is being resolved or already resolved.
@@ -461,12 +465,13 @@ function link(entry, fetcher)
         var hasAsyncDependency = false;
         var dependencies = entry.dependencies;
         for (var i = 0, length = dependencies.length; i < length; ++i) {
-            var dependency = dependencies[i];
+            var dependency = dependencies[i].record;
             this.link(dependency, fetcher);
             hasAsyncDependency ||= dependency.isAsync;
         }
 
-        entry.isAsync = this.moduleDeclarationInstantiation(entry.module, fetcher) || hasAsyncDependency;
+        entry.hasTopLevelAwait = this.moduleDeclarationInstantiation(entry.module, fetcher);
+        entry.isAsync = entry.hasTopLevelAwait || hasAsyncDependency;
     } catch (error) {
         entry.linkSucceeded = false;
         entry.linkError = error;
@@ -493,8 +498,9 @@ function moduleEvaluation(entry, fetcher)
         // Since linking sets isAsync for any strongly connected component with an async module we should only get here if all our dependencies are also sync.
         for (var i = 0, length = dependencies.length; i < length; ++i) {
             var dependency = dependencies[i];
-            @assert(!dependency.isAsync);
-            this.moduleEvaluation(dependency, fetcher);
+            @assert(!dependency.record.isAsync);
+            if (dependency.phase !== @ModulePhaseDefer)
+                this.moduleEvaluation(dependency.record, fetcher);
         }
 
         this.evaluate(entry.key, entry.module, fetcher);
@@ -507,8 +513,13 @@ async function asyncModuleEvaluation(entry, fetcher, dependencies)
 {
     "use strict";
 
-    for (var i = 0, length = dependencies.length; i < length; ++i)
-        await this.moduleEvaluation(dependencies[i], fetcher);
+    for (var i = 0, length = dependencies.length; i < length; ++i) {
+        var dependency = dependencies[i];
+        if (dependency.phase === @ModulePhaseDefer)
+            await this.asyncModuleDeferredEvaluation(dependency.record, fetcher, new @Set);
+        else
+            await this.moduleEvaluation(dependency.record, fetcher);
+    }
 
     var resumeMode = @GeneratorResumeModeNormal;
     while (true) {
@@ -524,6 +535,33 @@ async function asyncModuleEvaluation(entry, fetcher, dependencies)
             resumeMode = @GeneratorResumeModeThrow;
         }
     }
+}
+
+@visibility=PrivateRecursive
+async function asyncModuleDeferredEvaluation(entry, fetcher, seen)
+{
+    "use strict";
+
+    // We only need to handle async evaluations here, and so we will never call
+    // this.moduleEvaluation here and thus we need to handle the evaluated flag.
+    if (entry.evaluated || seen.@has(entry))
+        return;
+    seen.@add(entry);
+
+    var dependencies = entry.dependencies;
+
+    if (entry.hasTopLevelAwait) {
+        entry.evaluated = true;
+        await this.asyncModuleEvaluation(entry, fetcher, dependencies);
+    } else {
+        for (var i = 0, length = dependencies.length; i < length; ++i)
+            await this.asyncModuleDeferredEvaluation(dependencies[i].record, fetcher, seen);
+    }
+
+    // The isAsync flag is set to false because only sync module evaluations
+    // should remain in this part of the module graph at this point. When
+    // deferred evaluations are triggered, only the sync parts execute.
+    entry.isAsync = false;
 }
 
 // APIs to control the module loader.
@@ -577,7 +615,7 @@ async function requestImportModule(moduleName, referrer, parameters, fetcher)
     var key = this.resolve(moduleName, referrer, fetcher);
     var entry = await this.requestSatisfy(this.ensureRegistered(key), parameters, fetcher, new @Set);
     await this.linkAndEvaluateModule(entry.key, fetcher);
-    return this.getModuleNamespaceObject(entry.module);
+    return this.getModuleNamespaceObject(entry.module, @ModulePhaseEvaluation);
 }
 
 @visibility=PrivateRecursive
@@ -593,7 +631,7 @@ function dependencyKeysIfEvaluated(key)
     var length = dependencies.length;
     var result = new @Array(length);
     for (var i = 0; i < length; ++i)
-        result[i] = dependencies[i].key;
+        result[i] = dependencies[i].record.key;
 
     return result;
 }

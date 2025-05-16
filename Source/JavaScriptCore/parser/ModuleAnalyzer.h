@@ -26,11 +26,11 @@
 #pragma once
 
 #include "ErrorType.h"
+#include "JSModuleRecord.h"
 #include "Nodes.h"
 
 namespace JSC {
 
-class JSModuleRecord;
 class SourceCode;
 class ScriptFetchParameters;
 
@@ -46,7 +46,7 @@ public:
 
     JSModuleRecord* moduleRecord() { return m_moduleRecord; }
 
-    void appendRequestedModule(const Identifier&, RefPtr<ScriptFetchParameters>&&);
+    void appendRequestedModule(const Identifier&, JSModuleRecord::ModulePhase, RefPtr<ScriptFetchParameters>&&);
 
     void fail(std::tuple<ErrorType, String>&& errorMessage) { m_errorMessage = errorMessage; }
 
@@ -55,7 +55,7 @@ private:
 
     VM& m_vm;
     JSModuleRecord* m_moduleRecord;
-    IdentifierSet m_requestedModules;
+    IdentifierMap m_requestedModules;
     std::tuple<ErrorType, String> m_errorMessage;
 };
 

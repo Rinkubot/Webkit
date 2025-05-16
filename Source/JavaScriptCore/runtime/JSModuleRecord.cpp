@@ -172,7 +172,7 @@ void JSModuleRecord::instantiateDeclarations(JSGlobalObject* globalObject, Modul
         RETURN_IF_EXCEPTION(scope, void());
         switch (importEntry.type) {
         case AbstractModuleRecord::ImportEntryType::Namespace: {
-            JSModuleNamespaceObject* namespaceObject = importedModule->getModuleNamespace(globalObject);
+            JSModuleNamespaceObject* namespaceObject = importedModule->getModuleNamespace(globalObject, importEntry.phase);
             RETURN_IF_EXCEPTION(scope, void());
             bool putResult = false;
             symbolTablePutTouchWatchpointSet(moduleEnvironment, globalObject, importEntry.localName, namespaceObject, /* shouldThrowReadOnlyError */ false, /* ignoreReadOnlyErrors */ true, putResult);
@@ -198,7 +198,7 @@ void JSModuleRecord::instantiateDeclarations(JSGlobalObject* globalObject, Modul
 
             case Resolution::Type::Resolved: {
                 if (vm.propertyNames->starNamespacePrivateName == resolution.localName) {
-                    resolution.moduleRecord->getModuleNamespace(globalObject); // Force module namespace object materialization.
+                    resolution.moduleRecord->getModuleNamespace(globalObject, AbstractModuleRecord::ModulePhase::Evaluation); // Force module namespace object materialization.
                     RETURN_IF_EXCEPTION(scope, void());
                 }
                 break;
@@ -276,9 +276,52 @@ JSValue JSModuleRecord::evaluate(JSGlobalObject* globalObject, JSValue sentValue
     VM& vm = globalObject->vm();
     ModuleProgramExecutable* executable = m_moduleProgramExecutable.get();
     JSValue resultOrAwaitedValue = vm.interpreter.executeModuleProgram(this, executable, globalObject, moduleEnvironment(), sentValue, resumeMode);
-    if (JSValue state = internalField(Field::State).get(); !state.isNumber() || state.asNumber() == static_cast<unsigned>(State::Executing))
+    if (JSValue state = internalField(Field::State).get(); !state.isNumber() || state.asInt32() == static_cast<int>(State::Executing))
         m_moduleProgramExecutable.clear();
     return resultOrAwaitedValue;
+}
+
+bool JSModuleRecord::readyForSyncExecution(JSGlobalObject* globalObject)
+{
+    VM& vm = globalObject->vm();
+    auto scope = DECLARE_THROW_SCOPE(vm);
+
+    IdentifierSet seen;
+    Vector<AbstractModuleRecord*> stack;
+    stack.append(this);
+
+    while (!stack.isEmpty()) {
+        AbstractModuleRecord* currentModule = stack.takeLast();
+        if (seen.contains(currentModule->moduleKey().impl()))
+            continue;
+        seen.add(currentModule->moduleKey().impl());
+
+        if (JSModuleRecord* jsModule = jsDynamicCast<JSModuleRecord*>(currentModule)) {
+            JSValue state = jsModule->internalField(Field::State).get();
+
+            if (!state.isInt32())
+                return false;
+
+            if (state.asInt32() == static_cast<int>(State::Executing)) {
+                if (!jsModule->m_moduleProgramExecutable)
+                    continue;
+                return false;
+            }
+
+            if (jsModule->m_moduleProgramExecutable->isAsync())
+                return false;
+
+            auto& requestedModules = jsModule->requestedModules();
+            for (unsigned i = 0; i < requestedModules.size(); i++) {
+                auto* importedRecord = jsModule->hostResolveImportedModule(globalObject, Identifier::fromUid(globalObject->vm(), requestedModules[i].m_specifier.get()));
+                RETURN_IF_EXCEPTION(scope, false);
+                ASSERT(importedRecord);
+                stack.append(importedRecord);
+            }
+        }
+    }
+
+    return true;
 }
 
 } // namespace JSC

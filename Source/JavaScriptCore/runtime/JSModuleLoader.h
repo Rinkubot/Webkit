@@ -55,6 +55,11 @@ public:
         Ready,
     };
 
+    enum Phase {
+        Evaluation = 1,
+        Defer,
+    };
+
     static JSModuleLoader* create(JSGlobalObject* globalObject, VM& vm, Structure* structure)
     {
         JSModuleLoader* object = new (NotNull, allocateCell<JSModuleLoader>(vm)) JSModuleLoader(vm, structure);
@@ -84,7 +89,7 @@ public:
     JSValue evaluateNonVirtual(JSGlobalObject*, JSValue key, JSValue moduleRecord, JSValue scriptFetcher, JSValue sentValue, JSValue resumeMode);
 
     // Utility functions.
-    JSModuleNamespaceObject* getModuleNamespaceObject(JSGlobalObject*, JSValue moduleRecord);
+    JSModuleNamespaceObject* getModuleNamespaceObject(JSGlobalObject*, JSValue moduleRecord, JSValue phase);
     JSArray* dependencyKeysIfEvaluated(JSGlobalObject*, JSValue key);
 
 private:

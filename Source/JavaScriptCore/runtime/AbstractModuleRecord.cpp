@@ -74,14 +74,15 @@ void AbstractModuleRecord::visitChildrenImpl(JSCell* cell, Visitor& visitor)
     Base::visitChildren(thisObject, visitor);
     visitor.append(thisObject->m_moduleEnvironment);
     visitor.append(thisObject->m_moduleNamespaceObject);
+    visitor.append(thisObject->m_moduleDeferredNamespaceObject);
     visitor.append(thisObject->m_dependenciesMap);
 }
 
 DEFINE_VISIT_CHILDREN(AbstractModuleRecord);
 
-void AbstractModuleRecord::appendRequestedModule(const Identifier& moduleName, RefPtr<ScriptFetchParameters>&& attributes)
+void AbstractModuleRecord::appendRequestedModule(const Identifier& moduleName, ModulePhase phase, RefPtr<ScriptFetchParameters>&& attributes)
 {
-    m_requestedModules.append({ moduleName.impl(), WTFMove(attributes) });
+    m_requestedModules.append({ moduleName.impl(), phase, WTFMove(attributes) });
 }
 
 void AbstractModuleRecord::addStarExportEntry(const Identifier& moduleName)
@@ -745,14 +746,16 @@ static void getExportedNames(JSGlobalObject* globalObject, AbstractModuleRecord*
     }
 }
 
-JSModuleNamespaceObject* AbstractModuleRecord::getModuleNamespace(JSGlobalObject* globalObject)
+JSModuleNamespaceObject* AbstractModuleRecord::getModuleNamespace(JSGlobalObject* globalObject, ModulePhase phase)
 {
     VM& vm = globalObject->vm();
     auto scope = DECLARE_THROW_SCOPE(vm);
 
     // http://www.ecma-international.org/ecma-262/6.0/#sec-getmodulenamespace
-    if (m_moduleNamespaceObject)
+    if (phase == ModulePhase::Evaluation && m_moduleNamespaceObject)
         return m_moduleNamespaceObject.get();
+    if (phase == ModulePhase::Defer && m_moduleDeferredNamespaceObject)
+        return m_moduleDeferredNamespaceObject.get();
 
     IdentifierSet exportedNames;
     getExportedNames(globalObject, this, exportedNames);
@@ -781,7 +784,7 @@ JSModuleNamespaceObject* AbstractModuleRecord::getModuleNamespace(JSGlobalObject
         }
     }
 
-    auto* moduleNamespaceObject = JSModuleNamespaceObject::create(globalObject, globalObject->moduleNamespaceObjectStructure(), this, WTFMove(resolutions));
+    auto* moduleNamespaceObject = JSModuleNamespaceObject::create(globalObject, globalObject->moduleNamespaceObjectStructure(), this, WTFMove(resolutions), phase == ModulePhase::Defer);
     RETURN_IF_EXCEPTION(scope, nullptr);
 
     // Materialize *namespace* slot with module namespace object unless the module environment is not yet materialized, in which case we'll do it in setModuleEnvironment
@@ -792,7 +795,12 @@ JSModuleNamespaceObject* AbstractModuleRecord::getModuleNamespace(JSGlobalObject
         symbolTablePutTouchWatchpointSet(m_moduleEnvironment.get(), globalObject, vm.propertyNames->starNamespacePrivateName, moduleNamespaceObject, shouldThrowReadOnlyError, ignoreReadOnlyErrors, putResult);
         RETURN_IF_EXCEPTION(scope, nullptr);
     }
-    m_moduleNamespaceObject.set(vm, this, moduleNamespaceObject);
+    if (phase == ModulePhase::Evaluation)
+        m_moduleNamespaceObject.set(vm, this, moduleNamespaceObject);
+    else if (phase == ModulePhase::Defer)
+        m_moduleDeferredNamespaceObject.set(vm, this, moduleNamespaceObject);
+    else
+        RELEASE_ASSERT_NOT_REACHED();
 
     return moduleNamespaceObject;
 }
@@ -873,7 +881,7 @@ void AbstractModuleRecord::dump()
 
     dataLog("    Dependencies: ", m_requestedModules.size(), " modules\n");
     for (const auto& request : m_requestedModules)
-        dataLogLn("      module(", printableName(request.m_specifier), "),attributes(", RawPointer(request.m_attributes.get()), ")");
+        dataLogLn("      module(", printableName(request.m_specifier), "),phase(", request.m_phase == ModulePhase::Evaluation ? "evaluation" : "defer", "),attributes(", RawPointer(request.m_attributes.get()), ")");
 
     dataLog("    Import: ", m_importEntries.size(), " entries\n");
     for (const auto& pair : m_importEntries) {

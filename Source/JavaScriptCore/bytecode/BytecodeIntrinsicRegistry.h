@@ -139,6 +139,8 @@ enum class LinkTimeConstant : int32_t;
     macro(ModuleSatisfy) \
     macro(ModuleLink) \
     macro(ModuleReady) \
+    macro(ModulePhaseDefer) \
+    macro(ModulePhaseEvaluation) \
     macro(promiseRejectionReject) \
     macro(promiseRejectionHandle) \
     macro(promiseStatePending) \

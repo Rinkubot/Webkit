@@ -1284,6 +1284,18 @@ test/language/identifiers/start-unicode-16.0.0-escaped.js:
 test/language/identifiers/start-unicode-16.0.0.js:
   default: "SyntaxError: Invalid character '\\u1c89'"
   strict mode: "SyntaxError: Invalid character '\\u1c89'"
+test/language/import/import-defer/deferred-namespace-object/exotic-object-behavior.js:
+  module: 'Test262Error: descriptor should be writable'
+test/language/import/import-defer/errors/get-self-while-defer-evaluating/main.js:
+  module: 'Test262Error: ns.foo while evaluating throws a TypeError'
+test/language/import/import-defer/errors/module-throws/defer-import-after-evaluation.js:
+  module: 'Test262:AsyncTestFailure:Test262Error: Test262Error: Evaluation errors are thrown for modules evaluated before getting the deferred namespace Expected SameValue(«[object Object]», «undefined») to be true'
+test/language/import/import-defer/errors/module-throws/third-party-evaluation-after-defer-import.js:
+  module: 'Test262:AsyncTestFailure:Test262Error: Test262Error: Evaluation errors are thrown for modules evaluated after getting the deferred namespace Expected SameValue(«[object Object]», «undefined») to be true'
+test/language/import/import-defer/errors/module-throws/trigger-evaluation.js:
+  module: 'Test262Error: Evaluation errors are thrown for already evaluated modules Expected SameValue(«[object Object]», «undefined») to be true'
+test/language/import/import-defer/evaluation-top-level-await/flattening-order/main.js:
+  module: 'Test262Error: Actual [1, 2.1.1 start, 2.1.1 end, 2.2.1, 2.2 start, 2.2 end, 3, 4.1 start, 4.1 end, 5] and expected [1, 2.1.1 start, 2.2.1, 2.2 start, 3, 5, 2.1.1 end, 2.2 end, 4.1 start, 4.1 end, 5] should have the same contents. '
 test/language/module-code/top-level-await/async-module-does-not-block-sibling-modules.js:
   module: 'Test262Error: Expected SameValue(«true», «false») to be true'
 test/language/statements/async-generator/yield-star-promise-not-unwrapped.js:
