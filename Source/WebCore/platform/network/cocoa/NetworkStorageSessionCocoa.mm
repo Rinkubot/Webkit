@@ -102,14 +102,38 @@ void NetworkStorageSession::deleteCookie(const Cookie& cookie, CompletionHandler
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), makeBlockPtr(WTFMove(work)).get());
 }
 
-static Vector<Cookie> nsCookiesToCookieVector(NSArray<NSHTTPCookie *> *nsCookies, NOESCAPE const Function<bool(NSHTTPCookie *)>& filter = { })
+#if HAVE(ALLOW_ONLY_PARTITIONED_COOKIES)
+static NSHTTPCookie *removeCookiePartition(NSHTTPCookie *cookie)
+{
+    if (!cookie)
+        return cookie;
+
+    if (!cookie._storagePartition)
+        return cookie;
+
+    auto properties = adoptNS([[cookie properties] mutableCopy]);
+    [properties removeObjectForKey:@"StoragePartition"];
+    return [NSHTTPCookie cookieWithProperties:properties.get()];
+}
+#endif
+
+static Vector<Cookie> nsCookiesToCookieVector(NSArray<NSHTTPCookie *> *nsCookies, bool clearStoragePartition, NOESCAPE const Function<bool(NSHTTPCookie *)>& filter = { })
 {
     Vector<Cookie> cookies;
     cookies.reserveInitialCapacity(nsCookies.count);
     for (NSHTTPCookie *nsCookie in nsCookies) {
         @autoreleasepool {
-            if (!filter || filter(nsCookie))
+            if (!filter || filter(nsCookie)) {
+#if HAVE(ALLOW_ONLY_PARTITIONED_COOKIES)
+                if (clearStoragePartition)
+                    cookies.append(removeCookiePartition(nsCookie));
+                else
+                    cookies.append(nsCookie);
+#else
+                UNUSED_PARAM(clearStoragePartition);
                 cookies.append(nsCookie);
+#endif
+            }
         }
     }
     if (filter)
@@ -120,13 +144,13 @@ static Vector<Cookie> nsCookiesToCookieVector(NSArray<NSHTTPCookie *> *nsCookies
 Vector<Cookie> NetworkStorageSession::getAllCookies()
 {
     ASSERT(hasProcessPrivilege(ProcessPrivilege::CanAccessRawCookies));
-    return nsCookiesToCookieVector([nsCookieStorage() cookies]);
+    return nsCookiesToCookieVector([nsCookieStorage() cookies], true);
 }
 
 Vector<Cookie> NetworkStorageSession::getCookies(const URL& url)
 {
     ASSERT(hasProcessPrivilege(ProcessPrivilege::CanAccessRawCookies));
-    return nsCookiesToCookieVector([nsCookieStorage() cookiesForURL:url.createNSURL().get()]);
+    return nsCookiesToCookieVector([nsCookieStorage() cookiesForURL:url.createNSURL().get()], true);
 }
 
 void NetworkStorageSession::hasCookies(const RegistrableDomain& domain, CompletionHandler<void(bool)>&& completionHandler) const
@@ -770,7 +794,7 @@ Vector<Cookie> NetworkStorageSession::domCookiesForHost(const URL& firstParty)
     }
 #endif
 
-    return nsCookiesToCookieVector(nsCookies.get(), [](NSHTTPCookie *cookie) { return !cookie.HTTPOnly; });
+    return nsCookiesToCookieVector(nsCookies.get(), false, [](NSHTTPCookie *cookie) { return !cookie.HTTPOnly; });
 }
 
 #if HAVE(COOKIE_CHANGE_LISTENER_API)
@@ -789,7 +813,7 @@ void NetworkStorageSession::registerCookieChangeListenersIfNecessary()
         auto it = m_cookieChangeObservers.find(host);
         if (it == m_cookieChangeObservers.end())
             return;
-        auto cookies = nsCookiesToCookieVector(addedCookies, [](NSHTTPCookie *cookie) { return !cookie.HTTPOnly; });
+        auto cookies = nsCookiesToCookieVector(addedCookies, false, [](NSHTTPCookie *cookie) { return !cookie.HTTPOnly; });
         if (cookies.isEmpty())
             return;
         for (Ref observer : it->value)
@@ -812,7 +836,7 @@ void NetworkStorageSession::registerCookieChangeListenersIfNecessary()
         if (it == m_cookieChangeObservers.end())
             return;
 
-        auto cookies = nsCookiesToCookieVector(removedCookies, [](NSHTTPCookie *cookie) { return !cookie.HTTPOnly; });
+        auto cookies = nsCookiesToCookieVector(removedCookies, false, [](NSHTTPCookie *cookie) { return !cookie.HTTPOnly; });
         if (cookies.isEmpty())
             return;
         for (Ref observer : it->value)
