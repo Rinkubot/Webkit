@@ -791,6 +791,10 @@ static gboolean webKitWebSrcQuery(GstBaseSrc* baseSrc, GstQuery* query)
     if (!result)
         result = GST_BASE_SRC_CLASS(webkit_web_src_parent_class)->query(baseSrc, query);
 
+    URL url { String::fromLatin1(priv->originalURI.data()) };
+    if (url.protocolIsBlob() || url.protocolIsFile())
+        return result;
+
     if (GST_QUERY_TYPE(query) == GST_QUERY_SCHEDULING) {
         GstSchedulingFlags flags;
         int minSize, maxSize, align;
@@ -868,7 +872,7 @@ static gboolean webKitWebSrcUnLockStop(GstBaseSrc* baseSrc)
 
 static bool urlHasSupportedProtocol(const URL& url)
 {
-    return url.isValid() && (url.protocolIsInHTTPFamily() || url.protocolIsBlob());
+    return url.isValid() && (url.protocolIsInHTTPFamily() || url.protocolIsBlob() || url.protocolIsFile());
 }
 
 // uri handler interface
@@ -880,7 +884,7 @@ static GstURIType webKitWebSrcUriGetType(GType)
 
 const gchar* const* webKitWebSrcGetProtocols(GType)
 {
-    static std::array<const char*, 4> protocols { "http", "https", "blob" };
+    static std::array<const char*, 5> protocols { "http", "https", "blob", "file" };
     return protocols.data();
 }
 
