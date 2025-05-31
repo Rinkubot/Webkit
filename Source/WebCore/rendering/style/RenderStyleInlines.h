@@ -1195,7 +1195,7 @@ inline bool shouldApplyLayoutContainment(const RenderStyle& style, const Element
         return false;
     if (style.isInternalTableBox() && style.display() != DisplayType::TableCell)
         return false;
-    if (style.isRubyContainerOrInternalRubyBox() || (style.display() == DisplayType::Inline && !element.isReplaced(style)))
+    if (style.isRubyContainerOrInternalRubyBox() || (style.display() == DisplayType::Inline && !element.isReplaced(&style)))
         return false;
     return true;
 }
@@ -1216,7 +1216,7 @@ inline bool shouldApplySizeContainment(const RenderStyle& style, const Element& 
         return false;
     if (style.isInternalTableBox())
         return false;
-    if (style.isRubyContainerOrInternalRubyBox() || (style.display() == DisplayType::Inline && !element.isReplaced(style)))
+    if (style.isRubyContainerOrInternalRubyBox() || (style.display() == DisplayType::Inline && !element.isReplaced(&style)))
         return false;
     return true;
 }
@@ -1236,7 +1236,7 @@ inline bool shouldApplyInlineSizeContainment(const RenderStyle& style, const Ele
         return false;
     if (style.isInternalTableBox())
         return false;
-    if (style.isRubyContainerOrInternalRubyBox() || (style.display() == DisplayType::Inline && !element.isReplaced(style)))
+    if (style.isRubyContainerOrInternalRubyBox() || (style.display() == DisplayType::Inline && !element.isReplaced(&style)))
         return false;
     return true;
 }
@@ -1261,7 +1261,7 @@ inline bool shouldApplyPaintContainment(const RenderStyle& style, const Element&
         return false;
     if (style.isInternalTableBox() && style.display() != DisplayType::TableCell)
         return false;
-    if (style.isRubyContainerOrInternalRubyBox() || (style.display() == DisplayType::Inline && !element.isReplaced(style)))
+    if (style.isRubyContainerOrInternalRubyBox() || (style.display() == DisplayType::Inline && !element.isReplaced(&style)))
         return false;
     return true;
 }
