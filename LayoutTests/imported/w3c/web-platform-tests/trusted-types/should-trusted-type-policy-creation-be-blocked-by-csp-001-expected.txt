@@ -241,6 +241,12 @@ CONSOLE MESSAGE: Refused to connect to ws://common/blank.html because it does no
 CONSOLE MESSAGE: Refused to connect to ws://common/blank.html because it does not appear in the connect-src directive of the Content Security Policy.
 CONSOLE MESSAGE: [Report Only] Refused to create a TrustedTypePolicy named 'tt-policy-name3' because it violates the following Content Security Policy directive: "trusted-types tt-policy-name1 tt-policy-name2 tt-policy-name3"
 CONSOLE MESSAGE: Refused to connect to ws://common/blank.html because it does not appear in the connect-src directive of the Content Security Policy.
+CONSOLE MESSAGE: Refused to connect to ws://common/blank.html because it does not appear in the connect-src directive of the Content Security Policy.
+CONSOLE MESSAGE: Refused to create a TrustedTypePolicy named 'other-tt-policy-name' because it violates the following Content Security Policy directive: "trusted-types none"
+CONSOLE MESSAGE: Refused to connect to ws://common/blank.html because it does not appear in the connect-src directive of the Content Security Policy.
+CONSOLE MESSAGE: Refused to connect to ws://common/blank.html because it does not appear in the connect-src directive of the Content Security Policy.
+CONSOLE MESSAGE: Refused to create a TrustedTypePolicy named 'other-tt-policy-name' because it violates the following Content Security Policy directive: "trusted-types allow-duplicates"
+CONSOLE MESSAGE: Refused to connect to ws://common/blank.html because it does not appear in the connect-src directive of the Content Security Policy.
 
 PASS single enforce policy with directive "trusted-type tt-policy-name"
 PASS single report-only policy with directive "trusted-type tt-policy-name"
@@ -264,4 +270,6 @@ PASS single enforce policy with directive "trusted-type tt-policy-name *"
 PASS single report-only policy with directive "trusted-type tt-policy-name *"
 PASS single enforce policy with directive "trusted-type tt-policy-name1 tt-policy-name2 tt-policy-name3"
 PASS single report-only policy with directive "trusted-type tt-policy-name1 tt-policy-name2 tt-policy-name3"
+PASS Single enforce policy with directive "trusted-type none"
+PASS Single enforce policy with directive "trusted-type allow-duplicates"
 

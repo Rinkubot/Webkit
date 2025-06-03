@@ -1894,7 +1894,6 @@ webkit.org/b/271223 fast/events/wheel/redispatched-wheel-event.html [ Skip ] # T
 webkit.org/b/266630 imported/w3c/web-platform-tests/trusted-types/trusted-types-reporting.html [ Skip ]
 webkit.org/b/266630 imported/w3c/web-platform-tests/trusted-types/trusted-types-eval-reporting-report-only.html [ Skip ]
 webkit.org/b/266630 imported/w3c/web-platform-tests/trusted-types/trusted-types-eval-reporting-no-unsafe-eval.html [ Skip ]
-webkit.org/b/266630 imported/w3c/web-platform-tests/trusted-types/trusted-types-eval-reporting.html [ Skip ]
 webkit.org/b/266630 imported/w3c/web-platform-tests/trusted-types/should-trusted-type-policy-creation-be-blocked-by-csp-001.html [ Skip ]
 webkit.org/b/266630 imported/w3c/web-platform-tests/trusted-types/should-trusted-type-policy-creation-be-blocked-by-csp-002.html [ Skip ]
 webkit.org/b/266630 imported/w3c/web-platform-tests/trusted-types/should-trusted-type-policy-creation-be-blocked-by-csp-003.html [ Skip ]

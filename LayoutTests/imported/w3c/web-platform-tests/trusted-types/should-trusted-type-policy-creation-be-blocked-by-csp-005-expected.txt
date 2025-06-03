@@ -1,0 +1,5 @@
+CONSOLE MESSAGE: Refused to create a TrustedTypePolicy named 'tt-policy-name' because it violates the following Content Security Policy directive: "trusted-types 'none'"
+CONSOLE MESSAGE: Refused to connect to ws://common/blank.html because it does not appear in the connect-src directive of the Content Security Policy.
+
+PASS Location of trusted-types violations.
+

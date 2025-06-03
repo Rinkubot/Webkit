@@ -1,0 +1,26 @@
+CONSOLE MESSAGE: Refused to create a TrustedTypePolicy named '𝐆𝐆𝐆𝐆𝐆𝐆𝐆𝐆𝐆𝐆𝐆𝐆𝐆𝐆𝐆𝐆𝐆𝐆𝐆𝐆' because it violates the following Content Security Policy directive: "trusted-types 'none'"
+CONSOLE MESSAGE: Refused to connect to ws://common/blank.html because it does not appear in the connect-src directive of the Content Security Policy.
+CONSOLE MESSAGE: This requires a TrustedHTML value else it violates the following Content Security Policy directive: "require-trusted-types-for 'script'"
+CONSOLE MESSAGE: Refused to connect to ws://common/blank.html because it does not appear in the connect-src directive of the Content Security Policy.
+CONSOLE MESSAGE: Refused to create a TrustedTypePolicy named 'H𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇' because it violates the following Content Security Policy directive: "trusted-types 'none'"
+CONSOLE MESSAGE: Refused to connect to ws://common/blank.html because it does not appear in the connect-src directive of the Content Security Policy.
+CONSOLE MESSAGE: This requires a TrustedHTML value else it violates the following Content Security Policy directive: "require-trusted-types-for 'script'"
+CONSOLE MESSAGE: Refused to connect to ws://common/blank.html because it does not appear in the connect-src directive of the Content Security Policy.
+CONSOLE MESSAGE: Refused to create a TrustedTypePolicy named '𝐈𝐈𝐈𝐈𝐈𝐈𝐈𝐈𝐈𝐈𝐈𝐈𝐈𝐈𝐈𝐈𝐈𝐈𝐈𝐈I' because it violates the following Content Security Policy directive: "trusted-types 'none'"
+CONSOLE MESSAGE: Refused to connect to ws://common/blank.html because it does not appear in the connect-src directive of the Content Security Policy.
+CONSOLE MESSAGE: This requires a TrustedHTML value else it violates the following Content Security Policy directive: "require-trusted-types-for 'script'"
+CONSOLE MESSAGE: Refused to connect to ws://common/blank.html because it does not appear in the connect-src directive of the Content Security Policy.
+CONSOLE MESSAGE: Refused to create a TrustedTypePolicy named '𝐉𝐉𝐉𝐉𝐉𝐉𝐉𝐉𝐉𝐉𝐉𝐉𝐉𝐉𝐉𝐉𝐉𝐉𝐉𝐉𝐉' because it violates the following Content Security Policy directive: "trusted-types 'none'"
+CONSOLE MESSAGE: Refused to connect to ws://common/blank.html because it does not appear in the connect-src directive of the Content Security Policy.
+CONSOLE MESSAGE: This requires a TrustedHTML value else it violates the following Content Security Policy directive: "require-trusted-types-for 'script'"
+CONSOLE MESSAGE: Refused to connect to ws://common/blank.html because it does not appear in the connect-src directive of the Content Security Policy.
+
+PASS Clipping of violation sample for createPolicy(𝐆𝐆𝐆𝐆𝐆𝐆𝐆𝐆𝐆𝐆𝐆𝐆𝐆𝐆𝐆𝐆𝐆𝐆𝐆𝐆)
+PASS Clipping of violation sample for Element.innerHTML = "𝐆𝐆𝐆𝐆𝐆𝐆𝐆𝐆𝐆𝐆𝐆𝐆𝐆𝐆𝐆𝐆𝐆𝐆𝐆𝐆"
+FAIL Clipping of violation sample for createPolicy(H𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇) assert_equals: expected "H𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇" but got "H𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇U+d835"
+FAIL Clipping of violation sample for Element.innerHTML = "H𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇" assert_equals: expected "Element innerHTML|H𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇" but got "Element innerHTML|H𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇𝐇U+d835"
+PASS Clipping of violation sample for createPolicy(𝐈𝐈𝐈𝐈𝐈𝐈𝐈𝐈𝐈𝐈𝐈𝐈𝐈𝐈𝐈𝐈𝐈𝐈𝐈𝐈I)
+PASS Clipping of violation sample for Element.innerHTML = "𝐈𝐈𝐈𝐈𝐈𝐈𝐈𝐈𝐈𝐈𝐈𝐈𝐈𝐈𝐈𝐈𝐈𝐈𝐈𝐈I"
+PASS Clipping of violation sample for createPolicy(𝐉𝐉𝐉𝐉𝐉𝐉𝐉𝐉𝐉𝐉𝐉𝐉𝐉𝐉𝐉𝐉𝐉𝐉𝐉𝐉𝐉)
+PASS Clipping of violation sample for Element.innerHTML = "𝐉𝐉𝐉𝐉𝐉𝐉𝐉𝐉𝐉𝐉𝐉𝐉𝐉𝐉𝐉𝐉𝐉𝐉𝐉𝐉𝐉"
+

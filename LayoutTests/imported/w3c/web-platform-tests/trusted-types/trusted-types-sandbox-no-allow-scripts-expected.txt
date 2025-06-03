@@ -1,0 +1,5 @@
+CONSOLE MESSAGE: Blocked script execution in 'http://localhost:8800/trusted-types/support/trusted-types-sandbox-no-allow-scripts.html' because the document's frame is sandboxed and the 'allow-scripts' permission is not set.
+
+
+PASS Trusted Types CSP directives don't affect the behavior of sandboxed page without allow-scripts.
+

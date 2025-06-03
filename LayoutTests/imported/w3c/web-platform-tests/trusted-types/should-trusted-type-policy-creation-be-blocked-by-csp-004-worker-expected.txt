@@ -1,0 +1,7 @@
+
+Harness Error (TIMEOUT), message = null
+
+TIMEOUT No violation/exception for allowed policy names (tt-policy-name-1 tt-policy-name-2 tt-policy-name-3). Test timed out
+NOTRUN Violation and exception for duplicate policy names (tt-policy-name-1 tt-policy-name-2 tt-policy-name-3).
+NOTRUN Violation and exception for forbidden policy name (tt-policy-name-1 tt-policy-name-2 tt-policy-name-3).
+

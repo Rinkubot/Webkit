@@ -25,13 +25,11 @@ CONSOLE MESSAGE: The value for Content Security Policy directive 'trusted-types'
 CONSOLE MESSAGE: Refused to connect to ws://common/blank.html because it does not appear in the connect-src directive of the Content Security Policy.
 CONSOLE MESSAGE: Refused to connect to ws://common/blank.html because it does not appear in the connect-src directive of the Content Security Policy.
 CONSOLE MESSAGE: Refused to connect to ws://common/blank.html because it does not appear in the connect-src directive of the Content Security Policy.
-CONSOLE MESSAGE: Refused to create a TrustedTypePolicy named '_TTP3_' because it violates the following Content Security Policy directive: "trusted-types _TTP1_	_TTP2_"
 CONSOLE MESSAGE: Refused to connect to ws://common/blank.html because it does not appear in the connect-src directive of the Content Security Policy.
-CONSOLE MESSAGE: Refused to create a TrustedTypePolicy named '_TTP4_' because it violates the following Content Security Policy directive: "trusted-types _TTP1_	_TTP2_"
 CONSOLE MESSAGE: Refused to connect to ws://common/blank.html because it does not appear in the connect-src directive of the Content Security Policy.
-CONSOLE MESSAGE: Refused to create a TrustedTypePolicy named '_TTP5_' because it violates the following Content Security Policy directive: "trusted-types _TTP1_	_TTP2_"
+CONSOLE MESSAGE: Refused to create a TrustedTypePolicy named '_TTP5_' because it violates the following Content Security Policy directive: "trusted-types _TTP1_	_TTP2_ _TTP3__TTP4_"
 CONSOLE MESSAGE: Refused to connect to ws://common/blank.html because it does not appear in the connect-src directive of the Content Security Policy.
-CONSOLE MESSAGE: Refused to create a TrustedTypePolicy named '_TTP6_' because it violates the following Content Security Policy directive: "trusted-types _TTP1_	_TTP2_"
+CONSOLE MESSAGE: Refused to create a TrustedTypePolicy named '_TTP6_' because it violates the following Content Security Policy directive: "trusted-types _TTP1_	_TTP2_ _TTP3__TTP4_"
 CONSOLE MESSAGE: Refused to connect to ws://common/blank.html because it does not appear in the connect-src directive of the Content Security Policy.
 CONSOLE MESSAGE: Refused to create a TrustedTypePolicy named '_TTP_' because it violates the following Content Security Policy directive: "trusted-types _TTP_*"
 CONSOLE MESSAGE: Refused to connect to ws://common/blank.html because it does not appear in the connect-src directive of the Content Security Policy.
@@ -54,7 +52,7 @@ PASS invalid tt-policy-name name "policy*name"
 PASS invalid tt-policy-name name "policy$name"
 PASS invalid tt-policy-name name "policy?name"
 PASS invalid tt-policy-name name "policy!name"
-FAIL invalid tt-policy-name name "política" assert_true: createPolicy() should throw a TypeError. expected true got false
-FAIL directive "trusted-type _TTP1_%09_TTP2_%0A_TTP3_%0C_TTP4_%0D_TTP5_%20_TTP6_" (required-ascii-whitespace) assert_equals: expected null but got object "TypeError: Failed to execute 'createPolicy': Policy with name '_TTP3_' disallowed."
+PASS non-ASCII trusted-types directives are discarded ("política")
+FAIL directive "trusted-type _TTP1_%09_TTP2_%0A%20_TTP3_%0C_TTP4_%0D_TTP5_%20_TTP6_" (required-ascii-whitespace) assert_equals: expected null but got object "TypeError: Failed to execute 'createPolicy': Policy with name '_TTP5_' disallowed."
 PASS invalid directive "trusted-type _TTP" (no ascii whitespace)
 
