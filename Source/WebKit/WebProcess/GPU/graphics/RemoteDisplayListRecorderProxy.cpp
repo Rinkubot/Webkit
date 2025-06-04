@@ -618,19 +618,19 @@ bool RemoteDisplayListRecorderProxy::recordResourceUse(NativeImage& image)
     auto colorSpace = image.colorSpace();
 
     if (image.headroom() > Headroom::None) {
-#if ENABLE(PIXEL_FORMAT_RGBA16F) && HAVE(CORE_GRAPHICS_EXTENDED_SRGB_COLOR_SPACE)
-        // The image will be drawn to a Float16 layer, so use extended range sRGB
-        // to preserve the HDR contents.
-        if (m_contentsFormat && *m_contentsFormat == ContentsFormat::RGBA16F)
-            colorSpace = DestinationColorSpace::ExtendedSRGB();
-        else
-#endif
 #if PLATFORM(IOS_FAMILY)
+        if (!m_contentsFormat || *m_contentsFormat == ContentsFormat::RGBA8) {
             // iOS typically renders into extended range sRGB to preserve wide gamut colors, but we want
             // a non-extended range colorspace here so that the contents are tone mapped to SDR range.
             colorSpace = DestinationColorSpace::DisplayP3();
-#else
-            colorSpace = DestinationColorSpace::SRGB();
+        } else {
+#endif
+            if (auto extendedColorSpace = contentsFormatExtendedColorSpace(*m_contentsFormat))
+                colorSpace = *extendedColorSpace;
+            else
+                colorSpace = DestinationColorSpace::SRGB();
+#if PLATFORM(IOS_FAMILY)
+        }
 #endif
     }
 

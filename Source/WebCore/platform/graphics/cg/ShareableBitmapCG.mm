@@ -58,11 +58,10 @@ std::optional<DestinationColorSpace> ShareableBitmapConfiguration::validateColor
     if (auto colorSpaceAsRGB = colorSpace->asRGB())
         return colorSpaceAsRGB;
 
-#if HAVE(CORE_GRAPHICS_EXTENDED_SRGB_COLOR_SPACE)
-    return DestinationColorSpace::ExtendedSRGB();
-#else
+    if (auto colorSpaceAsExtendedRange = colorSpace->asExtendedRange())
+        return *colorSpaceAsExtendedRange;
+
     return DestinationColorSpace::SRGB();
-#endif
 }
 
 CheckedUint32 ShareableBitmapConfiguration::calculateBytesPerPixel(const DestinationColorSpace& colorSpace)

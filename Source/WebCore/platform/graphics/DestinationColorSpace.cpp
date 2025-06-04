@@ -159,6 +159,18 @@ std::optional<DestinationColorSpace> DestinationColorSpace::asRGB() const
 #endif
 }
 
+std::optional<DestinationColorSpace> DestinationColorSpace::asExtendedRange() const
+{
+    if (usesExtendedRange())
+        return *this;
+
+#if HAVE(CORE_GRAPHICS_EXTENDED_SRGB_COLOR_SPACE)
+    return DestinationColorSpace::ExtendedSRGB();
+#else
+    return std::nullopt;
+#endif
+}
+
 bool DestinationColorSpace::supportsOutput() const
 {
 #if USE(CG)

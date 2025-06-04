@@ -39,14 +39,18 @@ std::optional<DestinationColorSpace> contentsFormatExtendedColorSpace(ContentsFo
     switch (contentsFormat) {
     case ContentsFormat::RGBA8:
         return std::nullopt;
-#if ENABLE(PIXEL_FORMAT_RGB10) && ENABLE(DESTINATION_COLOR_SPACE_EXTENDED_SRGB)
+#if ENABLE(DESTINATION_COLOR_SPACE_EXTENDED_SRGB)
+#if ENABLE(PIXEL_FORMAT_RGB10)
     case ContentsFormat::RGBA10:
         return DestinationColorSpace::ExtendedSRGB();
 #endif
-#if ENABLE(PIXEL_FORMAT_RGBA16F) && ENABLE(DESTINATION_COLOR_SPACE_EXTENDED_REC_2020)
+#if ENABLE(PIXEL_FORMAT_RGBA16F)
     case ContentsFormat::RGBA16F:
-        return DestinationColorSpace::ExtendedRec2020();
+        return DestinationColorSpace::ExtendedSRGB();
 #endif
+#endif
+    default:
+        break;
     }
 
     ASSERT_NOT_REACHED();
