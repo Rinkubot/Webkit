@@ -242,16 +242,24 @@ inline std::optional<double> safeReciprocalForDivByConst(double constant)
 
 ALWAYS_INLINE bool canBeStrictInt32(double value)
 {
-    if (std::isinf(value) || std::isnan(value))
+    if (!std::isfinite(value)
+        || value < static_cast<double>(std::numeric_limits<int32_t>::min())
+        || value > static_cast<double>(std::numeric_limits<int32_t>::max())
+    ) {
         return false;
+    }
     const int32_t asInt32 = static_cast<int32_t>(value);
-    return !(asInt32 != value || (!asInt32 && std::signbit(value))); // true for -0.0
+    return !(asInt32 != value || (!asInt32 && std::signbit(value))); // false for -0.0
 }
 
 ALWAYS_INLINE bool canBeInt32(double value)
 {
-    if (std::isinf(value) || std::isnan(value))
+    if (!std::isfinite(value)
+        || value < static_cast<double>(std::numeric_limits<int32_t>::min())
+        || value > static_cast<double>(std::numeric_limits<int32_t>::max())
+    ) {
         return false;
+    }
     return static_cast<int32_t>(value) == value;
 }
 
