@@ -50,6 +50,7 @@
 /* Begin PBXBuildFile section */
 		041A1E34216FFDBC00789E0A /* PublicSuffix.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 041A1E33216FFDBC00789E0A /* PublicSuffix.cpp */; };
 		04DB2396235E43EC00328F17 /* BumpPointerAllocator.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0451A5A6235E438E009DF945 /* BumpPointerAllocator.cpp */; };
+		0714673C2DFE57DA00F77867 /* libTestWebKitAPI.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 7CCE7E8C1A41144E00447C4C /* libTestWebKitAPI.a */; };
 		07275CBC2D01398C002315A5 /* _WebKit_SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 07275CBB2D01398C002315A5 /* _WebKit_SwiftUI.framework */; };
 		074E87E52CF920A20059E469 /* Bundle+Extras.swift in Sources */ = {isa = PBXBuildFile; fileRef = 074E87E42CF920A20059E469 /* Bundle+Extras.swift */; };
 		075663822DF68BAB00E9A4E3 /* TestPDFDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 078B0CA82DF656BD00B3E569 /* TestPDFDocument.swift */; };
@@ -59,7 +60,6 @@
 		077A5AF3230638A600A7105C /* AccessibilityTestPlugin.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0746645822FF630500E3451A /* AccessibilityTestPlugin.mm */; };
 		078B04482CF118BD00B453A6 /* URLSchemeHandlerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 078B04472CF118BD00B453A6 /* URLSchemeHandlerTests.swift */; };
 		078B044A2CF139BF00B453A6 /* Foundation+Extras.swift in Sources */ = {isa = PBXBuildFile; fileRef = 078B04492CF139BF00B453A6 /* Foundation+Extras.swift */; };
-		078B0CA92DF656BD00B3E569 /* TestPDFDocument.swift in Sources */ = {isa = PBXBuildFile; fileRef = 078B0CA82DF656BD00B3E569 /* TestPDFDocument.swift */; };
 		078F21302DD99E6A00E87858 /* RunLoopQueueTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 078F21282DD99E6300E87858 /* RunLoopQueueTests.swift */; };
 		079D45F22A2A6BBE003830C7 /* Viewport.mm in Sources */ = {isa = PBXBuildFile; fileRef = 079D45F12A2A6BBE003830C7 /* Viewport.mm */; };
 		07C02FD22D6D6FBC0004ED97 /* rtl-sideways-scrolling.html in Copy Resources */ = {isa = PBXBuildFile; fileRef = 07C02FD12D6D6FBC0004ED97 /* rtl-sideways-scrolling.html */; };
@@ -4183,6 +4183,7 @@
 			files = (
 				07275CBC2D01398C002315A5 /* _WebKit_SwiftUI.framework in Frameworks */,
 				A17C58482C9C0387009DD0B5 /* gtest.framework in Frameworks */,
+				0714673C2DFE57DA00F77867 /* libTestWebKitAPI.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -7797,7 +7798,6 @@
 				A17C58472C9BF524009DD0B5 /* GoogleTests.mm in Sources */,
 				DD5698002DC1320500050321 /* rdar150228472.swift in Sources */,
 				078F21302DD99E6A00E87858 /* RunLoopQueueTests.swift in Sources */,
-				078B0CA92DF656BD00B3E569 /* TestPDFDocument.swift in Sources */,
 				078B04482CF118BD00B453A6 /* URLSchemeHandlerTests.swift in Sources */,
 				07FAA74D2CE95E3200128360 /* WebPageTests.swift in Sources */,
 				077489CC2CE4061A00133938 /* WKWebViewSwiftOverlayTests.swift in Sources */,
