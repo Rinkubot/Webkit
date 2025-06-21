@@ -1548,12 +1548,16 @@ GstElement* MediaPlayerPrivateGStreamer::createAudioSink()
 #if ENABLE(WPE_PLATFORM)
     if (WEBKIT_IS_AUDIO_SINK(audioSink) && hasSocketPath) {
         webkitAudioSinkSetStartedCallback(WEBKIT_AUDIO_SINK(audioSink), [&](const auto& path) {
-            if (RefPtr player = m_player.get())
-                player->audioSinkStarted(path);
+            callOnMainThreadAndWait([&] {
+                if (RefPtr player = m_player.get())
+                    player->audioSinkStarted(path);
+            });
         });
         webkitAudioSinkSetStoppedCallback(WEBKIT_AUDIO_SINK(audioSink), [&](const auto& path) {
-            if (RefPtr player = m_player.get())
-                player->audioSinkStopped(path);
+            callOnMainThreadAndWait([&] {
+                if (RefPtr player = m_player.get())
+                    player->audioSinkStopped(path);
+            });
         });
     }
 #endif
