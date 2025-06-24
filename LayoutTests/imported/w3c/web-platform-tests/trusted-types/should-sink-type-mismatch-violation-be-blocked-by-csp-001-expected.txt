@@ -1,0 +1,68 @@
+CONSOLE MESSAGE: Invalid sink group in 'require-trusted-types-for' Content Security Policy directive: ''invalid''.
+
+CONSOLE MESSAGE: This requires a TrustedHTML value else it violates the following Content Security Policy directive: "require-trusted-types-for 'script'"
+CONSOLE MESSAGE: Refused to connect to ws://common/blank.html because it does not appear in the connect-src directive of the Content Security Policy.
+CONSOLE MESSAGE: The Content Security Policy 'require-trusted-types-for 'script'' was delivered in report-only mode, but does not specify a 'report-to'; the policy will have no effect. Please either add a 'report-to' directive, or deliver the policy via the 'Content-Security-Policy' header.
+CONSOLE MESSAGE: The Content Security Policy ' require-trusted-types-for 'script'' was delivered in report-only mode, but does not specify a 'report-to'; the policy will have no effect. Please either add a 'report-to' directive, or deliver the policy via the 'Content-Security-Policy' header.
+CONSOLE MESSAGE: The Content Security Policy ' require-trusted-types-for 'script'' was delivered in report-only mode, but does not specify a 'report-to'; the policy will have no effect. Please either add a 'report-to' directive, or deliver the policy via the 'Content-Security-Policy' header.
+CONSOLE MESSAGE: The Content Security Policy ' require-trusted-types-for 'script'' was delivered in report-only mode, but does not specify a 'report-to'; the policy will have no effect. Please either add a 'report-to' directive, or deliver the policy via the 'Content-Security-Policy' header.
+CONSOLE MESSAGE: Invalid sink group in 'require-trusted-types-for' Content Security Policy directive: ''invalid''.
+
+CONSOLE MESSAGE: The Content Security Policy ' require-trusted-types-for 'invalid'' was delivered in report-only mode, but does not specify a 'report-to'; the policy will have no effect. Please either add a 'report-to' directive, or deliver the policy via the 'Content-Security-Policy' header.
+CONSOLE MESSAGE: The Content Security Policy ' require-trusted-types-for 'script'' was delivered in report-only mode, but does not specify a 'report-to'; the policy will have no effect. Please either add a 'report-to' directive, or deliver the policy via the 'Content-Security-Policy' header.
+CONSOLE MESSAGE: [Report Only] This requires a TrustedHTML value else it violates the following Content Security Policy directive: "require-trusted-types-for 'script'"
+CONSOLE MESSAGE: [Report Only] This requires a TrustedHTML value else it violates the following Content Security Policy directive: "require-trusted-types-for 'script'"
+CONSOLE MESSAGE: [Report Only] This requires a TrustedHTML value else it violates the following Content Security Policy directive: "require-trusted-types-for 'script'"
+CONSOLE MESSAGE: [Report Only] This requires a TrustedHTML value else it violates the following Content Security Policy directive: "require-trusted-types-for 'script'"
+CONSOLE MESSAGE: [Report Only] This requires a TrustedHTML value else it violates the following Content Security Policy directive: "require-trusted-types-for 'script'"
+CONSOLE MESSAGE: Refused to connect to ws://common/blank.html because it does not appear in the connect-src directive of the Content Security Policy.
+CONSOLE MESSAGE: Invalid sink group in 'require-trusted-types-for' Content Security Policy directive: ''unknown''.
+
+CONSOLE MESSAGE: The Content Security Policy 'require-trusted-types-for 'script'' was delivered in report-only mode, but does not specify a 'report-to'; the policy will have no effect. Please either add a 'report-to' directive, or deliver the policy via the 'Content-Security-Policy' header.
+CONSOLE MESSAGE: This requires a TrustedHTML value else it violates the following Content Security Policy directive: "require-trusted-types-for 'script'"
+CONSOLE MESSAGE: Refused to connect to ws://common/blank.html because it does not appear in the connect-src directive of the Content Security Policy.
+CONSOLE MESSAGE: The Content Security Policy 'require-trusted-types-for 'script'' was delivered in report-only mode, but does not specify a 'report-to'; the policy will have no effect. Please either add a 'report-to' directive, or deliver the policy via the 'Content-Security-Policy' header.
+CONSOLE MESSAGE: The Content Security Policy ' require-trusted-types-for 'script'' was delivered in report-only mode, but does not specify a 'report-to'; the policy will have no effect. Please either add a 'report-to' directive, or deliver the policy via the 'Content-Security-Policy' header.
+CONSOLE MESSAGE: The Content Security Policy ' require-trusted-types-for 'script'' was delivered in report-only mode, but does not specify a 'report-to'; the policy will have no effect. Please either add a 'report-to' directive, or deliver the policy via the 'Content-Security-Policy' header.
+CONSOLE MESSAGE: Invalid sink group in 'require-trusted-types-for' Content Security Policy directive: ''unknown''.
+
+CONSOLE MESSAGE: The Content Security Policy ' require-trusted-types-for 'unknown'' was delivered in report-only mode, but does not specify a 'report-to'; the policy will have no effect. Please either add a 'report-to' directive, or deliver the policy via the 'Content-Security-Policy' header.
+CONSOLE MESSAGE: The Content Security Policy ' require-trusted-types-for 'script'' was delivered in report-only mode, but does not specify a 'report-to'; the policy will have no effect. Please either add a 'report-to' directive, or deliver the policy via the 'Content-Security-Policy' header.
+CONSOLE MESSAGE: This requires a TrustedHTML value else it violates the following Content Security Policy directive: "require-trusted-types-for 'script'"
+CONSOLE MESSAGE: Refused to connect to ws://common/blank.html because it does not appear in the connect-src directive of the Content Security Policy.
+CONSOLE MESSAGE: The Content Security Policy 'require-trusted-types-for 'script'' was delivered in report-only mode, but does not specify a 'report-to'; the policy will have no effect. Please either add a 'report-to' directive, or deliver the policy via the 'Content-Security-Policy' header.
+CONSOLE MESSAGE: The Content Security Policy ' require-trusted-types-for 'script'' was delivered in report-only mode, but does not specify a 'report-to'; the policy will have no effect. Please either add a 'report-to' directive, or deliver the policy via the 'Content-Security-Policy' header.
+CONSOLE MESSAGE: The Content Security Policy ' require-trusted-types-for 'script'' was delivered in report-only mode, but does not specify a 'report-to'; the policy will have no effect. Please either add a 'report-to' directive, or deliver the policy via the 'Content-Security-Policy' header.
+CONSOLE MESSAGE: This requires a TrustedHTML value else it violates the following Content Security Policy directive: "require-trusted-types-for 'script'"
+CONSOLE MESSAGE: Refused to connect to ws://common/blank.html because it does not appear in the connect-src directive of the Content Security Policy.
+CONSOLE MESSAGE: This requires a TrustedHTML value else it violates the following Content Security Policy directive: "require-trusted-types-for 'script'"
+CONSOLE MESSAGE: Refused to connect to ws://common/blank.html because it does not appear in the connect-src directive of the Content Security Policy.
+CONSOLE MESSAGE: Invalid sink group in 'require-trusted-types-for' Content Security Policy directive: ''script''script''.
+
+CONSOLE MESSAGE: Refused to connect to ws://common/blank.html because it does not appear in the connect-src directive of the Content Security Policy.
+CONSOLE MESSAGE: Invalid sink group in 'require-trusted-types-for' Content Security Policy directive: ''invalid''.
+
+CONSOLE MESSAGE: This requires a TrustedHTML value else it violates the following Content Security Policy directive: "require-trusted-types-for 'script'"
+CONSOLE MESSAGE: Refused to connect to ws://common/blank.html because it does not appear in the connect-src directive of the Content Security Policy.
+CONSOLE MESSAGE: Invalid sink group in 'require-trusted-types-for' Content Security Policy directive: ''invalid''.
+
+CONSOLE MESSAGE: This requires a TrustedHTML value else it violates the following Content Security Policy directive: "require-trusted-types-for 'script'"
+CONSOLE MESSAGE: Refused to connect to ws://common/blank.html because it does not appear in the connect-src directive of the Content Security Policy.
+CONSOLE MESSAGE: Invalid sink group in 'require-trusted-types-for' Content Security Policy directive: ''invalid''.
+
+CONSOLE MESSAGE: Invalid sink group in 'require-trusted-types-for' Content Security Policy directive: ''also-invalid''.
+
+CONSOLE MESSAGE: This requires a TrustedHTML value else it violates the following Content Security Policy directive: "require-trusted-types-for 'script'"
+CONSOLE MESSAGE: Refused to connect to ws://common/blank.html because it does not appear in the connect-src directive of the Content Security Policy.
+
+FAIL Multiple enforce require-trusted-types-for directives. assert_equals: expected 5 but got 1
+PASS Multiple report-only require-trusted-types-for directives.
+FAIL One violated report-only require-trusted-types-for directive followed by multiple enforce directives assert_equals: expected 5 but got 1
+FAIL One violated enforce require-trusted-types-for directive followed by multiple report-only directives assert_equals: expected 5 but got 1
+FAIL Mixing enforce and report-only require-trusted-types-for directives. assert_equals: expected 6 but got 1
+PASS directive "require-trusted-types-for 'script'%09'script'%0A'script'%0C'script'%0D'script'%20'script'" (required-ascii-whitespace)
+PASS invalid directive "require-trusted-types-for 'script''script'" (no ascii-whitespace)
+PASS directive "require-trusted-types-for 'script' 'invalid'" (unknown sink group)
+PASS directive "require-trusted-types-for 'invalid' 'script'" (unknown sink group)
+PASS directive "require-trusted-types-for 'invalid' 'script' 'also-invalid" (unknown sink group)
+
