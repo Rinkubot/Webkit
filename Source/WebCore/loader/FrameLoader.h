@@ -48,6 +48,7 @@
 #include <wtf/CheckedRef.h>
 #include <wtf/CompletionHandler.h>
 #include <wtf/Forward.h>
+#include <wtf/HashMap.h>
 #include <wtf/HashSet.h>
 #include <wtf/OptionSet.h>
 #include <wtf/Platform.h>
@@ -61,6 +62,7 @@ namespace WebCore {
 class Archive;
 class CachedFrameBase;
 class CachedPage;
+class CachedRawResource;
 class CachedResource;
 class Chrome;
 class SharedBuffer;
@@ -88,6 +90,7 @@ class ResourceRequest;
 class ResourceResponse;
 class SerializedScriptValue;
 class SubstituteData;
+class DocumentPrefetcher;
 
 enum class CachePolicy : uint8_t;
 enum class NewLoadInProgress : bool;
@@ -364,6 +367,9 @@ public:
 
     WEBCORE_EXPORT void prefetchDNSIfNeeded(const URL&);
 
+    void prefetch(const URL&, const Vector<String>&, const String&, bool lowPriority = false);
+    DocumentPrefetcher& documentPrefetcher() { return *m_documentPrefetcher; }
+
 private:
     enum FormSubmissionCacheLoadPolicy {
         MayAttemptCacheOnlyLoadForFormSubmissionItem,
@@ -552,6 +558,8 @@ private:
     bool m_doNotAbortNavigationAPI { false };
     RefPtr<HistoryItem> m_pendingNavigationAPIItem;
     uint64_t m_requiredCookiesVersion { 0 };
+
+    RefPtr<DocumentPrefetcher> m_documentPrefetcher;
 };
 
 // This function is called by createWindow() in JSDOMWindowBase.cpp, for example, for
