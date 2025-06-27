@@ -3574,8 +3574,10 @@ void Element::childrenChanged(const ChildChange& change)
     }
 
     if (document().isDirAttributeDirty()) [[unlikely]] {
-        if (selfOrPrecedingNodesAffectDirAuto())
-            updateEffectiveTextDirection();
+        if (change.type != ChildChange::Type::ElementInserted || !(is<HTMLImageElement>(change.siblingChanged) || change.siblingChanged->isReplaced())) {
+            if (selfOrPrecedingNodesAffectDirAuto())
+                updateEffectiveTextDirection();
+        }
     }
 }
 

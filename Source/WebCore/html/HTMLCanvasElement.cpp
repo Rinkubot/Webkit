@@ -187,7 +187,7 @@ RenderPtr<RenderElement> HTMLCanvasElement::createElementRenderer(RenderStyle&& 
     return HTMLElement::createElementRenderer(WTFMove(style), insertionPosition);
 }
 
-bool HTMLCanvasElement::isReplaced(const RenderStyle&) const
+bool HTMLCanvasElement::isReplaced(const RenderStyle*) const
 {
     RefPtr frame = document().frame();
     return frame && frame->checkedScript()->canExecuteScripts(ReasonForCallingCanExecuteScripts::NotAboutToExecuteScript);
