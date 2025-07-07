@@ -26,8 +26,6 @@
 #include "config.h"
 #include "ContentExtensionActions.h"
 
-#if ENABLE(CONTENT_EXTENSIONS)
-
 #include "ContentExtensionError.h"
 #include "ResourceRequest.h"
 #include <JavaScriptCore/JSRetainPtr.h>
@@ -911,4 +909,3 @@ size_t RedirectAction::URLTransformAction::QueryTransform::QueryKeyValue::serial
 
 } // namespace WebCore::ContentExtensions
 
-#endif // ENABLE(CONTENT_EXTENSIONS)

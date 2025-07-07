@@ -26,8 +26,6 @@
 #include "config.h"
 #include "ContentExtensionStringSerialization.h"
 
-#if ENABLE(CONTENT_EXTENSIONS)
-
 #include <wtf/StdLibExtras.h>
 
 namespace WebCore::ContentExtensions {
@@ -54,4 +52,3 @@ size_t stringSerializedLength(std::span<const uint8_t> span)
 
 } // namespace WebCore::ContentExtensions
 
-#endif // ENABLE(CONTENT_EXTENSIONS)

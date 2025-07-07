@@ -79,9 +79,7 @@ public:
 
     std::optional<SharedPreferencesForWebProcess> sharedPreferencesForWebProcess(const IPC::Connection&) const;
 
-#if ENABLE(CONTENT_EXTENSIONS)
     void reportNetworkUsageToWorkerObject(WebCore::SharedWorkerObjectIdentifier, size_t bytesTransferredOverNetworkDelta);
-#endif
 
 private:
     WebSharedWorkerServerConnection(NetworkProcess&, WebSharedWorkerServer&, IPC::Connection&, WebCore::ProcessIdentifier);

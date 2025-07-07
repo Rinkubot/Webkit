@@ -26,8 +26,6 @@
 #include "config.h"
 #include "DFAMinimizer.h"
 
-#if ENABLE(CONTENT_EXTENSIONS)
-
 #include "DFA.h"
 #include "DFANode.h"
 #include "MutableRangeList.h"
@@ -501,4 +499,3 @@ void DFAMinimizer::minimize(DFA& dfa)
 } // namespace ContentExtensions
 } // namespace WebCore
 
-#endif // ENABLE(CONTENT_EXTENSIONS)

@@ -26,7 +26,6 @@
 #include "config.h"
 #include "WebCompiledContentRuleList.h"
 
-#if ENABLE(CONTENT_EXTENSIONS)
 
 namespace WebKit {
 
@@ -74,4 +73,3 @@ std::span<const uint8_t> WebCompiledContentRuleList::spanWithOffsetAndLength(siz
 
 } // namespace WebKit
 
-#endif // ENABLE(CONTENT_EXTENSIONS)

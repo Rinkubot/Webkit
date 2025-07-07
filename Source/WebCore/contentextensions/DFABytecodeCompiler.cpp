@@ -26,8 +26,6 @@
 #include "config.h"
 #include "DFABytecodeCompiler.h"
 
-#if ENABLE(CONTENT_EXTENSIONS)
-
 #include "ContentExtensionRule.h"
 #include "DFA.h"
 #include "DFANode.h"
@@ -572,4 +570,3 @@ void DFABytecodeCompiler::compile()
 
 } // namespace WebCore::ContentExtensions
 
-#endif // ENABLE(CONTENT_EXTENSIONS)

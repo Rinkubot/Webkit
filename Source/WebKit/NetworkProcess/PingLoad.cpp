@@ -74,9 +74,7 @@ void PingLoad::initialize(NetworkProcess& networkProcess)
         m_networkLoadChecker->setCSPResponseHeaders(WTFMove(m_parameters.cspResponseHeaders.value()));
     m_networkLoadChecker->setParentCrossOriginEmbedderPolicy(m_parameters.parentCrossOriginEmbedderPolicy);
     m_networkLoadChecker->setCrossOriginEmbedderPolicy(m_parameters.crossOriginEmbedderPolicy);
-#if ENABLE(CONTENT_EXTENSIONS)
     m_networkLoadChecker->setContentExtensionController(WTFMove(m_parameters.mainDocumentURL), WTFMove(m_parameters.frameURL), m_parameters.userContentControllerIdentifier);
-#endif
 
     // If the server never responds, this object will hang around forever.
     // Set a very generous timeout, just in case.

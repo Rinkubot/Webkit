@@ -25,8 +25,6 @@
 
 #pragma once
 
-#if ENABLE(CONTENT_EXTENSIONS)
-
 #include <wtf/text/WTFString.h>
 
 namespace WebCore {
@@ -66,4 +64,3 @@ private:
 } // namespace ContentExtensions
 } // namespace WebCore
 
-#endif // ENABLE(CONTENT_EXTENSIONS)

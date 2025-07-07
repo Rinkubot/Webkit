@@ -55,15 +55,11 @@ private:
 #if ENABLE(USER_MESSAGE_HANDLERS)
     void forEachUserMessageHandler(NOESCAPE const Function<void(const UserMessageHandlerDescriptor&)>&) const final;
 #endif
-#if ENABLE(CONTENT_EXTENSIONS)
     ContentExtensions::ContentExtensionsBackend& userContentExtensionBackend() override { return m_contentExtensionBackend; }
-#endif
 
     UserScriptMap m_userScripts;
     UserStyleSheetMap m_userStyleSheets;
-#if ENABLE(CONTENT_EXTENSIONS)
     ContentExtensions::ContentExtensionsBackend m_contentExtensionBackend;
-#endif
 };
 
 } // namespace WebCore

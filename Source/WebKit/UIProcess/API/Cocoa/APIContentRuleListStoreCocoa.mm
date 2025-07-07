@@ -26,7 +26,6 @@
 #import "config.h"
 #import "APIContentRuleListStore.h"
 
-#if ENABLE(CONTENT_EXTENSIONS)
 
 #import "SandboxUtilities.h"
 #import <WebCore/SharedBuffer.h>
@@ -63,4 +62,3 @@ WTF::String ContentRuleListStore::defaultStorePath()
 
 } // namespace API
 
-#endif // ENABLE(CONTENT_EXTENSIONS)

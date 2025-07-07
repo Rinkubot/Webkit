@@ -32,7 +32,6 @@
 #include <wtf/Seconds.h>
 #include <wtf/StdLibExtras.h>
 
-#if ENABLE(CONTENT_EXTENSIONS)
 
 #define RESOURCEMONITOR_RELEASE_LOG(fmt, ...) RELEASE_LOG(ResourceMonitoring, "ResourceMonitorThrottler::" fmt, ##__VA_ARGS__)
 
@@ -205,4 +204,3 @@ bool ResourceMonitorThrottler::AccessThrottler::tryExpire(ContinuousApproximateT
 
 #undef RESOURCEMONITOR_RELEASE_LOG
 
-#endif

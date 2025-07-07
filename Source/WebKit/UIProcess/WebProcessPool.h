@@ -620,10 +620,8 @@ public:
     void updateWebProcessSuspensionDelayWithPacing(WeakHashSet<WebProcessProxy>&&);
 #endif
 
-#if ENABLE(CONTENT_EXTENSIONS)
     WebCompiledContentRuleList* cachedResourceMonitorRuleList(bool forTesting);
     void setResourceMonitorURLsForTesting(const String& rulesText, CompletionHandler<void()>&&);
-#endif
 
 #if PLATFORM(COCOA)
     void registerUserInstalledFonts(WebProcessProxy&);
@@ -766,13 +764,11 @@ private:
     void terminateAllWebContentProcessesWithModelPlayers();
 #endif
 
-#if ENABLE(CONTENT_EXTENSIONS)
     void loadOrUpdateResourceMonitorRuleList();
 
     void platformLoadResourceMonitorRuleList(CompletionHandler<void(RefPtr<WebCompiledContentRuleList>)>&&);
     void platformCompileResourceMonitorRuleList(const String& rulesText, CompletionHandler<void(RefPtr<WebCompiledContentRuleList>)>&&);
     String platformResourceMonitorRuleListSourceForTesting();
-#endif
 
     const Ref<API::ProcessPoolConfiguration> m_configuration;
 
@@ -900,9 +896,7 @@ private:
     RetainPtr<NSMutableDictionary> m_bundleParameters;
 #endif
 
-#if ENABLE(CONTENT_EXTENSIONS)
     HashMap<String, String> m_encodedContentExtensions;
-#endif
 
 #if ENABLE(GAMEPAD)
     WeakHashSet<WebProcessProxy> m_processesUsingGamepads;
@@ -1017,12 +1011,10 @@ private:
     RunLoop::Timer m_checkMemoryPressureStatusTimer;
 #endif
 
-#if ENABLE(CONTENT_EXTENSIONS)
     RefPtr<WebCompiledContentRuleList> m_resourceMonitorRuleListCache;
     bool m_resourceMonitorRuleListLoading { false };
     bool m_resourceMonitorRuleListFailed { false };
     RunLoop::Timer m_resourceMonitorRuleListRefreshTimer;
-#endif
 
 #if PLATFORM(COCOA)
     std::optional<Vector<URL>> m_assetFontURLs;

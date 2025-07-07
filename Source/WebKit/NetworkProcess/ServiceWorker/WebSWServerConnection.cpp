@@ -982,12 +982,10 @@ void WebSWServerConnection::getNotifications(const URL& registrationURL, const S
 }
 #endif
 
-#if ENABLE(CONTENT_EXTENSIONS)
 void WebSWServerConnection::reportNetworkUsageToWorkerClient(WebCore::ScriptExecutionContextIdentifier identifier, uint64_t bytesTransferredOverNetworkDelta)
 {
     send(Messages::WebSWClientConnection::ReportNetworkUsageToWorkerClient(identifier, bytesTransferredOverNetworkDelta));
 }
-#endif
 
 void WebSWServerConnection::checkTopOrigin(const WebCore::SecurityOriginData& origin)
 {

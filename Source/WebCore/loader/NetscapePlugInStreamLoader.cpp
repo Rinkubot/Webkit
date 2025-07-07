@@ -35,9 +35,7 @@
 #include <wtf/CompletionHandler.h>
 #include <wtf/Ref.h>
 
-#if ENABLE(CONTENT_EXTENSIONS)
 #include "ResourceLoadInfo.h"
-#endif
 
 namespace WebCore {
 
@@ -59,9 +57,7 @@ NetscapePlugInStreamLoader::NetscapePlugInStreamLoader(LocalFrame& frame, Netsca
         CachingPolicy::AllowCaching))
     , m_client(client)
 {
-#if ENABLE(CONTENT_EXTENSIONS)
     m_resourceType = { ContentExtensions::ResourceType::Other };
-#endif
 }
 
 NetscapePlugInStreamLoader::~NetscapePlugInStreamLoader() = default;

@@ -29,8 +29,6 @@
 #include "DFA.h"
 #include <wtf/HashMap.h>
 
-#if ENABLE(CONTENT_EXTENSIONS)
-
 namespace WebCore {
 
 namespace ContentExtensions {
@@ -143,4 +141,3 @@ uint32_t DFANode::bestFallbackTarget(const DFA& dfa) const
 
 } // namespace WebCore
 
-#endif // ENABLE(CONTENT_EXTENSIONS)

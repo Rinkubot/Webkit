@@ -81,9 +81,7 @@ private:
     URLKeepingBlobAlive m_blobURLExtension;
     size_t m_bytesTransferredOverNetwork { 0 };
 
-#if ENABLE(CONTENT_EXTENSIONS)
     RefPtr<ResourceMonitor> m_resourceMonitor;
-#endif
 
     bool m_isActive { true };
     bool m_isSuspendedForBackForwardCache { false };

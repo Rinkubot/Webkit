@@ -499,7 +499,6 @@ void WebSWServerToContextConnection::setInspectable(ServiceWorkerIsInspectable i
     send(Messages::WebSWContextManagerConnection::SetInspectable { inspectable });
 }
 
-#if ENABLE(CONTENT_EXTENSIONS)
 void WebSWServerToContextConnection::reportNetworkUsageToWorkerClient(const WebCore::ScriptExecutionContextIdentifier identifier, uint64_t bytesTransferredOverNetworkDelta)
 {
     if (RefPtr server = this->server()) {
@@ -507,7 +506,6 @@ void WebSWServerToContextConnection::reportNetworkUsageToWorkerClient(const WebC
             connection->reportNetworkUsageToWorkerClient(identifier, bytesTransferredOverNetworkDelta);
     }
 }
-#endif
 
 #undef MESSAGE_CHECK
 } // namespace WebKit

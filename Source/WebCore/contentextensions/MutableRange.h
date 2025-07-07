@@ -25,8 +25,6 @@
 
 #pragma once
 
-#if ENABLE(CONTENT_EXTENSIONS)
-
 namespace WebCore {
 
 namespace ContentExtensions {
@@ -93,4 +91,3 @@ public:
 } // namespace ContentExtensions
 } // namespace WebCore
 
-#endif // ENABLE(CONTENT_EXTENSIONS)

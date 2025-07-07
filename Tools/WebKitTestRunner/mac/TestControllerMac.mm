@@ -211,7 +211,6 @@ TestFeatures TestController::platformSpecificFeatureDefaultsForTest(const TestCo
     return features;
 }
 
-#if ENABLE(CONTENT_EXTENSIONS)
 void TestController::configureContentExtensionForTest(const TestInvocation& test)
 {
     if (!test.urlContains("contentextensions/"_s))
@@ -253,7 +252,6 @@ void TestController::configureContentExtensionForTest(const TestInvocation& test
     }];
     platformRunUntil(doneCompiling, noTimeout);
 }
-#endif
 
 void TestController::platformConfigureViewForTest(const TestInvocation& test)
 {

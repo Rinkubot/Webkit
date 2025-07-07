@@ -52,7 +52,6 @@ public:
         RemoveFailed
     };
 
-#if ENABLE(CONTENT_EXTENSIONS)
     // This should be incremented every time a functional change is made to the bytecode, file format, etc.
     // to prevent crashing while loading old data.
     static constexpr uint32_t CurrentContentRuleListFileVersion = 20;
@@ -93,7 +92,6 @@ private:
     Ref<WTF::ConcurrentWorkQueue> m_compileQueue;
     Ref<WTF::WorkQueue> m_readQueue;
     Ref<WTF::WorkQueue> m_removeQueue;
-#endif // ENABLE(CONTENT_EXTENSIONS)
 };
 
 const std::error_category& contentRuleListStoreErrorCategory();

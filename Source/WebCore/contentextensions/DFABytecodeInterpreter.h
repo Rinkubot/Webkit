@@ -25,8 +25,6 @@
 
 #pragma once
 
-#if ENABLE(CONTENT_EXTENSIONS)
-
 #include "ContentExtensionRule.h"
 #include "ContentExtensionsDebugging.h"
 #include "DFABytecode.h"
@@ -57,4 +55,3 @@ private:
 
 } // namespace WebCore::ContentExtensions
 
-#endif // ENABLE(CONTENT_EXTENSIONS)

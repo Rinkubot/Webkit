@@ -25,8 +25,6 @@
 
 #pragma once
 
-#if ENABLE(CONTENT_EXTENSIONS)
-
 #include "ContentExtensionActions.h"
 #include <wtf/KeyValuePair.h>
 #include <wtf/Vector.h>
@@ -85,4 +83,3 @@ struct ContentRuleListResults {
 
 }
 
-#endif // ENABLE(CONTENT_EXTENSIONS)

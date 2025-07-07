@@ -63,7 +63,6 @@
 
 namespace WebCore {
 
-#if ENABLE(CONTENT_EXTENSIONS)
 
 // Returns true if we should block the load.
 static bool processContentRuleListsForLoad(const LocalFrame& frame, ResourceRequest& request, OptionSet<ContentExtensions::ResourceType> resourceType)
@@ -81,7 +80,6 @@ static bool processContentRuleListsForLoad(const LocalFrame& frame, ResourceRequ
     return results.shouldBlock();
 }
 
-#endif
 
 void PingLoader::loadImage(LocalFrame& frame, URL&& url)
 {
@@ -99,10 +97,8 @@ void PingLoader::loadImage(LocalFrame& frame, URL&& url)
     }
 
     ResourceRequest request(WTFMove(url));
-#if ENABLE(CONTENT_EXTENSIONS)
     if (processContentRuleListsForLoad(frame, request, ContentExtensions::ResourceType::Image))
         return;
-#endif
 
     document->checkedContentSecurityPolicy()->upgradeInsecureRequestIfNeeded(request, ContentSecurityPolicy::InsecureRequestType::Load);
 
@@ -130,10 +126,8 @@ void PingLoader::sendPing(LocalFrame& frame, URL&& sendPingURL, const URL& desti
     const auto& pingURL = request.url();
     request.setRequester(ResourceRequestRequester::Ping);
 
-#if ENABLE(CONTENT_EXTENSIONS)
     if (processContentRuleListsForLoad(frame, request, ContentExtensions::ResourceType::Ping))
         return;
-#endif
 
     Ref document = *frame.document();
     if (!document->checkedContentSecurityPolicy()->allowConnectToSource(pingURL))
@@ -172,10 +166,8 @@ void PingLoader::sendViolationReport(LocalFrame& frame, URL&& violationReportURL
 
     ResourceRequest request(WTFMove(violationReportURL));
     const auto& reportURL = request.url();
-#if ENABLE(CONTENT_EXTENSIONS)
     if (processContentRuleListsForLoad(frame, request, ContentExtensions::ResourceType::CSPReport))
         return;
-#endif
 
     Ref document = *frame.document();
     document->checkedContentSecurityPolicy()->upgradeInsecureRequestIfNeeded(request, ContentSecurityPolicy::InsecureRequestType::Load);

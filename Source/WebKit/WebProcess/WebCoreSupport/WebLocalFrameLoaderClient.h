@@ -283,9 +283,7 @@ private:
 
     Ref<WebCore::LocalFrame> protectedLocalFrame() const;
 
-#if ENABLE(CONTENT_EXTENSIONS)
     void didExceedNetworkUsageThreshold();
-#endif
 
 #if ENABLE(PDF_PLUGIN)
     RefPtr<PluginView> m_pluginView;

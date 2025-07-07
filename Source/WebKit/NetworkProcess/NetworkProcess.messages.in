@@ -39,11 +39,9 @@ messages -> NetworkProcess : AuxiliaryProcess WantsAsyncDispatchMessage {
     SetNetworkProxySettings(PAL::SessionID sessionID, struct WebCore::SoupNetworkProxySettings settings)
     PrefetchDNS(String hostname)
     SetPersistentCredentialStorageEnabled(PAL::SessionID sessionID, bool enabled)
-#endif
 
 #if USE(CURL)
     SetNetworkProxySettings(PAL::SessionID sessionID, WebCore::CurlProxySettings settings)
-#endif
 
     AddWebsiteDataStore(struct WebKit::WebsiteDataStoreParameters websiteDataStoreParameters) AllowedWhenWaitingForSyncReply
     DestroySession(PAL::SessionID sessionID) -> ()
@@ -61,11 +59,8 @@ messages -> NetworkProcess : AuxiliaryProcess WantsAsyncDispatchMessage {
 #if PLATFORM(COCOA)
 #if HAVE(MODERN_DOWNLOADPROGRESS)
     PublishDownloadProgress(WebKit::DownloadID downloadID, URL url, std::span<const uint8_t> bookmarkData, enum:bool WebKit::UseDownloadPlaceholder useDownloadPlaceholder, std::span<const uint8_t> activityAccessToken)
-#endif
 #if !HAVE(MODERN_DOWNLOADPROGRESS)
     PublishDownloadProgress(WebKit::DownloadID downloadID, URL url, WebKit::SandboxExtensionHandle sandboxExtensionHandle)
-#endif
-#endif
     DataTaskWithRequest(WebKit::WebPageProxyIdentifier pageID, PAL::SessionID sessionID, WebCore::ResourceRequest request, std::optional<WebCore::SecurityOriginData> topOrigin, IPC::FormDataReference requestBody) -> (std::optional<WebKit::DataTaskIdentifier> taskIdentifier)
     CancelDataTask(WebKit::DataTaskIdentifier taskIdentifier, PAL::SessionID sessionID) -> ()
     ApplicationDidEnterBackground()
@@ -75,7 +70,6 @@ messages -> NetworkProcess : AuxiliaryProcess WantsAsyncDispatchMessage {
 
 #if !PLATFORM(COCOA)
     AllowSpecificHTTPSCertificateForHost(PAL::SessionID sessionID, WebCore::CertificateInfo certificate, String host)
-#endif
     AllowTLSCertificateChainForLocalPCMTesting(PAL::SessionID sessionID, WebCore::CertificateInfo certificate)
 
     SetCacheModel(enum:uint8_t WebKit::CacheModel cacheModel)
@@ -151,10 +145,8 @@ messages -> NetworkProcess : AuxiliaryProcess WantsAsyncDispatchMessage {
     CloseITPDatabase(PAL::SessionID sessionID) -> ()
 #if ENABLE(APP_BOUND_DOMAINS)
     SetAppBoundDomainsForResourceLoadStatistics(PAL::SessionID sessionID, HashSet<WebCore::RegistrableDomain> appBoundDomains) -> ()
-#endif
 #if ENABLE(MANAGED_DOMAINS)
     SetManagedDomainsForResourceLoadStatistics(PAL::SessionID sessionID, HashSet<WebCore::RegistrableDomain> appBoundDomains) -> ()
-#endif
     SetShouldDowngradeReferrerForTesting(bool enabled) -> ()
     SetThirdPartyCookieBlockingMode(PAL::SessionID sessionID, enum:uint8_t WebCore::ThirdPartyCookieBlockingMode blockingMode) -> ()
     SetShouldEnbleSameSiteStrictEnforcementForTesting(PAL::SessionID sessionID, enum:bool WebCore::SameSiteStrictEnforcementEnabled enabled) -> ()
@@ -168,7 +160,6 @@ messages -> NetworkProcess : AuxiliaryProcess WantsAsyncDispatchMessage {
     SetShouldSendPrivateTokenIPCForTesting(PAL::SessionID sessionID, bool enabled)
 #if HAVE(ALLOW_ONLY_PARTITIONED_COOKIES)
     SetOptInCookiePartitioningEnabled(PAL::SessionID sessionID, bool enabled)
-#endif
 
     SetSessionIsControlledByAutomation(PAL::SessionID sessionID, bool controlled);
 
@@ -177,7 +168,6 @@ messages -> NetworkProcess : AuxiliaryProcess WantsAsyncDispatchMessage {
     RegisterURLSchemeAsLocal(String scheme)
 #if ENABLE(ALL_LEGACY_REGISTERED_SPECIAL_URL_SCHEMES)
     RegisterURLSchemeAsNoAccess(String scheme)
-#endif
 
     SyncLocalStorage() -> ()
     StoreServiceWorkerRegistrations(PAL::SessionID sessionID) -> ()
@@ -206,7 +196,6 @@ messages -> NetworkProcess : AuxiliaryProcess WantsAsyncDispatchMessage {
     SetOriginQuotaRatioEnabledForTesting(PAL::SessionID sessionID, bool enabled) -> ();
 #if PLATFORM(IOS_FAMILY)
     SetBackupExclusionPeriodForTesting(PAL::SessionID sessionID, Seconds period) -> ()
-#endif
     ResetStoragePersistedState(PAL::SessionID sessionID) -> ()
     CloneSessionStorageForWebPage(PAL::SessionID sessionID, WebKit::WebPageProxyIdentifier sourcePage, WebKit::WebPageProxyIdentifier destinationPage)
     DidIncreaseQuota(PAL::SessionID sessionID, struct WebCore::ClientOrigin origin, WebKit::QuotaIncreaseRequestIdentifier identifier, std::optional<uint64_t> newQuota)
@@ -214,19 +203,16 @@ messages -> NetworkProcess : AuxiliaryProcess WantsAsyncDispatchMessage {
 #if ENABLE(APP_BOUND_DOMAINS)
     HasAppBoundSession(PAL::SessionID sessionID) -> (bool hasAppBoundSession)
     ClearAppBoundSession(PAL::SessionID sessionID) -> ()
-#endif
 
 #if PLATFORM(IOS_FAMILY) && !PLATFORM(MACCATALYST)
     DisableServiceWorkerEntitlement()
     ClearServiceWorkerEntitlementOverride() -> ()
-#endif
     UpdateBundleIdentifier(String bundleIdentifier) -> ()
     ClearBundleIdentifier() -> ()
 
 #if PLATFORM(COCOA)
     AppPrivacyReportTestingData(PAL::SessionID sessionID) -> (struct WebKit::AppPrivacyReportTestingData data)
     ClearAppPrivacyReportTestingData(PAL::SessionID sessionID) -> ()
-#endif
 
     AddWebPageNetworkParameters(PAL::SessionID sessionID, WebKit::WebPageProxyIdentifier pageID, WebKit::WebPageNetworkParameters parameters)
     RemoveWebPageNetworkParameters(PAL::SessionID sessionID, WebKit::WebPageProxyIdentifier pageID)
@@ -255,12 +241,10 @@ messages -> NetworkProcess : AuxiliaryProcess WantsAsyncDispatchMessage {
 
 #if ENABLE(INSPECTOR_NETWORK_THROTTLING)
     SetEmulatedConditions(PAL::SessionID sessionID, std::optional<int64_t> bytesPerSecondLimit)
-#endif
 
 #if HAVE(NW_PROXY_CONFIG)
     ClearProxyConfigData(PAL::SessionID sessionID)
     SetProxyConfigData(PAL::SessionID sessionID, Vector<std::pair<Vector<uint8_t>, std::optional<WTF::UUID>>> proxyConfigurations)
-#endif
 
     SetStorageSiteValidationEnabled(PAL::SessionID sessionID, bool enabled)
     SetPersistedDomains(PAL::SessionID sessionsID, HashSet<WebCore::RegistrableDomain> domains)
@@ -275,7 +259,5 @@ messages -> NetworkProcess : AuxiliaryProcess WantsAsyncDispatchMessage {
 
     SetShouldRelaxThirdPartyCookieBlockingForPage(WebKit::WebPageProxyIdentifier pageID)
 
-#if ENABLE(CONTENT_EXTENSIONS)
     ResetResourceMonitorThrottlerForTesting(PAL::SessionID sessionID) -> ();
-#endif
 }

@@ -25,7 +25,6 @@
 
 #pragma once
 
-#if ENABLE(CONTENT_EXTENSIONS)
 
 #include "CachedResource.h"
 #include <wtf/OptionSet.h>
@@ -122,4 +121,3 @@ struct ResourceLoadInfo {
 
 } // namespace WebCore::ContentExtensions
 
-#endif

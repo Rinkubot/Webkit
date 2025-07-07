@@ -62,7 +62,6 @@ my (
     $bubblewrapSandboxSupport,
     $cachePartitioningSupport,
     $cloopSupport,
-    $contentExtensionsSupport,
     $contentFilteringSupport,
     $contextMenusSupport,
     $cssDeviceAdaptationSupport,
@@ -192,9 +191,6 @@ my @features = (
 
     { option => "cache-partitioning", desc => "Toggle cache partitioning support",
       define => "ENABLE_CACHE_PARTITIONING", value => \$cachePartitioningSupport },
-
-    { option => "content-extensions", desc => "Toggle Content Extensions support",
-      define => "ENABLE_CONTENT_EXTENSIONS", value => \$contentExtensionsSupport },
 
     { option => "content-filtering", desc => "Toggle content filtering support",
       define => "ENABLE_CONTENT_FILTERING", value => \$contentFilteringSupport },

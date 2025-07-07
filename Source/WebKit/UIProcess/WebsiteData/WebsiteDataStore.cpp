@@ -477,10 +477,8 @@ static void resolveDirectories(WebsiteDataStoreConfiguration::Directories& direc
         directories.cookieStorageFile = FileSystem::pathByAppendingComponent(resolvedCookieDirectory, FileSystem::pathFileName(directories.cookieStorageFile));
     }
 
-#if ENABLE(CONTENT_EXTENSIONS)
     if (!directories.resourceMonitorThrottlerDirectory.isEmpty())
         directories.resourceMonitorThrottlerDirectory = resolveAndCreateReadWriteDirectoryForSandboxExtension(directories.resourceMonitorThrottlerDirectory);
-#endif
 }
 
 const WebsiteDataStoreConfiguration::Directories& WebsiteDataStore::resolvedDirectories() const
@@ -2093,12 +2091,10 @@ WebsiteDataStoreParameters WebsiteDataStore::parameters()
     SandboxExtension::Handle hstsStorageDirectoryExtensionHandle;
     createHandleFromResolvedPathIfPossible(hstsStorageDirectory, hstsStorageDirectoryExtensionHandle);
 
-#if ENABLE(CONTENT_EXTENSIONS)
     auto resourceMonitorThrottlerDirectory = isPersistent() ? directories.resourceMonitorThrottlerDirectory : emptyString();
     SandboxExtension::Handle resourceMonitorThrottlerDirectoryExtensionHandle;
     if (!resourceMonitorThrottlerDirectory.isEmpty())
         createHandleFromResolvedPathIfPossible(resourceMonitorThrottlerDirectory, resourceMonitorThrottlerDirectoryExtensionHandle);
-#endif
 
 #if HAVE(WEBCONTENTRESTRICTIONS_PATH_SPI)
     auto webContentRestrictionsConfigurationFile = m_configuration->webContentRestrictionsConfigurationFile();
@@ -2201,10 +2197,8 @@ WebsiteDataStoreParameters WebsiteDataStore::parameters()
 #if HAVE(NW_PROXY_CONFIG)
     networkSessionParameters.proxyConfigData = m_proxyConfigData;
 #endif
-#if ENABLE(CONTENT_EXTENSIONS)
     networkSessionParameters.resourceMonitorThrottlerDirectory = WTFMove(resourceMonitorThrottlerDirectory);
     networkSessionParameters.resourceMonitorThrottlerDirectoryExtensionHandle = WTFMove(resourceMonitorThrottlerDirectoryExtensionHandle);
-#endif
     networkSessionParameters.isLegacyTLSAllowed = m_configuration->legacyTLSEnabled();
 
 #if HAVE(WEBCONTENTRESTRICTIONS_PATH_SPI)
@@ -2452,14 +2446,12 @@ String WebsiteDataStore::defaultJavaScriptConfigurationDirectory(const String&)
     return String();
 }
 
-#if ENABLE(CONTENT_EXTENSIONS)
 String WebsiteDataStore::defaultResourceMonitorThrottlerDirectory(const String& baseDataDirectory)
 {
 #if PLATFORM(PLAYSTATION) || USE(GLIB)
     return websiteDataDirectoryFileSystemRepresentation("resourcemonitorthrottler"_s, baseDataDirectory);
 #else
     return websiteDataDirectoryFileSystemRepresentation("ResourceMonitorThrottler"_s, baseDataDirectory);
-#endif
 }
 #endif
 
@@ -2899,12 +2891,10 @@ bool WebsiteDataStore::builtInNotificationsEnabled() const
 }
 #endif
 
-#if ENABLE(CONTENT_EXTENSIONS)
 void WebsiteDataStore::resetResourceMonitorThrottlerForTesting(CompletionHandler<void()>&& completionHandler)
 {
     protectedNetworkProcess()->resetResourceMonitorThrottlerForTesting(m_sessionID, WTFMove(completionHandler));
 }
-#endif
 
 void WebsiteDataStore::setCookies(Vector<WebCore::Cookie>&& cookies, CompletionHandler<void()>&& completionHandler)
 {

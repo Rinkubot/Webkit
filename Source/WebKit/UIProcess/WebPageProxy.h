@@ -2853,9 +2853,7 @@ private:
 
     void willSubmitForm(IPC::Connection&, WebCore::FrameIdentifier, WebCore::FrameIdentifier sourceFrameID, Vector<std::pair<String, String>>&& textFieldValues, const UserData&, CompletionHandler<void()>&&);
 
-#if ENABLE(CONTENT_EXTENSIONS)
     void contentRuleListNotification(URL&&, WebCore::ContentRuleListResults&&);
-#endif
 
     // History client
     void didNavigateWithNavigationData(IPC::Connection&, const WebNavigationDataStore&, WebCore::FrameIdentifier);

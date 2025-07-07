@@ -31,8 +31,6 @@
 #include <wtf/FileSystem.h>
 #include <wtf/text/ParsingUtilities.h>
 
-#if ENABLE(CONTENT_EXTENSIONS)
-
 namespace WebCore {
 namespace ContentExtensions {
 
@@ -136,4 +134,3 @@ auto SerializedNFA::actions() const -> const Range<uint64_t>
 } // namespace ContentExtensions
 } // namespace WebCore
 
-#endif // ENABLE(CONTENT_EXTENSIONS)

@@ -336,10 +336,8 @@ public:
     WEBCORE_EXPORT void setScrollingMode(ScrollbarMode);
     WEBCORE_EXPORT void showMemoryMonitorError();
 
-#if ENABLE(CONTENT_EXTENSIONS)
     WEBCORE_EXPORT void showResourceMonitoringError();
     WEBCORE_EXPORT void reportResourceMonitoringWarning();
-#endif
 
     bool frameCanCreatePaymentSession() const final;
 

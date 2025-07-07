@@ -25,8 +25,6 @@
 
 #include "config.h"
 
-#if ENABLE(CONTENT_EXTENSIONS)
-
 #include "Utilities.h"
 #include <WebCore/ResourceMonitorThrottlerHolder.h>
 #include <wtf/FileSystem.h>
@@ -218,5 +216,3 @@ TEST_F(ResourceMonitorTest, ThrottlerCreateAndDelete)
 }
 
 } // namespace TestWebKitAPI
-
-#endif // ENABLE(CONTENT_EXTENSIONS)

@@ -6059,7 +6059,6 @@ header: <WebCore/RTCDataChannelHandler.h>
 
 #endif // ENABLE(WEB_RTC)
 
-#if ENABLE(CONTENT_EXTENSIONS)
 
 [Nested] struct WebCore::ContentRuleListResults::Result {
     bool blockedLoad;
@@ -6085,7 +6084,6 @@ struct WebCore::ContentRuleListResults {
     Vector<std::pair<String, WebCore::ContentRuleListResults::Result>> results;
 };
 
-#endif
 
 enum class WebCore::PolicyAction : uint8_t {
     Use,

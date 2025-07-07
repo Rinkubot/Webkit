@@ -32,7 +32,6 @@
 #include <wtf/Seconds.h>
 #include <wtf/StdLibExtras.h>
 
-#if ENABLE(CONTENT_EXTENSIONS)
 
 #define RESOURCEMONITOR_RELEASE_LOG(fmt, ...) RELEASE_LOG(ResourceMonitoring, "ResourceMonitorChecker::" fmt, ##__VA_ARGS__)
 
@@ -167,4 +166,3 @@ void ResourceMonitorChecker::setNetworkUsageThreshold(size_t threshold, double r
 
 #undef RESOURCEMONITOR_RELEASE_LOG
 
-#endif

@@ -62,10 +62,8 @@ public:
     void setIFrameFullscreenFlag(bool value) { m_IFrameFullscreenFlag = value; }
 #endif
 
-#if ENABLE(CONTENT_EXTENSIONS)
     const URL& initiatorSourceURL() const { return m_initiatorSourceURL; }
     void setInitiatorSourceURL(URL&& url) { m_initiatorSourceURL = WTFMove(url); }
-#endif
 
 private:
     HTMLIFrameElement(const QualifiedName&, Document&);
@@ -87,9 +85,7 @@ private:
 
     const std::unique_ptr<DOMTokenList> m_sandbox;
     std::unique_ptr<LazyLoadFrameObserver> m_lazyLoadFrameObserver;
-#if ENABLE(CONTENT_EXTENSIONS)
     URL m_initiatorSourceURL;
-#endif
     SubstituteData::SessionHistoryVisibility m_srcdocSessionHistoryVisibility { SubstituteData::SessionHistoryVisibility::Visible };
 #if ENABLE(FULLSCREEN_API)
     bool m_IFrameFullscreenFlag { false };

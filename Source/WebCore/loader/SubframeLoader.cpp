@@ -347,7 +347,6 @@ RefPtr<LocalFrame> FrameLoader::SubframeLoader::loadSubframe(HTMLFrameOwnerEleme
 
     frame->loader().loadURLIntoChildFrame(url, referrerToUse, *subFrame);
 
-#if ENABLE(CONTENT_EXTENSIONS)
     RefPtr subFramePage = subFrame->page();
     if ((url.isAboutBlank() || url.isAboutSrcDoc()) && subFramePage) {
         subFramePage->protectedUserContentProvider()->userContentExtensionBackend().forEach([&] (const String& identifier, ContentExtensions::ContentExtension& extension) {
@@ -355,7 +354,6 @@ RefPtr<LocalFrame> FrameLoader::SubframeLoader::loadSubframe(HTMLFrameOwnerEleme
                 subFrame->protectedDocument()->extensionStyleSheets().maybeAddContentExtensionSheet(identifier, *styleSheetContents);
         });
     }
-#endif
 
     document->decrementLoadEventDelayCount();
 

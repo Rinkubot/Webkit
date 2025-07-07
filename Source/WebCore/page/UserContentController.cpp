@@ -31,9 +31,7 @@
 #include "UserStyleSheet.h"
 #include <JavaScriptCore/JSObjectInlines.h>
 
-#if ENABLE(CONTENT_EXTENSIONS)
 #include "CompiledContentExtension.h"
-#endif
 
 namespace WebCore {
 

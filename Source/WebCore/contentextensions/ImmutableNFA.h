@@ -25,8 +25,6 @@
 
 #pragma once
 
-#if ENABLE(CONTENT_EXTENSIONS)
-
 #include "ContentExtensionsDebugging.h"
 #include <wtf/Vector.h>
 
@@ -81,4 +79,3 @@ struct ImmutableNFA {
 } // namespace ContentExtensions
 } // namespace WebCore
 
-#endif // ENABLE(CONTENT_EXTENSIONS)

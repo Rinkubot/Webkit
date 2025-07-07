@@ -175,9 +175,7 @@ static NSString * const WebKitLogCookieInformationDefaultsKey = @"WebKitLogCooki
 static NSString * const kPLTaskingStartNotificationGlobal = @"kPLTaskingStartNotificationGlobal";
 #endif
 
-#if ENABLE(CONTENT_EXTENSIONS)
 static NSString * const WebKitResourceMonitorURLsForTestingIdentifier = @"com.apple.WebPrivacy.ResourceMonitorURLsForTesting";
-#endif
 
 #if PLATFORM(IOS_FAMILY) && !PLATFORM(MACCATALYST)
 SOFT_LINK_PRIVATE_FRAMEWORK(BackBoardServices)
@@ -1432,7 +1430,6 @@ void WebProcessPool::setCachedHardwareKeyboardState(HardwareKeyboardState hardwa
 }
 #endif
 
-#if ENABLE(CONTENT_EXTENSIONS)
 static RefPtr<WebCompiledContentRuleList> createCompiledContentRuleList(WKContentRuleList* list)
 {
     if (!list)
@@ -1461,7 +1458,6 @@ void WebProcessPool::platformLoadResourceMonitorRuleList(CompletionHandler<void(
     });
 #else
     completionHandler(nullptr);
-#endif
 }
 
 void WebProcessPool::platformCompileResourceMonitorRuleList(const String& rulesText, CompletionHandler<void(RefPtr<WebCompiledContentRuleList>)>&& completionHandler)

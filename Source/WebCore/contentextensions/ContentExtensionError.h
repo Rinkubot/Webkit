@@ -25,8 +25,6 @@
 
 #pragma once
 
-#if ENABLE(CONTENT_EXTENSIONS)
-
 #include <system_error>
 
 #include <wtf/Forward.h>
@@ -104,4 +102,3 @@ namespace std {
     template<> struct is_error_code_enum<WebCore::ContentExtensions::ContentExtensionError> : public true_type { };
 }
 
-#endif // ENABLE(CONTENT_EXTENSIONS)

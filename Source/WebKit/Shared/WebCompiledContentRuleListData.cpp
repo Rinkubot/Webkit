@@ -26,7 +26,6 @@
 #include "config.h"
 #include "WebCompiledContentRuleListData.h"
 
-#if ENABLE(CONTENT_EXTENSIONS)
 
 #include "ArgumentCoders.h"
 
@@ -67,4 +66,3 @@ WebCompiledContentRuleListData::WebCompiledContentRuleListData(String&& identifi
 
 } // namespace WebKit
 
-#endif // ENABLE(CONTENT_EXTENSIONS)

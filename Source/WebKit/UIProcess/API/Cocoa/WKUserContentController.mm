@@ -109,23 +109,17 @@ WK_OBJECT_DISABLE_DISABLE_KVC_IVAR_ACCESS;
 
 - (void)addContentRuleList:(WKContentRuleList *)contentRuleList
 {
-#if ENABLE(CONTENT_EXTENSIONS)
     _userContentControllerProxy->addContentRuleList(*contentRuleList->_contentRuleList);
-#endif
 }
 
 - (void)removeContentRuleList:(WKContentRuleList *)contentRuleList
 {
-#if ENABLE(CONTENT_EXTENSIONS)
     _userContentControllerProxy->removeContentRuleList(contentRuleList->_contentRuleList->name());
-#endif
 }
 
 - (void)removeAllContentRuleLists
 {
-#if ENABLE(CONTENT_EXTENSIONS)
     _userContentControllerProxy->removeAllContentRuleLists();
-#endif
 }
 
 class ScriptMessageHandlerDelegate final : public WebKit::WebScriptMessageHandler::Client {
@@ -278,30 +272,22 @@ private:
 - (void)_addUserContentFilter:(_WKUserContentFilter *)userContentFilter
 #pragma clang diagnostic pop
 {
-#if ENABLE(CONTENT_EXTENSIONS)
     _userContentControllerProxy->addContentRuleList(*userContentFilter->_contentRuleList->_contentRuleList);
-#endif
 }
 
 - (void)_addContentRuleList:(WKContentRuleList *)contentRuleList extensionBaseURL:(NSURL *)extensionBaseURL
 {
-#if ENABLE(CONTENT_EXTENSIONS)
     _userContentControllerProxy->addContentRuleList(*contentRuleList->_contentRuleList, extensionBaseURL);
-#endif
 }
 
 - (void)_removeUserContentFilter:(NSString *)userContentFilterName
 {
-#if ENABLE(CONTENT_EXTENSIONS)
     _userContentControllerProxy->removeContentRuleList(userContentFilterName);
-#endif
 }
 
 - (void)_removeAllUserContentFilters
 {
-#if ENABLE(CONTENT_EXTENSIONS)
     _userContentControllerProxy->removeAllContentRuleLists();
-#endif
 }
 
 - (NSArray *)_userStyleSheets

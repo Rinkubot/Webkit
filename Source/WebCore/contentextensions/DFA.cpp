@@ -26,8 +26,6 @@
 #include "config.h"
 #include "DFA.h"
 
-#if ENABLE(CONTENT_EXTENSIONS)
-
 #include "DFAMinimizer.h"
 #include <ranges>
 #include <wtf/DataLog.h>
@@ -170,4 +168,3 @@ void DFA::debugPrintDot() const
 
 } // namespace WebCore
 
-#endif // ENABLE(CONTENT_EXTENSIONS)

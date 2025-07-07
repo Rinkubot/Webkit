@@ -80,9 +80,7 @@ WebSharedWorkerContextManagerConnection::WebSharedWorkerContextManagerConnection
 #endif
     , m_userContentController(WebUserContentController::getOrCreate(initializationData.userContentControllerIdentifier))
 {
-#if ENABLE(CONTENT_EXTENSIONS)
     m_userContentController->addContentRuleLists(WTFMove(initializationData.contentRuleLists));
-#endif
 
     updatePreferencesStore(preferencesStore);
     WebProcess::singleton().disableTermination();

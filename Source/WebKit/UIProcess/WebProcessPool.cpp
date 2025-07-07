@@ -274,9 +274,7 @@ WebProcessPool::WebProcessPool(API::ProcessPoolConfiguration& configuration)
     , m_lastMemoryPressureStatusTime(ApproximateTime::now() - memoryPressureCheckInterval())
     , m_checkMemoryPressureStatusTimer(RunLoop::main(), this, &WebProcessPool::checkMemoryPressureStatus)
 #endif
-#if ENABLE(CONTENT_EXTENSIONS)
     , m_resourceMonitorRuleListRefreshTimer(RunLoop::main(), this, &WebProcessPool::loadOrUpdateResourceMonitorRuleList)
-#endif
 #if ENABLE(IPC_TESTING_API)
     , m_ipcTester(IPCTester::create())
 #endif
@@ -2753,8 +2751,6 @@ void WebProcessPool::updateWebProcessSuspensionDelayWithPacing(WeakHashSet<WebPr
 
 #endif // ENABLE(WEB_PROCESS_SUSPENSION_DELAY)
 
-#if ENABLE(CONTENT_EXTENSIONS)
-
 constexpr static Seconds resourceMonitorRuleListCheckInterval = 24_h;
 
 WebCompiledContentRuleList* WebProcessPool::cachedResourceMonitorRuleList(bool forTesting)
@@ -2850,8 +2846,6 @@ String WebProcessPool::platformResourceMonitorRuleListSourceForTesting()
     notImplemented();
     return "[]"_s;
 }
-
-#endif
 
 #endif
 

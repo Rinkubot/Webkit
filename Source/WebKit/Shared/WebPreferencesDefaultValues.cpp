@@ -357,14 +357,12 @@ bool defaultCookieStoreAPIEnabled()
 #endif
 }
 
-#if ENABLE(CONTENT_EXTENSIONS)
 bool defaultIFrameResourceMonitoringEnabled()
 {
 #if PLATFORM(COCOA)
     return isFullWebBrowserOrRunningTest();
 #else
     return false;
-#endif
 }
 #endif
 

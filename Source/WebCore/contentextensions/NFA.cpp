@@ -26,8 +26,6 @@
 #include "config.h"
 #include "NFA.h"
 
-#if ENABLE(CONTENT_EXTENSIONS)
-
 #include <wtf/ASCIICType.h>
 #include <wtf/DataLog.h>
 
@@ -123,4 +121,3 @@ void NFA::debugPrintDot() const
 
 } // namespace WebCore
 
-#endif // ENABLE(CONTENT_EXTENSIONS)

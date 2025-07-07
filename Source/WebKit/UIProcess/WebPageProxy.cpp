@@ -2133,10 +2133,8 @@ void WebPageProxy::loadRequestWithNavigationShared(Ref<WebProcessProxy>&& proces
     loadParameters.requiredCookiesVersion = protectedWebsiteDataStore()->cookiesVersion();
     loadParameters.originatingFrame = navigation.lastNavigationAction() ? std::optional(navigation.lastNavigationAction()->originatingFrameInfoData) : std::nullopt;
 
-#if ENABLE(CONTENT_EXTENSIONS)
     if (protectedPreferences()->iFrameResourceMonitoringEnabled())
         process->requestResourceMonitorRuleLists(protectedPreferences()->iFrameResourceMonitoringTestingSettingsEnabled());
-#endif
 
     maybeInitializeSandboxExtensionHandle(process, url, pageLoadState->resourceDirectoryURL(), true, [weakThis = WeakPtr { *this }, weakProcess = WeakPtr { process }, loadParameters = WTFMove(loadParameters), url, navigation = Ref { navigation }, webPageID, shouldTreatAsContinuingLoad] (std::optional<SandboxExtension::Handle>&& sandboxExtensionHandle) mutable {
         RefPtr protectedProcess = weakProcess.get();
@@ -8499,12 +8497,10 @@ void WebPageProxy::willSubmitForm(IPC::Connection& connection, FrameIdentifier f
     m_formClient->willSubmitForm(*this, *frame, *sourceFrame, WTFMove(textFieldValues), process->transformHandlesToObjects(userData.protectedObject().get()).get(), WTFMove(completionHandler));
 }
 
-#if ENABLE(CONTENT_EXTENSIONS)
 void WebPageProxy::contentRuleListNotification(URL&& url, ContentRuleListResults&& results)
 {
     m_navigationClient->contentRuleListNotification(*this, WTFMove(url), WTFMove(results));
 }
-#endif
 
 void WebPageProxy::didNavigateWithNavigationData(IPC::Connection& connection, const WebNavigationDataStore& store, FrameIdentifier frameID)
 {

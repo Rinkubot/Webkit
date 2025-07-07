@@ -155,23 +155,15 @@
 
 #if ENABLE(WEB_ARCHIVE) || ENABLE(MHTML)
 #include "Archive.h"
-#endif
-
 #if ENABLE(DATA_DETECTION)
 #include "DataDetection.h"
 #include "DataDetectionResultsStorage.h"
-#endif
-
 #if PLATFORM(COCOA)
 #include <wtf/cocoa/RuntimeApplicationChecksCocoa.h>
-#endif
-
 #if PLATFORM(IOS_FAMILY)
 #include "DocumentType.h"
 #include "ResourceLoader.h"
 #include <wtf/RuntimeApplicationChecks.h>
-#endif
-
 #define PAGE_ID (pageID() ? pageID()->toUInt64() : 0)
 #define FRAME_ID (frameID().toUInt64())
 #define FRAMELOADER_RELEASE_LOG(channel, fmt, ...) RELEASE_LOG(channel, "%p - [pageID=%" PRIu64 ", frameID=%" PRIu64 ", isMainFrame=%d] FrameLoader::" fmt, this, PAGE_ID, FRAME_ID, m_frame->isMainFrame(), ##__VA_ARGS__)
@@ -188,8 +180,6 @@ static void verifyUserAgent(const String&)
 }
 
 }
-#endif
-
 namespace WebCore {
 
 using namespace HTMLNames;
@@ -1058,8 +1048,6 @@ void FrameLoader::loadURLIntoChildFrame(const URL& url, const String& referer, L
             return;
         }
     }
-#endif
-
     // If we're moving in the back/forward list, we might want to replace the content
     // of this child frame with whatever was there at that point.
     RefPtr parentItem = history().currentItem();
@@ -1958,8 +1946,6 @@ bool FrameLoader::willLoadMediaElementURL(URL& url, Node& initiatorNode)
     // doesn't let them tell when a load request is coming from a media element. See <rdar://problem/8266916> for more details.
     if (WTF::IOSApplication::isMobileStore())
         return m_client->shouldLoadMediaElementURL(url);
-#endif
-
     ResourceRequest request(URL { url });
     request.setInspectorInitiatorNodeIdentifier(InspectorInstrumentation::identifierForNode(initiatorNode));
     if (m_documentLoader)
@@ -2180,8 +2166,6 @@ void FrameLoader::stopForUserCancel(bool deferCheckLoadComplete)
     // FIXME: Is this behavior specific to iOS? Or should we expose a setting to toggle this behavior?
     if (frame->view() && !frame->view()->didFirstLayout())
         frame->protectedView()->layoutContext().layout();
-#endif
-
     if (deferCheckLoadComplete)
         scheduleCheckLoadComplete();
     else if (frame->page())
@@ -2467,8 +2451,6 @@ IGNORE_GCC_WARNINGS_END
             frame->protectedView()->forceLayout();
 #else
         frame->protectedView()->forceLayout();
-#endif
-
         // Main resource delegates were already sent, so we skip the first response here.
         RefPtr documentLoader = m_documentLoader;
         unsigned responsesSize = documentLoader ? documentLoader->responses().size() : 0;
@@ -2815,8 +2797,6 @@ void FrameLoader::dispatchDidFailProvisionalLoad(DocumentLoader& provisionalDocu
 
 #if ENABLE(CONTENT_FILTERING)
     auto contentFilterWillContinueLoading = false;
-#endif
-
     auto willContinueLoading = willInternallyHandleFailure == WillInternallyHandleFailure::Yes ? WillContinueLoading::Yes : WillContinueLoading::No;
     if (history().provisionalItem())
         willContinueLoading = WillContinueLoading::Yes;
@@ -2825,15 +2805,11 @@ void FrameLoader::dispatchDidFailProvisionalLoad(DocumentLoader& provisionalDocu
         willContinueLoading = WillContinueLoading::Yes;
         contentFilterWillContinueLoading = true;
     }
-#endif
-
     m_client->dispatchDidFailProvisionalLoad(error, willContinueLoading, willInternallyHandleFailure);
 
 #if ENABLE(CONTENT_FILTERING)
     if (contentFilterWillContinueLoading)
         provisionalDocumentLoader.contentFilterHandleProvisionalLoadFailure(error);
-#endif
-
     m_provisionalLoadErrorBeingHandledURL = { };
 }
 
@@ -3630,7 +3606,6 @@ ResourceLoaderIdentifier FrameLoader::loadResourceSynchronously(const ResourceRe
     ResourceRequest newRequest = WTFMove(initialRequest);
     auto identifier = requestFromDelegate(newRequest, IsMainResourceLoad::No, error);
 
-#if ENABLE(CONTENT_EXTENSIONS)
     if (error.isNull()) {
         if (RefPtr page = m_frame->page()) {
             if (RefPtr documentLoader = m_documentLoader) {
@@ -3645,7 +3620,6 @@ ResourceLoaderIdentifier FrameLoader::loadResourceSynchronously(const ResourceRe
             }
         }
     }
-#endif
 
     m_frame->protectedDocument()->checkedContentSecurityPolicy()->upgradeInsecureRequestIfNeeded(newRequest, ContentSecurityPolicy::InsecureRequestType::Load);
 
@@ -4566,15 +4540,11 @@ ResourceError FrameLoader::blockedByContentFilterError(const ResourceRequest& re
     error.setType(ResourceError::Type::General);
     return error;
 }
-#endif
-
 #if PLATFORM(IOS_FAMILY)
 RetainPtr<CFDictionaryRef> FrameLoader::connectionProperties(ResourceLoader* loader)
 {
     return m_client->connectionProperties(loader->documentLoader(), *loader->identifier());
 }
-#endif
-
 ReferrerPolicy FrameLoader::effectiveReferrerPolicy() const
 {
     if (RefPtr parentFrame = dynamicDowncast<LocalFrame>(m_frame->tree().parent()))
@@ -4766,8 +4736,6 @@ std::pair<RefPtr<Frame>, CreatedNewPage> createWindow(LocalFrame& openerFrame, F
 
 #if PLATFORM(GTK)
     features.oldWindowRect = oldPage->chrome().windowRect();
-#endif
-
     String openedMainFrameName = isBlankTargetFrameName(request.frameName()) ? String() : request.frameName();
     ShouldOpenExternalURLsPolicy shouldOpenExternalURLsPolicy = shouldOpenExternalURLsPolicyToApply(openerFrame, request);
     NavigationAction action { request.requester(), request.resourceRequest(), request.initiatedByMainFrame(), request.isRequestFromClientOrUserInput(), NavigationType::Other, shouldOpenExternalURLsPolicy };
@@ -4844,7 +4812,6 @@ RefPtr<DocumentLoader> FrameLoader::loaderForWebsitePolicies(CanIncludeCurrentDo
 
 void FrameLoader::prefetchDNSIfNeeded(const URL& url)
 {
-#if ENABLE(CONTENT_EXTENSIONS)
     RefPtr page = m_frame->page();
     if (!page)
         return;
@@ -4856,7 +4823,6 @@ void FrameLoader::prefetchDNSIfNeeded(const URL& url)
     auto results = page->protectedUserContentProvider()->processContentRuleListsForLoad(*page, url, ContentExtensions::ResourceType::Ping, *documentLoader);
     if (results.shouldBlock())
         return;
-#endif
 
     if (url.isValid() && !url.isEmpty() && url.protocolIsInHTTPFamily())
         client().prefetchDNS(url.host().toString());

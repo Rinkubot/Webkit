@@ -62,14 +62,10 @@ void WKUserContentControllerRemoveAllUserScripts(WKUserContentControllerRef user
 
 void WKUserContentControllerAddUserContentFilter(WKUserContentControllerRef userContentControllerRef, WKUserContentFilterRef userContentFilterRef)
 {
-#if ENABLE(CONTENT_EXTENSIONS)
     toProtectedImpl(userContentControllerRef)->addContentRuleList(*toProtectedImpl(userContentFilterRef));
-#endif
 }
 
 void WKUserContentControllerRemoveAllUserContentFilters(WKUserContentControllerRef userContentControllerRef)
 {
-#if ENABLE(CONTENT_EXTENSIONS)
     toProtectedImpl(userContentControllerRef)->removeAllContentRuleLists();
-#endif
 }

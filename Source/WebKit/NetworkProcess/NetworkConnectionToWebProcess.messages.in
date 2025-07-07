@@ -59,7 +59,6 @@ messages -> NetworkConnectionToWebProcess WantsDispatchMessage {
 #if HAVE(COOKIE_CHANGE_LISTENER_API)
     SubscribeToCookieChangeNotifications(URL url, URL firstParty, WebCore::FrameIdentifier frameID, WebCore::PageIdentifier pageID, WebKit::WebPageProxyIdentifier webPageProxyID) -> (bool result) AllowedWhenWaitingForSyncReply
     UnsubscribeFromCookieChangeNotifications(String host) AllowedWhenWaitingForSyncReply
-#endif
 
     RegisterInternalFileBlobURL(URL url, String path, String replacementPath, WebKit::SandboxExtensionHandle extensionHandle, String contentType)
     RegisterInternalBlobURL(URL url, Vector<WebCore::BlobPart> blobParts, String contentType)
@@ -106,7 +105,6 @@ messages -> NetworkConnectionToWebProcess WantsDispatchMessage {
     CreateRTCProvider() -> ()
 #if ENABLE(WEB_RTC)
     ConnectToRTCDataChannelRemoteSource(struct WebCore::RTCDataChannelIdentifier source, struct WebCore::RTCDataChannelIdentifier handler) -> (std::optional<bool> result)
-#endif
 
     CreateNewMessagePortChannel(struct WebCore::MessagePortIdentifier port1, struct WebCore::MessagePortIdentifier port2)
     EntangleLocalPortInThisProcessToRemote(struct WebCore::MessagePortIdentifier local, struct WebCore::MessagePortIdentifier remote)
@@ -122,14 +120,11 @@ messages -> NetworkConnectionToWebProcess WantsDispatchMessage {
     UpdateActivePages(String name, Vector<String> activePagesOrigins, struct WebKit::CoreIPCAuditToken auditToken)
 #if ENABLE(LAUNCHSERVICES_SANDBOX_EXTENSION_BLOCKING)
     CheckInWebProcess(struct WebKit::CoreIPCAuditToken auditToken)
-#endif
-#endif
     SetResourceLoadSchedulingMode(WebCore::PageIdentifier webPageID, enum:uint8_t WebCore::LoadSchedulingMode mode)
     PrioritizeResourceLoads(Vector<WebCore::ResourceLoaderIdentifier> loadIdentifiers)
 
 #if ENABLE(CONTENT_FILTERING)
     InstallMockContentFilter(WebCore::MockContentFilterSettings settings)
-#endif
 
     UseRedirectionForCurrentNavigation(WebCore::ResourceLoaderIdentifier resourceLoadIdentifier, WebCore::ResourceResponse response)
 
@@ -138,7 +133,6 @@ messages -> NetworkConnectionToWebProcess WantsDispatchMessage {
     NavigatorUnsubscribeFromPushService(URL scopeURL, WebCore::PushSubscriptionIdentifier pushSubscriptionIdentifier) -> (Expected<bool, WebCore::ExceptionData> result)
     NavigatorGetPushSubscription(URL scopeURL) -> (Expected<std::optional<WebCore::PushSubscriptionData>, WebCore::ExceptionData> result)
     NavigatorGetPushPermissionState(URL scopeURL) -> (Expected<uint8_t, WebCore::ExceptionData> result)
-#endif
 
     [EnabledBy=WebTransportEnabled] InitializeWebTransportSession(URL url, WebKit::WebPageProxyIdentifier pageID, struct WebCore::ClientOrigin clientOrigin) -> (std::optional<WebKit::WebTransportSessionIdentifier> identifier)
     [EnabledBy=WebTransportEnabled] DestroyWebTransportSession(WebKit::WebTransportSessionIdentifier identifier)
@@ -150,7 +144,5 @@ messages -> NetworkConnectionToWebProcess WantsDispatchMessage {
     SetLoginStatus(WebCore::RegistrableDomain domain, enum:uint8_t WebCore::IsLoggedIn loggedInStatus, std::optional<WebCore::LoginStatus> lastAuthentication) -> ()
     IsLoggedIn(WebCore::RegistrableDomain domain) -> (bool result)
 
-#if ENABLE(CONTENT_EXTENSIONS)
     ShouldOffloadIFrameForHost(String host) -> (bool wasGranted)
-#endif
 }

@@ -25,8 +25,6 @@
 
 #pragma once
 
-#if ENABLE(CONTENT_EXTENSIONS)
-
 namespace WebCore::ContentExtensions {
 
 using DFABytecode = uint8_t;
@@ -112,4 +110,3 @@ static constexpr size_t UInt24Size = 3;
 
 } // namespace WebCore::ContentExtensions
 
-#endif // ENABLE(CONTENT_EXTENSIONS)

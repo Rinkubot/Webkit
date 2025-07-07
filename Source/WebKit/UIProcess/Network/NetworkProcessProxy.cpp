@@ -281,10 +281,8 @@ NetworkProcessProxy::NetworkProcessProxy()
 
 NetworkProcessProxy::~NetworkProcessProxy()
 {
-#if ENABLE(CONTENT_EXTENSIONS)
     for (Ref proxy : m_webUserContentControllerProxies)
         proxy->removeNetworkProcess(*this);
-#endif
 
     if (RefPtr downloadProxyMap = m_downloadProxyMap.get())
         downloadProxyMap->invalidate();
@@ -1429,7 +1427,6 @@ WebsiteDataStore* NetworkProcessProxy::websiteDataStoreFromSessionID(PAL::Sessio
     return WebsiteDataStore::existingDataStoreForSessionID(sessionID);
 }
 
-#if ENABLE(CONTENT_EXTENSIONS)
 void NetworkProcessProxy::contentExtensionRules(UserContentControllerIdentifier identifier)
 {
     if (RefPtr webUserContentControllerProxy = WebUserContentControllerProxy::get(identifier)) {
@@ -1450,7 +1447,6 @@ void NetworkProcessProxy::didDestroyWebUserContentControllerProxy(WebUserContent
     send(Messages::NetworkContentRuleListManager::Remove { proxy.identifier() }, 0);
     m_webUserContentControllerProxies.remove(proxy);
 }
-#endif
 
 void NetworkProcessProxy::registerRemoteWorkerClientProcess(RemoteWorkerType workerType, WebCore::ProcessIdentifier clientProcessIdentifier, WebCore::ProcessIdentifier remoteWorkerProcessIdentifier)
 {
@@ -2031,12 +2027,10 @@ void NetworkProcessProxy::restoreLocalStorage(PAL::SessionID sessionID, HashMap<
     sendWithAsyncReply(Messages::NetworkProcess::RestoreLocalStorage(sessionID, WTFMove(localStorage)), WTFMove(completionHandler));
 }
 
-#if ENABLE(CONTENT_EXTENSIONS)
 void NetworkProcessProxy::resetResourceMonitorThrottlerForTesting(PAL::SessionID sessionID, CompletionHandler<void()>&& completionHandler)
 {
     sendWithAsyncReply(Messages::NetworkProcess::ResetResourceMonitorThrottlerForTesting(sessionID), WTFMove(completionHandler));
 }
-#endif
 
 } // namespace WebKit
 

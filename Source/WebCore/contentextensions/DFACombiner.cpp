@@ -26,8 +26,6 @@
 #include "config.h"
 #include "DFACombiner.h"
 
-#if ENABLE(CONTENT_EXTENSIONS)
-
 #include "MutableRangeList.h"
 #include <wtf/HashMap.h>
 #include <wtf/HashSet.h>

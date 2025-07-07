@@ -26,8 +26,6 @@
 #include "config.h"
 #include "ContentExtensionsBackend.h"
 
-#if ENABLE(CONTENT_EXTENSIONS)
-
 #include "Chrome.h"
 #include "ChromeClient.h"
 #include "CompiledContentExtension.h"
@@ -475,4 +473,3 @@ void applyResultsToRequest(ContentRuleListResults&& results, Page* page, Resourc
     
 } // namespace WebCore::ContentExtensions
 
-#endif // ENABLE(CONTENT_EXTENSIONS)

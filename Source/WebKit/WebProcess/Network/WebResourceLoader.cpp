@@ -52,15 +52,12 @@
 #include <WebCore/Page.h>
 #include <WebCore/ResourceError.h>
 #include <WebCore/ResourceLoader.h>
+#include <WebCore/ResourceMonitor.h>
 #include <WebCore/SubresourceLoader.h>
 #include <WebCore/SubstituteData.h>
 #include <wtf/CheckedArithmetic.h>
 #include <wtf/CompletionHandler.h>
 #include <wtf/text/MakeString.h>
-
-#if ENABLE(CONTENT_EXTENSIONS)
-#include <WebCore/ResourceMonitor.h>
-#endif
 
 
 #define WEBRESOURCELOADER_RELEASE_LOG(fmt, ...) RELEASE_LOG_FORWARDABLE(Network, fmt, m_trackingParameters ? m_trackingParameters->pageID.toUInt64() : 0, m_trackingParameters ? m_trackingParameters->frameID.toUInt64() : 0, m_trackingParameters ? m_trackingParameters->resourceID.toUInt64() : 0, ##__VA_ARGS__)
@@ -249,12 +246,10 @@ void WebResourceLoader::didReceiveData(IPC::SharedBufferReference&& data, uint64
 
     coreLoader->didReceiveData(data.isNull() ? SharedBuffer::create() : data.unsafeBuffer().releaseNonNull(), delta, DataPayloadBytes);
 
-#if ENABLE(CONTENT_EXTENSIONS)
     if (delta) {
         if (RefPtr resourceMonitor = coreLoader->resourceMonitorIfExists())
             resourceMonitor->addNetworkUsage(delta);
     }
-#endif
 }
 
 void WebResourceLoader::didFinishResourceLoad(NetworkLoadMetrics&& networkLoadMetrics)
@@ -273,7 +268,6 @@ void WebResourceLoader::didFinishResourceLoad(NetworkLoadMetrics&& networkLoadMe
 
     networkLoadMetrics.workerStart = m_workerStart;
 
-#if ENABLE(CONTENT_EXTENSIONS)
     if (networkLoadMetrics.responseBodyBytesReceived != std::numeric_limits<uint64_t>::max()) {
         auto delta = calculateBytesTransferredOverNetworkDelta(networkLoadMetrics.responseBodyBytesReceived);
         if (delta) {
@@ -281,7 +275,6 @@ void WebResourceLoader::didFinishResourceLoad(NetworkLoadMetrics&& networkLoadMe
                 resourceMonitor->addNetworkUsage(delta);
         }
     }
-#endif
 
     ASSERT_WITH_MESSAGE(!m_isProcessingNetworkResponse, "Load should not be able to finish before we've validated the response");
     coreLoader->didFinishLoading(networkLoadMetrics);

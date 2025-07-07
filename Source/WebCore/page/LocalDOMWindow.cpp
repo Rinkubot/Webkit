@@ -2676,7 +2676,6 @@ ExceptionOr<RefPtr<WindowProxy>> LocalDOMWindow::open(LocalDOMWindow& activeWind
     if (activeDocument->quirks().shouldOpenAsAboutBlank(urlStringToOpen))
         urlString = "about:blank"_s;
 
-#if ENABLE(CONTENT_EXTENSIONS)
     RefPtr page = firstFrame->page();
     RefPtr firstFrameDocument = firstFrame->document();
 
@@ -2690,7 +2689,6 @@ ExceptionOr<RefPtr<WindowProxy>> LocalDOMWindow::open(LocalDOMWindow& activeWind
         if (results.shouldBlock())
             return RefPtr<WindowProxy> { nullptr };
     }
-#endif
 
     RefPtr frame = this->localFrame();
     if (!frame)

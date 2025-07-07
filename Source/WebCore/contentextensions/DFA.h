@@ -25,8 +25,6 @@
 
 #pragma once
 
-#if ENABLE(CONTENT_EXTENSIONS)
-
 #include "ContentExtensionsDebugging.h"
 #include "DFANode.h"
 #include <wtf/Vector.h>
@@ -82,4 +80,3 @@ inline void DFANode::RangeIterator::resetTarget(uint32_t newTarget)
 } // namespace ContentExtensions
 } // namespace WebCore
 
-#endif // ENABLE(CONTENT_EXTENSIONS)

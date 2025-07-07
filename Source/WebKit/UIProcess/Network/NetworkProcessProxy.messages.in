@@ -46,9 +46,7 @@ messages -> NetworkProcessProxy WantsDispatchMessage {
     DidCommitCrossSiteLoadWithDataTransferFromPrevalentResource(WebKit::WebPageProxyIdentifier pageID)
     SetDomainsWithUserInteraction(HashSet<WebCore::RegistrableDomain> domains)
     SetDomainsWithCrossPageStorageAccess(HashMap<WebCore::RegistrableDomain, Vector<WebCore::RegistrableDomain>> domains) -> ()
-#if ENABLE(CONTENT_EXTENSIONS)
     ContentExtensionRules(WebKit::UserContentControllerIdentifier identifier)
-#endif
 
     TerminateWebProcess(WebCore::ProcessIdentifier webProcessIdentifier)
 

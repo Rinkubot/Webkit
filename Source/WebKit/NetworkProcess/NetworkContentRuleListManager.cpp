@@ -26,7 +26,6 @@
 #include "config.h"
 #include "NetworkContentRuleListManager.h"
 
-#if ENABLE(CONTENT_EXTENSIONS)
 
 #include "NetworkProcess.h"
 #include "NetworkProcessProxyMessages.h"
@@ -126,4 +125,3 @@ void NetworkContentRuleListManager::remove(UserContentControllerIdentifier ident
 
 } // namespace WebKit
 
-#endif // ENABLE(CONTENT_EXTENSIONS)

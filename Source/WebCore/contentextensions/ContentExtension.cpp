@@ -33,8 +33,6 @@
 #include "StyleSheetContents.h"
 #include <wtf/text/StringBuilder.h>
 
-#if ENABLE(CONTENT_EXTENSIONS)
-
 namespace WebCore::ContentExtensions {
 
 Ref<ContentExtension> ContentExtension::create(const String& identifier, Ref<CompiledContentExtension>&& compiledExtension, URL&& extensionBaseURL, ShouldCompileCSS shouldCompileCSS)
@@ -158,4 +156,3 @@ const DFABytecodeInterpreter::Actions& ContentExtension::frameURLActions(const U
 
 } // namespace WebCore::ContentExtensions
 
-#endif // ENABLE(CONTENT_EXTENSIONS)

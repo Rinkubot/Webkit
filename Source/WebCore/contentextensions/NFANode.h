@@ -25,8 +25,6 @@
 
 #pragma once
 
-#if ENABLE(CONTENT_EXTENSIONS)
-
 #include "ContentExtensionsDebugging.h"
 #include <wtf/HashMap.h>
 #include <wtf/HashSet.h>
@@ -53,4 +51,3 @@ public:
 } // namespace ContentExtensions
 } // namespace WebCore
 
-#endif // ENABLE(CONTENT_EXTENSIONS)

@@ -25,8 +25,6 @@
 
 #pragma once
 
-#if ENABLE(CONTENT_EXTENSIONS)
-
 #include "CombinedFiltersAlphabet.h"
 #include "ContentExtensionsDebugging.h"
 #include "NFA.h"
@@ -64,4 +62,3 @@ private:
 } // namespace ContentExtensions
 } // namespace WebCore
 
-#endif // ENABLE(CONTENT_EXTENSIONS)

@@ -324,7 +324,6 @@ void SWClientConnection::registerServiceWorkerClients()
     Worker::forEachWorker([] { return [] (auto& context) { context.updateServiceWorkerClientData(); }; });
 }
 
-#if ENABLE(CONTENT_EXTENSIONS)
 void SWClientConnection::reportNetworkUsageToWorkerClient(ScriptExecutionContextIdentifier destinationContextIdentifier, uint64_t bytesTransferredOverNetworkDelta)
 {
     ASSERT(isMainThread());
@@ -334,6 +333,5 @@ void SWClientConnection::reportNetworkUsageToWorkerClient(ScriptExecutionContext
             resourceMonitor->addNetworkUsage(bytesTransferredOverNetworkDelta);
     }
 }
-#endif
 
 } // namespace WebCore

@@ -26,7 +26,6 @@
 #include "config.h"
 #include "ResourceLoadInfo.h"
 
-#if ENABLE(CONTENT_EXTENSIONS)
 
 #include "ContentExtensionActions.h"
 #include "RegistrableDomain.h"
@@ -57,7 +56,6 @@ OptionSet<ResourceType> toResourceType(CachedResource::Type type, ResourceReques
     case CachedResource::Type::CSSStyleSheet:
 #if ENABLE(XSLT)
     case CachedResource::Type::XSLStyleSheet:
-#endif
         return { ResourceType::StyleSheet };
 
     case CachedResource::Type::Script:
@@ -90,8 +88,6 @@ OptionSet<ResourceType> toResourceType(CachedResource::Type type, ResourceReques
 #if ENABLE(VIDEO)
     case CachedResource::Type::TextTrackResource:
         return { ResourceType::Media };
-#endif
-
     };
     ASSERT_NOT_REACHED();
     return { };
@@ -229,4 +225,3 @@ ASCIILiteral resourceTypeToString(OptionSet<ResourceType> resourceTypes)
 
 } // namespace WebCore::ContentExtensions
 
-#endif // ENABLE(CONTENT_EXTENSIONS)

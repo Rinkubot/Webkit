@@ -49,8 +49,6 @@
 
 #if ENABLE(LOCKDOWN_MODE_API)
 #import <pal/cocoa/LockdownModeCocoa.h>
-#endif
-
 namespace WebCore {
 
 CachedResourceRequest::CachedResourceRequest(ResourceRequest&& resourceRequest, const ResourceLoaderOptions& options, std::optional<ResourceLoadPriority> priority, String&& charset)
@@ -170,8 +168,6 @@ static String acceptHeaderValueForImageResource(bool usingSecureProtocol)
 #else
     static bool limitToLockdownModeSet = false;
     UNUSED_PARAM(usingSecureProtocol);
-#endif
-
     StringBuilder builder;
     if (limitToLockdownModeSet)
         builder.append("image/webp,"_s);
@@ -277,14 +273,12 @@ void CachedResourceRequest::removeFragmentIdentifierIfNeeded()
         m_resourceRequest.setURL(WTFMove(url));
 }
 
-#if ENABLE(CONTENT_EXTENSIONS)
 
 void CachedResourceRequest::applyResults(ContentRuleListResults&& results, Page* page)
 {
     ContentExtensions::applyResultsToRequest(WTFMove(results), page, m_resourceRequest);
 }
 
-#endif
 
 void CachedResourceRequest::updateReferrerPolicy(ReferrerPolicy defaultPolicy)
 {

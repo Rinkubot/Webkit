@@ -396,9 +396,7 @@ public:
 #endif
     static String defaultJavaScriptConfigurationDirectory(const String& baseDataDirectory = nullString());
 
-#if ENABLE(CONTENT_EXTENSIONS)
     static String defaultResourceMonitorThrottlerDirectory(const String& baseDataDirectory = nullString());
-#endif
 
     static constexpr uint64_t defaultPerOriginQuota() { return 1000 * MB; }
     static constexpr uint64_t defaultStandardVolumeCapacity() {
@@ -509,9 +507,7 @@ public:
     bool builtInNotificationsEnabled() const;
 #endif
 
-#if ENABLE(CONTENT_EXTENSIONS)
     void resetResourceMonitorThrottlerForTesting(CompletionHandler<void()>&&);
-#endif
 
     bool isRemovingData() const { return!!m_removeDataTaskCounter.value(); }
     uint64_t cookiesVersion() const { return m_cookiesVersion; }

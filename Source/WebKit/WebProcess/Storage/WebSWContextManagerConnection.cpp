@@ -99,9 +99,7 @@ WebSWContextManagerConnection::WebSWContextManagerConnection(Ref<IPC::Connection
     , m_userContentController(WebUserContentController::getOrCreate(initializationData.userContentControllerIdentifier))
     , m_queue(WorkQueue::create("WebSWContextManagerConnection queue"_s, WorkQueue::QOS::UserInitiated))
 {
-#if ENABLE(CONTENT_EXTENSIONS)
     m_userContentController->addContentRuleLists(WTFMove(initializationData.contentRuleLists));
-#endif
 
     WebPage::updatePreferencesGenerated(store);
     m_preferencesStore = store;

@@ -146,13 +146,11 @@ std::optional<SharedPreferencesForWebProcess> WebSharedWorkerServerConnection::s
     return m_networkProcess->webProcessConnection(connection)->sharedPreferencesForWebProcess();
 }
 
-#if ENABLE(CONTENT_EXTENSIONS)
 void WebSharedWorkerServerConnection::reportNetworkUsageToWorkerObject(WebCore::SharedWorkerObjectIdentifier sharedWorkerObjectIdentifier, size_t bytesTransferredOverNetworkDelta)
 {
     CONNECTION_RELEASE_LOG("reportNetworkUsageToWorkerObject: sharedWorkerObjectIdentifier=%" PUBLIC_LOG_STRING ", bytesTransferredOverNetworkDelta=%zu", sharedWorkerObjectIdentifier.toString().utf8().data(), bytesTransferredOverNetworkDelta);
     send(Messages::WebSharedWorkerObjectConnection::ReportNetworkUsageToWorkerObject { sharedWorkerObjectIdentifier, bytesTransferredOverNetworkDelta });
 }
-#endif
 
 #undef CONNECTION_RELEASE_LOG
 #undef CONNECTION_RELEASE_LOG_ERROR

@@ -26,8 +26,6 @@
 #include "config.h"
 #include "CombinedFiltersAlphabet.h"
 
-#if ENABLE(CONTENT_EXTENSIONS)
-
 namespace WebCore {
 
 namespace ContentExtensions {
@@ -84,4 +82,3 @@ size_t CombinedFiltersAlphabet::memoryUsed() const
 } // namespace ContentExtensions
 } // namespace WebCore
 
-#endif // ENABLE(CONTENT_EXTENSIONS)

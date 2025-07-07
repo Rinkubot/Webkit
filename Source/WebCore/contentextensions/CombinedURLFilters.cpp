@@ -26,8 +26,6 @@
 #include "config.h"
 #include "CombinedURLFilters.h"
 
-#if ENABLE(CONTENT_EXTENSIONS)
-
 #include "HashableActionList.h"
 #include "Term.h"
 #include <wtf/DataLog.h>
@@ -463,4 +461,3 @@ bool CombinedURLFilters::processNFAs(size_t maxNFASize, Function<bool(NFA&&)>&& 
 } // namespace ContentExtensions
 } // namespace WebCore
 
-#endif // ENABLE(CONTENT_EXTENSIONS)

@@ -26,8 +26,6 @@
 #include "config.h"
 #include "NFAToDFA.h"
 
-#if ENABLE(CONTENT_EXTENSIONS)
-
 #include "ContentExtensionsDebugging.h"
 #include "DFANode.h"
 #include "ImmutableNFA.h"
@@ -363,4 +361,3 @@ std::optional<DFA> NFAToDFA::convert(NFA&& nfa)
 
 } // namespace WebCore
 
-#endif // ENABLE(CONTENT_EXTENSIONS)

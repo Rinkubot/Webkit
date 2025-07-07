@@ -47,10 +47,8 @@
 #include <wtf/Ref.h>
 #include <wtf/text/MakeString.h>
 
-#if ENABLE(CONTENT_EXTENSIONS)
 #include "ContentRuleListResults.h"
 #include "UserContentController.h"
-#endif
 
 namespace WebCore {
 
@@ -601,7 +599,6 @@ bool StyleSheetContents::subresourcesAllowReuse(CachePolicy cachePolicy, FrameLo
         if (resource.makeRevalidationDecision(cachePolicy) != CachedResource::RevalidationDecision::No)
             return true;
 
-#if ENABLE(CONTENT_EXTENSIONS)
         // If a cached subresource is blocked or made HTTPS by a content blocker, we cannot reuse the cached stylesheet.
         auto* page = loader.frame().page();
         auto* documentLoader = loader.documentLoader();
@@ -611,9 +608,6 @@ bool StyleSheetContents::subresourcesAllowReuse(CachePolicy cachePolicy, FrameLo
             if (results.shouldBlock() || results.summary.madeHTTPS)
                 return true;
         }
-#else
-        UNUSED_PARAM(loader);
-#endif
 
         return false;
     });

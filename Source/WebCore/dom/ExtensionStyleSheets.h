@@ -37,9 +37,7 @@
 #include <wtf/WeakRef.h>
 #include <wtf/text/WTFString.h>
 
-#if ENABLE(CONTENT_EXTENSIONS)
 #include "ContentExtensionStyleSheet.h"
-#endif
 
 namespace WebCore {
 
@@ -73,10 +71,8 @@ public:
 
     WEBCORE_EXPORT void addAuthorStyleSheetForTesting(Ref<StyleSheetContents>&&);
 
-#if ENABLE(CONTENT_EXTENSIONS)
     void addDisplayNoneSelector(const String& identifier, const String& selector, uint32_t selectorID);
     void maybeAddContentExtensionSheet(const String& identifier, StyleSheetContents&);
-#endif
 
     void injectPageSpecificUserStyleSheet(const UserStyleSheet&);
     void removePageSpecificUserStyleSheet(const UserStyleSheet&);
@@ -101,10 +97,8 @@ private:
     Vector<RefPtr<CSSStyleSheet>> m_authorStyleSheetsForTesting;
     Vector<UserStyleSheet> m_pageSpecificStyleSheets;
 
-#if ENABLE(CONTENT_EXTENSIONS)
     MemoryCompactRobinHoodHashMap<String, RefPtr<CSSStyleSheet>> m_contentExtensionSheets;
     MemoryCompactRobinHoodHashMap<String, RefPtr<ContentExtensions::ContentExtensionStyleSheet>> m_contentExtensionSelectorSheets;
-#endif
 };
 
 } // namespace WebCore

@@ -35,11 +35,9 @@
 #include "LocalFrame.h"
 #include "Page.h"
 
-#if ENABLE(CONTENT_EXTENSIONS)
 #include "ContentExtensionCompiler.h"
 #include "ContentExtensionsBackend.h"
 #include "ContentRuleListResults.h"
-#endif
 
 namespace WebCore {
 
@@ -92,7 +90,6 @@ void UserContentProvider::invalidateInjectedStyleSheetCacheInAllFramesInAllPages
         page.invalidateInjectedStyleSheetCacheInAllFrames();
 }
 
-#if ENABLE(CONTENT_EXTENSIONS)
 static DocumentLoader* mainDocumentLoader(DocumentLoader& loader)
 {
     if (auto frame = loader.frame()) {
@@ -156,6 +153,5 @@ ContentRuleListResults UserContentProvider::processContentRuleListsForLoad(Page&
 
     return results;
 }
-#endif // ENABLE(CONTENT_EXTENSIONS)
 
 } // namespace WebCore

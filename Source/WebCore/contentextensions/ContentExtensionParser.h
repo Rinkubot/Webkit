@@ -25,8 +25,6 @@
 
 #pragma once
 
-#if ENABLE(CONTENT_EXTENSIONS)
-
 #include <system_error>
 #include <wtf/Expected.h>
 #include <wtf/Forward.h>
@@ -53,4 +51,3 @@ CSSParserContext contentExtensionCSSParserContext();
 } // namespace ContentExtensions
 } // namespace WebCore
 
-#endif // ENABLE(CONTENT_EXTENSIONS)

@@ -25,7 +25,6 @@
 
 #pragma once
 
-#if ENABLE(CONTENT_EXTENSIONS)
 
 #include "ResourceMonitorChecker.h"
 #include <wtf/CheckedArithmetic.h>
@@ -78,4 +77,3 @@ private:
 
 } // namespace WebCore
 
-#endif

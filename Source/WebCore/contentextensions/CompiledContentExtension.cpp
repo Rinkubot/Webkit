@@ -27,8 +27,6 @@
 #include "CompiledContentExtension.h"
 #include "DFABytecodeInterpreter.h"
 
-#if ENABLE(CONTENT_EXTENSIONS)
-
 namespace WebCore {
 namespace ContentExtensions {
 
@@ -37,4 +35,3 @@ CompiledContentExtension::~CompiledContentExtension() = default;
 } // namespace ContentExtensions
 } // namespace WebCore
 
-#endif // ENABLE(CONTENT_EXTENSIONS)

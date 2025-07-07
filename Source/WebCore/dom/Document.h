@@ -1985,7 +1985,6 @@ public:
     WEBCORE_EXPORT FrameMemoryMonitor& frameMemoryMonitor();
     Ref<FrameMemoryMonitor> protectedFrameMemoryMonitor();
 
-#if ENABLE(CONTENT_EXTENSIONS)
     ResourceMonitor* resourceMonitorIfExists();
     ResourceMonitor& resourceMonitor();
     Ref<ResourceMonitor> protectedResourceMonitor();
@@ -1993,7 +1992,6 @@ public:
 
     bool shouldSkipResourceMonitorThrottling() const { return m_shouldSkipResourceMonitorThrottling; }
     void setShouldSkipResourceMonitorThrottling(bool flag) { m_shouldSkipResourceMonitorThrottling = flag; }
-#endif
 
     double lookupCSSRandomBaseValue(const CSSCalc::RandomCachingKey&) const;
 
@@ -2734,10 +2732,8 @@ private:
 
     RefPtr<FrameMemoryMonitor> m_frameMemoryMonitor;
 
-#if ENABLE(CONTENT_EXTENSIONS)
     RefPtr<ResourceMonitor> m_resourceMonitor;
     bool m_shouldSkipResourceMonitorThrottling { false };
-#endif
 
     mutable RefPtr<CSSCalc::RandomCachingKeyMap> m_randomCachingKeyMap;
 

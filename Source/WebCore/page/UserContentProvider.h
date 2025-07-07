@@ -31,10 +31,8 @@
 #include <wtf/WeakHashSet.h>
 #include <wtf/WeakPtr.h>
 
-#if ENABLE(CONTENT_EXTENSIONS)
 #include "ContentExtensionsBackend.h"
 #include "ContentRuleListResults.h"
-#endif
 
 namespace WebCore {
 class UserContentProviderInvalidationClient;
@@ -74,9 +72,7 @@ public:
 #if ENABLE(USER_MESSAGE_HANDLERS)
     virtual void forEachUserMessageHandler(NOESCAPE const Function<void(const UserMessageHandlerDescriptor&)>&) const = 0;
 #endif
-#if ENABLE(CONTENT_EXTENSIONS)
     virtual ContentExtensions::ContentExtensionsBackend& userContentExtensionBackend() = 0;
-#endif
 
     void registerForUserMessageHandlerInvalidation(UserContentProviderInvalidationClient&);
     void unregisterForUserMessageHandlerInvalidation(UserContentProviderInvalidationClient&);
@@ -84,9 +80,7 @@ public:
     void addPage(Page&);
     void removePage(Page&);
 
-#if ENABLE(CONTENT_EXTENSIONS)
     ContentRuleListResults processContentRuleListsForLoad(Page&, const URL&, OptionSet<ContentExtensions::ResourceType>, DocumentLoader& initiatingDocumentLoader, const URL& redirectFrom = { });
-#endif
 
 protected:
     WEBCORE_EXPORT void invalidateAllRegisteredUserMessageHandlerInvalidationClients();

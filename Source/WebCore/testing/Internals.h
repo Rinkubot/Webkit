@@ -1561,11 +1561,9 @@ public:
     void setResourceCachingDisabledByWebInspector(bool);
     ExceptionOr<void> lowerAllFrameMemoryMonitorLimits();
 
-#if ENABLE(CONTENT_EXTENSIONS)
     void setResourceMonitorNetworkUsageThreshold(size_t threshold, double randomness = ResourceMonitorChecker::defaultNetworkUsageThresholdRandomness);
     bool shouldSkipResourceMonitorThrottling() const;
     void setShouldSkipResourceMonitorThrottling(bool);
-#endif
 
 #if ENABLE(DAMAGE_TRACKING)
     struct FrameDamage {

@@ -96,20 +96,14 @@
 #include <wtf/TZoneMallocInlines.h>
 #include <wtf/Unexpected.h>
 
-#if ENABLE(CONTENT_EXTENSIONS)
 #include "CompiledContentExtension.h"
-#endif
 
 #if USE(QUICK_LOOK)
 #include "LegacyPreviewLoaderClient.h"
-#endif
-
 #if HAVE(DIGITAL_CREDENTIALS_UI)
 #include "DigitalCredentialsRequestData.h"
 #include "DigitalCredentialsResponseData.h"
 #include "ExceptionData.h"
-#endif
-
 namespace WebCore {
 
 WTF_MAKE_TZONE_ALLOCATED_IMPL(DummyStorageProvider);
@@ -143,20 +137,12 @@ class EmptyContextMenuClient final : public ContextMenuClient {
 
 #if HAVE(TRANSLATION_UI_SERVICES)
     void handleTranslation(const TranslationContextMenuInfo&) final { }
-#endif
-
 #if PLATFORM(GTK)
     void insertEmoji(LocalFrame&) final { }
-#endif
-
 #if USE(ACCESSIBILITY_CONTEXT_MENUS)
     void showContextMenu() final { }
-#endif
-
 #if ENABLE(IMAGE_ANALYSIS)
     bool supportsLookUpInImages() final { return false; }
-#endif
-
 #if ENABLE(IMAGE_ANALYSIS_ENHANCEMENTS)
     bool supportsCopySubject() final { return false; }
 #endif
@@ -342,20 +328,14 @@ private:
     RefPtr<DocumentFragment> documentFragmentFromDelegate(int) final { return nullptr; }
     bool performsTwoStepPaste(DocumentFragment*) final { return false; }
     void updateStringForFind(const String&) final { }
-#endif
-
     bool performTwoStepDrop(DocumentFragment&, const SimpleRange&, bool) final { return false; }
 
 #if PLATFORM(COCOA)
     void setInsertionPasteboard(const String&) final { };
-#endif
-
 #if USE(APPKIT)
     void uppercaseWord() final { }
     void lowercaseWord() final { }
     void capitalizeWord() final { }
-#endif
-
 #if USE(AUTOMATIC_TEXT_REPLACEMENT)
     void showSubstitutionsPanel(bool) final { }
     bool substitutionsPanelIsShowing() final { return false; }
@@ -370,12 +350,8 @@ private:
     void toggleAutomaticTextReplacement() final { }
     bool isAutomaticSpellingCorrectionEnabled() final { return false; }
     void toggleAutomaticSpellingCorrection() final { }
-#endif
-
 #if PLATFORM(GTK)
     bool shouldShowUnicodeMenu() final { return false; }
-#endif
-
     TextCheckerClient* textChecker() final { return &m_textCheckerClient; }
 
     void updateSpellingUIWithGrammarString(const String&, const GrammarDetail&) final { }
@@ -394,8 +370,6 @@ private:
 
 #if USE(UNIFIED_TEXT_CHECKING)
         Vector<TextCheckingResult> checkTextOfParagraph(StringView, OptionSet<TextCheckingType>, const VisibleSelection&) final { return Vector<TextCheckingResult>(); }
-#endif
-
         void getGuessesForWord(const String&, const String&, const VisibleSelection&, Vector<String>&) final { }
         void requestCheckingOfString(TextCheckingRequest&, const VisibleSelection&) final;
     };
@@ -419,8 +393,6 @@ private:
     bool localFileContentSniffingEnabled() const { return false; }
     SchedulePairHashSet* scheduledRunLoopPairs() const { return nullptr; }
     RetainPtr<CFDataRef> sourceApplicationAuditData() const { return nullptr; };
-#endif
-
 #if PLATFORM(COCOA) || PLATFORM(WIN)
     ResourceError blockedError(const ResourceRequest&) const final { return { }; }
 #endif
@@ -472,8 +444,6 @@ private:
 
 WTF_MAKE_TZONE_ALLOCATED_IMPL(EmptyPaymentCoordinatorClient);
 
-#endif
-
 #if HAVE(DIGITAL_CREDENTIALS_UI)
 class EmptyCredentialRequestCoordinatorClient final : public CredentialRequestCoordinatorClient {
     WTF_MAKE_TZONE_ALLOCATED(EmptyCredentialRequestCoordinatorClient);
@@ -505,8 +475,6 @@ public:
     }
 };
 WTF_MAKE_TZONE_ALLOCATED_IMPL(EmptyCredentialRequestCoordinatorClient);
-#endif
-
 class EmptyPluginInfoProvider final : public PluginInfoProvider {
     void refreshPlugins() final { };
     Vector<PluginInfo> pluginInfo(Page&, std::optional<Vector<SupportedPluginIdentifier>>&) final { return { }; }
@@ -588,9 +556,7 @@ class EmptyUserContentProvider final : public UserContentProvider {
 #if ENABLE(USER_MESSAGE_HANDLERS)
     void forEachUserMessageHandler(NOESCAPE const Function<void(const UserMessageHandlerDescriptor&)>&) const final { }
 #endif
-#if ENABLE(CONTENT_EXTENSIONS)
     ContentExtensions::ContentExtensionsBackend& userContentExtensionBackend() final { static NeverDestroyed<ContentExtensions::ContentExtensionsBackend> backend; return backend.get(); };
-#endif
 };
 
 class EmptyVisitedLinkStore final : public VisitedLinkStore {
@@ -712,8 +678,6 @@ bool EmptyFrameLoaderClient::forceLayoutOnRestoreFromBackForwardCache()
     return false;
 }
 
-#endif
-
 void EmptyFrameLoaderClient::forceLayoutForNonHTML()
 {
 }
@@ -758,16 +722,12 @@ bool EmptyFrameLoaderClient::canAuthenticateAgainstProtectionSpace(DocumentLoade
     return false;
 }
 
-#endif
-
 #if PLATFORM(IOS_FAMILY)
 
 RetainPtr<CFDictionaryRef> EmptyFrameLoaderClient::connectionProperties(DocumentLoader*, ResourceLoaderIdentifier)
 {
     return nullptr;
 }
-
-#endif
 
 void EmptyFrameLoaderClient::dispatchDidReceiveResponse(DocumentLoader*, ResourceLoaderIdentifier, const ResourceResponse&)
 {
@@ -786,8 +746,6 @@ void EmptyFrameLoaderClient::dispatchDidFinishLoading(DocumentLoader*, IsMainRes
 void EmptyFrameLoaderClient::dispatchDidFinishDataDetection(NSArray *)
 {
 }
-
-#endif
 
 void EmptyFrameLoaderClient::dispatchDidFailLoading(DocumentLoader*, IsMainResourceLoad, ResourceLoaderIdentifier, const ResourceError&)
 {
@@ -1012,8 +970,6 @@ void EmptyFrameLoaderClient::didRestoreFrameHierarchyForCachedFrame()
 {
 }
 
-#endif
-
 void EmptyFrameLoaderClient::transitionToCommittedForNewPage(InitializingIframe)
 {
 }
@@ -1097,14 +1053,10 @@ IntPoint EmptyFrameLoaderClient::accessibilityRemoteFrameOffset()
 void EmptyFrameLoaderClient::setIsolatedTree(Ref<WebCore::AXIsolatedTree>&&)
 {
 }
-#endif
-
 void EmptyFrameLoaderClient::willCacheResponse(DocumentLoader*, ResourceLoaderIdentifier, NSCachedURLResponse *response, CompletionHandler<void(NSCachedURLResponse *)>&& completionHandler) const
 {
     completionHandler(response);
 }
-
-#endif
 
 bool EmptyFrameLoaderClient::isEmptyFrameLoaderClient() const
 {
@@ -1126,8 +1078,6 @@ RefPtr<LegacyPreviewLoaderClient> EmptyFrameLoaderClient::createPreviewLoaderCli
 {
     return nullptr;
 }
-
-#endif
 
 bool EmptyFrameLoaderClient::hasFrameSpecificStorageAccess()
 {
@@ -1256,8 +1206,6 @@ PageConfiguration pageConfigurationWithEmptyClients(std::optional<PageIdentifier
 
 #if ENABLE(DRAG_SUPPORT)
     pageConfiguration.dragClient = makeUnique<EmptyDragClient>();
-#endif
-
     pageConfiguration.inspectorClient = makeUnique<EmptyInspectorClient>();
 
     pageConfiguration.diagnosticLoggingClient = makeUnique<EmptyDiagnosticLoggingClient>();
@@ -1270,8 +1218,6 @@ PageConfiguration pageConfigurationWithEmptyClients(std::optional<PageIdentifier
     
 #if ENABLE(ATTACHMENT_ELEMENT)
     pageConfiguration.attachmentElementClient = makeUnique<EmptyAttachmentElementClient>();
-#endif
-
     return pageConfiguration;
 }
 

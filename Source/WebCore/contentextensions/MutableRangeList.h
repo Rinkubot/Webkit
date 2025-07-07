@@ -27,8 +27,6 @@
 
 #include "MutableRange.h"
 
-#if ENABLE(CONTENT_EXTENSIONS)
-
 namespace WebCore {
 
 namespace ContentExtensions {
@@ -268,4 +266,3 @@ private:
 } // namespace ContentExtensions
 } // namespace WebCore
 
-#endif // ENABLE(CONTENT_EXTENSIONS)

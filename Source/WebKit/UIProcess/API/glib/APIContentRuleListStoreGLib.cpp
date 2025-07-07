@@ -28,12 +28,10 @@
 
 namespace API {
 
-#if ENABLE(CONTENT_EXTENSIONS)
 String ContentRuleListStore::defaultStorePath()
 {
     ASSERT_NOT_REACHED();
     return String();
 }
-#endif
 
 }; // namespace API

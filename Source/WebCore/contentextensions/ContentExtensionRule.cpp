@@ -28,8 +28,6 @@
 
 #include <wtf/CrossThreadCopier.h>
 
-#if ENABLE(CONTENT_EXTENSIONS)
-
 namespace WebCore::ContentExtensions {
 
 ContentExtensionRule::ContentExtensionRule(Trigger&& trigger, Action&& action)
@@ -119,4 +117,3 @@ Action Action::isolatedCopy() &&
 
 } // namespace WebCore::ContentExtensions
 
-#endif // ENABLE(CONTENT_EXTENSIONS)

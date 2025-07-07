@@ -94,7 +94,6 @@ void SharedWorkerObjectConnection::postErrorToWorkerObject(SharedWorkerObjectIde
     ActiveDOMObject::queueTaskToDispatchEvent(*workerObject, TaskSource::DOMManipulation, WTFMove(event));
 }
 
-#if ENABLE(CONTENT_EXTENSIONS)
 void SharedWorkerObjectConnection::reportNetworkUsageToWorkerObject(SharedWorkerObjectIdentifier sharedWorkerObjectIdentifier, uint64_t bytesTransferredOverNetworkDelta)
 {
     ASSERT(isMainThread());
@@ -103,7 +102,6 @@ void SharedWorkerObjectConnection::reportNetworkUsageToWorkerObject(SharedWorker
     if (workerObject)
         workerObject->reportNetworkUsage(bytesTransferredOverNetworkDelta);
 }
-#endif
 
 #undef CONNECTION_RELEASE_LOG
 #undef CONNECTION_RELEASE_LOG_ERROR

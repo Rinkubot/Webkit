@@ -1344,10 +1344,8 @@ void WebChromeClient::registerBlobPathForTesting(const String& path, CompletionH
 
 void WebChromeClient::contentRuleListNotification(const URL& url, const ContentRuleListResults& results)
 {
-#if ENABLE(CONTENT_EXTENSIONS)
     if (RefPtr page = m_page.get())
         page->send(Messages::WebPageProxy::ContentRuleListNotification(url, results));
-#endif
 }
 
 bool WebChromeClient::layerTreeStateIsFrozen() const

@@ -35,7 +35,6 @@
 #import <wtf/CompletionHandler.h>
 #import <wtf/cocoa/VectorCocoa.h>
 
-#if ENABLE(CONTENT_EXTENSIONS)
 static WKErrorCode toWKErrorCode(const std::error_code& error)
 {
     ASSERT(error.category() == API::contentRuleListStoreErrorCategory());
@@ -52,7 +51,6 @@ static WKErrorCode toWKErrorCode(const std::error_code& error)
     ASSERT_NOT_REACHED();
     return WKErrorUnknown;
 }
-#endif
 
 @implementation WKContentRuleListStore
 
@@ -70,20 +68,16 @@ WK_OBJECT_DISABLE_DISABLE_KVC_IVAR_ACCESS;
 
 + (instancetype)defaultStore
 {
-#if ENABLE(CONTENT_EXTENSIONS)
     return wrapper(API::ContentRuleListStore::defaultStoreSingleton());
 #else
     return nil;
-#endif
 }
 
 + (instancetype)storeWithURL:(NSURL *)url
 {
-#if ENABLE(CONTENT_EXTENSIONS)
     return wrapper(API::ContentRuleListStore::storeWithPath(url.absoluteURL.path)).autorelease();
 #else
     return nil;
-#endif
 }
 
 - (Ref<API::ContentRuleListStore>)_protectedContentListStore
@@ -93,7 +87,6 @@ WK_OBJECT_DISABLE_DISABLE_KVC_IVAR_ACCESS;
 
 - (void)compileContentRuleListForIdentifier:(NSString *)identifier encodedContentRuleList:(NSString *)encodedContentRuleList completionHandler:(void (^)(WKContentRuleList *, NSError *))completionHandler
 {
-#if ENABLE(CONTENT_EXTENSIONS)
     self._protectedContentListStore->compileContentRuleList(identifier, encodedContentRuleList, [completionHandler = makeBlockPtr(completionHandler)](RefPtr<API::ContentRuleList> contentRuleList, std::error_code error) {
         if (error) {
             RetainPtr userInfo = @{ NSHelpAnchorErrorKey: adoptNS([[NSString alloc] initWithFormat:@"Rule list compilation failed: %s", error.message().c_str()]).get() };
@@ -104,12 +97,10 @@ WK_OBJECT_DISABLE_DISABLE_KVC_IVAR_ACCESS;
         }
         completionHandler(wrapper(*contentRuleList), nil);
     });
-#endif
 }
 
 - (void)lookUpContentRuleListForIdentifier:(NSString *)identifier completionHandler:(void (^)(WKContentRuleList *, NSError *))completionHandler
 {
-#if ENABLE(CONTENT_EXTENSIONS)
     self._protectedContentListStore->lookupContentRuleList(identifier, [completionHandler = makeBlockPtr(completionHandler)](RefPtr<API::ContentRuleList> contentRuleList, std::error_code error) {
         if (error) {
             RetainPtr userInfo = @{ NSHelpAnchorErrorKey: adoptNS([[NSString alloc] initWithFormat:@"Rule list lookup failed: %s", error.message().c_str()]).get() };
@@ -120,21 +111,17 @@ WK_OBJECT_DISABLE_DISABLE_KVC_IVAR_ACCESS;
 
         completionHandler(wrapper(*contentRuleList), nil);
     });
-#endif
 }
 
 - (void)getAvailableContentRuleListIdentifiers:(void (^)(NSArray<NSString *>*))completionHandler
 {
-#if ENABLE(CONTENT_EXTENSIONS)
     self._protectedContentListStore->getAvailableContentRuleListIdentifiers([completionHandler = makeBlockPtr(completionHandler)](Vector<String> identifiers) {
         completionHandler(createNSArray(identifiers).get());
     });
-#endif
 }
 
 - (void)removeContentRuleListForIdentifier:(NSString *)identifier completionHandler:(void (^)(NSError *))completionHandler
 {
-#if ENABLE(CONTENT_EXTENSIONS)
     self._protectedContentListStore->removeContentRuleList(identifier, [completionHandler = makeBlockPtr(completionHandler)](std::error_code error) {
         if (error) {
             RetainPtr userInfo = @{ NSHelpAnchorErrorKey: adoptNS([[NSString alloc] initWithFormat:@"Rule list removal failed: %s", error.message().c_str()]).get() };
@@ -144,7 +131,6 @@ WK_OBJECT_DISABLE_DISABLE_KVC_IVAR_ACCESS;
 
         completionHandler(nil);
     });
-#endif
 }
 
 #pragma mark WKObject protocol implementation
@@ -162,42 +148,31 @@ WK_OBJECT_DISABLE_DISABLE_KVC_IVAR_ACCESS;
 
 - (void)_removeAllContentRuleLists
 {
-#if ENABLE(CONTENT_EXTENSIONS)
     self._protectedContentListStore->synchronousRemoveAllContentRuleLists();
-#endif
 }
 
 - (void)_invalidateContentRuleListVersionForIdentifier:(NSString *)identifier
 {
-#if ENABLE(CONTENT_EXTENSIONS)
     self._protectedContentListStore->invalidateContentRuleListVersion(identifier);
-#endif
 }
 
 - (void)_corruptContentRuleListHeaderForIdentifier:(NSString *)identifier usingCurrentVersion:(BOOL)usingCurrentVersion
 {
-#if ENABLE(CONTENT_EXTENSIONS)
     self._protectedContentListStore->corruptContentRuleListHeader(identifier, usingCurrentVersion);
-#endif
 }
 
 - (void)_corruptContentRuleListActionsMatchingEverythingForIdentifier:(NSString *)identifier
 {
-#if ENABLE(CONTENT_EXTENSIONS)
     self._protectedContentListStore->corruptContentRuleListActionsMatchingEverything(identifier);
-#endif
 }
 
 - (void)_invalidateContentRuleListHeaderForIdentifier:(NSString *)identifier
 {
-#if ENABLE(CONTENT_EXTENSIONS)
     self._protectedContentListStore->invalidateContentRuleListHeader(identifier);
-#endif
 }
 
 - (void)_getContentRuleListSourceForIdentifier:(NSString *)identifier completionHandler:(void (^)(NSString*))completionHandler
 {
-#if ENABLE(CONTENT_EXTENSIONS)
     auto handler = adoptNS([completionHandler copy]);
     self._protectedContentListStore->getContentRuleListSource(identifier, [handler](String source) {
         auto rawHandler = (void (^)(NSString *))handler.get();
@@ -211,25 +186,20 @@ WK_OBJECT_DISABLE_DISABLE_KVC_IVAR_ACCESS;
         } else
             rawHandler(source.createNSString().get());
     });
-#endif
 }
 
 + (instancetype)defaultStoreWithLegacyFilename
 {
-#if ENABLE(CONTENT_EXTENSIONS)
     return wrapper(API::ContentRuleListStore::defaultStoreSingleton());
 #else
     return nil;
-#endif
 }
 
 + (instancetype)storeWithURLAndLegacyFilename:(NSURL *)url
 {
-#if ENABLE(CONTENT_EXTENSIONS)
     return wrapper(API::ContentRuleListStore::storeWithPath(url.absoluteURL.path)).autorelease();
 #else
     return nil;
-#endif
 }
 
 - (void)removeContentExtensionForIdentifier:(NSString *)identifier completionHandler:(void (^)(NSError *))completionHandler

@@ -422,7 +422,6 @@ void WebUserContentController::removeUserScriptMessageHandlerInternal(InjectedBu
 }
 #endif
 
-#if ENABLE(CONTENT_EXTENSIONS)
 void WebUserContentController::addContentRuleLists(Vector<std::pair<WebCompiledContentRuleListData, URL>>&& contentRuleLists)
 {
     for (auto&& pair : contentRuleLists) {
@@ -442,7 +441,6 @@ void WebUserContentController::removeAllContentRuleLists()
 {
     m_contentExtensionBackend.removeAllContentExtensions();
 }
-#endif
 
 void WebUserContentController::addUserScriptInternal(InjectedBundleScriptWorld& world, const std::optional<UserScriptIdentifier>& userScriptIdentifier, UserScript&& userScript, InjectUserScriptImmediately immediately)
 {

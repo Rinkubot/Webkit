@@ -26,8 +26,6 @@
 #include "config.h"
 #include "ContentExtensionParser.h"
 
-#if ENABLE(CONTENT_EXTENSIONS)
-
 #include "CSSSelectorParser.h"
 #include "CommonAtomStrings.h"
 #include "ContentExtensionError.h"
@@ -360,4 +358,3 @@ Expected<Vector<ContentExtensionRule>, std::error_code> parseRuleList(const Stri
 
 } // namespace WebCore::ContentExtensions
 
-#endif // ENABLE(CONTENT_EXTENSIONS)

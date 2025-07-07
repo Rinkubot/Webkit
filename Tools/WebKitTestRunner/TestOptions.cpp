@@ -106,9 +106,7 @@ const TestFeatures& TestOptions::defaults()
             { "GenericCueAPIEnabled", false },
             { "HiddenPageCSSAnimationSuspensionEnabled", false },
             { "HiddenPageDOMTimerThrottlingEnabled", false },
-#if ENABLE(CONTENT_EXTENSIONS)
             { "IFrameResourceMonitoringEnabled", true },
-#endif
             { "InlineMediaPlaybackRequiresPlaysInlineAttribute", false },
             { "InputTypeDateEnabled", true },
             { "InputTypeDateTimeLocalEnabled", true },

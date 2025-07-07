@@ -38,9 +38,7 @@ struct UserContentControllerParameters {
     Vector<WebUserScriptData> userScripts;
     Vector<WebUserStyleSheetData> userStyleSheets;
     Vector<WebScriptMessageHandlerData> messageHandlers;
-#if ENABLE(CONTENT_EXTENSIONS)
     Vector<std::pair<WebCompiledContentRuleListData, URL>> contentRuleLists;
-#endif
 };
 
 } // namespace WebKit

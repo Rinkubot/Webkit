@@ -43,12 +43,8 @@
 
 #if ENABLE(APPLICATION_MANIFEST)
 #include "ApplicationManifest.h"
-#endif
-
 #if ENABLE(CONTENT_FILTERING)
 #include "ContentFilterUnblockHandler.h"
-#endif
-
 #if PLATFORM(COCOA)
 #ifdef __OBJC__
 #import <Foundation/Foundation.h>
@@ -63,8 +59,6 @@ OBJC_CLASS NSArray;
 OBJC_CLASS NSCachedURLResponse;
 OBJC_CLASS NSDictionary;
 OBJC_CLASS NSView;
-#endif
-
 namespace WebCore {
 
 class AXIsolatedTree;
@@ -149,12 +143,8 @@ public:
     virtual void dispatchDidReceiveAuthenticationChallenge(DocumentLoader*, ResourceLoaderIdentifier, const AuthenticationChallenge&) = 0;
 #if USE(PROTECTION_SPACE_AUTH_CALLBACK)
     virtual bool canAuthenticateAgainstProtectionSpace(DocumentLoader*, ResourceLoaderIdentifier, const ProtectionSpace&) = 0;
-#endif
-
 #if PLATFORM(IOS_FAMILY)
     virtual RetainPtr<CFDictionaryRef> connectionProperties(DocumentLoader*, ResourceLoaderIdentifier) = 0;
-#endif
-
     virtual void dispatchDidReceiveResponse(DocumentLoader*, ResourceLoaderIdentifier, const ResourceResponse&) = 0;
     virtual void dispatchDidReceiveContentLength(DocumentLoader*, ResourceLoaderIdentifier, int dataLength) = 0;
     virtual void dispatchDidFinishLoading(DocumentLoader*, IsMainResourceLoad, ResourceLoaderIdentifier) = 0;
@@ -185,8 +175,6 @@ public:
     virtual void dispatchDidExplicitOpen(const URL&, const String& /* mimeType */) { }
 #if ENABLE(DATA_DETECTION)
     virtual void dispatchDidFinishDataDetection(NSArray *detectionResults) = 0;
-#endif
-
     virtual void dispatchDidLayout() { }
     virtual void dispatchDidReachLayoutMilestone(OptionSet<LayoutMilestone>) { }
     virtual void dispatchDidReachVisuallyNonEmptyState() { }
@@ -294,8 +282,6 @@ public:
 #endif
     virtual void willCacheResponse(DocumentLoader*, ResourceLoaderIdentifier, NSCachedURLResponse*, CompletionHandler<void(NSCachedURLResponse *)>&&) const = 0;
     virtual std::optional<double> dataDetectionReferenceDate() { return std::nullopt; }
-#endif
-
     virtual bool shouldLoadMediaElementURL(const URL&) const { return true; }
 
     virtual void didChangeScrollOffset() { }
@@ -321,8 +307,6 @@ public:
 
 #if ENABLE(WEB_RTC)
     virtual void dispatchWillStartUsingPeerConnectionHandler(RTCPeerConnectionHandler*) { }
-#endif
-
     virtual void completePageTransitionIfNeeded() { }
     virtual void setDocumentVisualUpdatesAllowed(bool) { }
 
@@ -332,12 +316,8 @@ public:
 
 #if USE(QUICK_LOOK)
     virtual RefPtr<LegacyPreviewLoaderClient> createPreviewLoaderClient(const String&, const String&) = 0;
-#endif
-
 #if ENABLE(CONTENT_FILTERING)
     virtual void contentFilterDidBlockLoad(ContentFilterUnblockHandler) { }
-#endif
-
     virtual void prefetchDNS(const String&) = 0;
     virtual void sendH2Ping(const URL&, CompletionHandler<void(Expected<Seconds, ResourceError>&&)>&&) = 0;
 
@@ -347,8 +327,6 @@ public:
 
 #if ENABLE(APPLICATION_MANIFEST)
     virtual void finishedLoadingApplicationManifest(uint64_t, const std::optional<ApplicationManifest>&) { }
-#endif
-
     virtual bool hasFrameSpecificStorageAccess() { return false; }
     virtual void didLoadFromRegistrableDomain(RegistrableDomain&&) { }
     virtual Vector<RegistrableDomain> loadedSubresourceDomains() const { return { }; }
@@ -358,33 +336,23 @@ public:
 #if ENABLE(APP_BOUND_DOMAINS)
     virtual bool shouldEnableInAppBrowserPrivacyProtections() const { return false; }
     virtual void notifyPageOfAppBoundBehavior() { }
-#endif
-
 #if ENABLE(PDF_PLUGIN)
     virtual bool shouldUsePDFPlugin(const String&, StringView) const { return false; }
-#endif
-
     virtual bool isParentProcessAFullWebBrowser() const { return false; }
 
 #if ENABLE(ARKIT_INLINE_PREVIEW_MAC)
     virtual void modelInlinePreviewUUIDs(CompletionHandler<void(Vector<String>)>&&) const { }
-#endif
-
     virtual void dispatchLoadEventToOwnerElementInAnotherProcess() = 0;
 
 #if ENABLE(WINDOW_PROXY_PROPERTY_ACCESS_NOTIFICATION)
     virtual void didAccessWindowProxyPropertyViaOpener(SecurityOriginData&&, WindowProxyProperty) { }
-#endif
-
     virtual void documentLoaderDetached(NavigationIdentifier, LoadWillContinueInAnotherProcess) { }
 
     virtual void frameNameChanged(const String&) { }
 
     virtual RefPtr<HistoryItem> createHistoryItemTree(bool clipAtTarget, BackForwardItemIdentifier) const = 0;
 
-#if ENABLE(CONTENT_EXTENSIONS)
     virtual void didExceedNetworkUsageThreshold();
-#endif
 
     virtual bool shouldSuppressLayoutMilestones() const { return false; }
 

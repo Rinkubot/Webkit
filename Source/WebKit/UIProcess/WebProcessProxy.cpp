@@ -2778,7 +2778,6 @@ void WebProcessProxy::disableRemoteWorkers(OptionSet<RemoteWorkerType> workerTyp
     maybeShutDown();
 }
 
-#if ENABLE(CONTENT_EXTENSIONS)
 static Vector<std::pair<WebCompiledContentRuleListData, URL>> contentRuleListsFromIdentifier(const std::optional<UserContentControllerIdentifier>& userContentControllerIdentifier)
 {
     if (!userContentControllerIdentifier) {
@@ -2792,7 +2791,6 @@ static Vector<std::pair<WebCompiledContentRuleListData, URL>> contentRuleListsFr
 
     return userContentController->contentRuleListData();
 }
-#endif
 
 void WebProcessProxy::enableRemoteWorkers(RemoteWorkerType workerType, const UserContentControllerIdentifier& userContentControllerIdentifier)
 {
@@ -2805,9 +2803,7 @@ void WebProcessProxy::enableRemoteWorkers(RemoteWorkerType workerType, const Use
         PageIdentifier::generate(),
         RemoteWorkerInitializationData {
             userContentControllerIdentifier,
-#if ENABLE(CONTENT_EXTENSIONS)
             contentRuleListsFromIdentifier(userContentControllerIdentifier),
-#endif
         },
         nullptr,
         { }
@@ -3138,7 +3134,6 @@ const WebCore::ProcessIdentity& WebProcessProxy::processIdentity()
 }
 #endif
 
-#if ENABLE(CONTENT_EXTENSIONS)
 void WebProcessProxy::requestResourceMonitorRuleLists(bool forTesting)
 {
     if (RefPtr processPool = m_processPool.get()) {
@@ -3164,7 +3159,6 @@ void WebProcessProxy::setResourceMonitorRuleLists(RefPtr<WebCompiledContentRuleL
     m_resourceMonitorRuleList = ruleList.get();
     sendWithAsyncReply(Messages::WebProcess::SetResourceMonitorContentRuleListAsync(ruleList->data()), WTFMove(completionHandler));
 }
-#endif
 
 } // namespace WebKit
 

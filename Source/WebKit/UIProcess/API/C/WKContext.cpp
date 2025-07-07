@@ -581,7 +581,7 @@ void WKContextClearMockGamepadsForTesting(WKContextRef)
 
 void WKContextSetResourceMonitorURLsForTesting(WKContextRef contextRef, WKStringRef rulesText, void* context, WKContextSetResourceMonitorURLsFunction callback)
 {
-#if ENABLE(CONTENT_EXTENSIONS) && PLATFORM(COCOA)
+#if PLATFORM(COCOA)
     WebKit::toProtectedImpl(contextRef)->setResourceMonitorURLsForTesting(WebKit::toWTFString(rulesText), [context, callback] {
         if (callback)
             callback(context);

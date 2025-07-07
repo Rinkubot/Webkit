@@ -1784,7 +1784,7 @@ void TestController::configureViewForTest(const TestInvocation& test)
     platformConfigureViewForTest(test);
 }
 
-#if ENABLE(CONTENT_EXTENSIONS) && !PLATFORM(COCOA)
+#if !PLATFORM(COCOA)
 
 struct ContentExtensionStoreCallbackContext {
     explicit ContentExtensionStoreCallbackContext(TestController& controller)
@@ -1874,19 +1874,7 @@ void TestController::resetContentExtensions()
     ASSERT(!context.filter);
 }
 
-#endif // ENABLE(CONTENT_EXTENSIONS) && !PLATFORM(COCOA)
-
-#if !ENABLE(CONTENT_EXTENSIONS)
-
-void TestController::configureContentExtensionForTest(const TestInvocation&)
-{
-}
-
-void TestController::resetContentExtensions()
-{
-}
-
-#endif // !ENABLE(CONTENT_EXTENSIONS)
+#endif // !PLATFORM(COCOA)
 
 bool TestController::runTest(const char* inputLine)
 {

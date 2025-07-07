@@ -30,8 +30,6 @@
 #include <wtf/StdLibExtras.h>
 #include <wtf/text/CString.h>
 
-#if ENABLE(CONTENT_EXTENSIONS)
-
 namespace WebCore::ContentExtensions {
 
 template <typename IntType>
@@ -411,4 +409,3 @@ auto DFABytecodeInterpreter::interpret(const String& urlString, ResourceFlags fl
 
 } // namespace WebCore::ContentExtensions
 
-#endif // ENABLE(CONTENT_EXTENSIONS)

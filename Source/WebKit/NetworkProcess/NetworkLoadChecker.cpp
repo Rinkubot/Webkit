@@ -319,7 +319,6 @@ void NetworkLoadChecker::checkRequest(ResourceRequest&& request, ContentSecurity
         }
     }
 
-#if ENABLE(CONTENT_EXTENSIONS)
     this->processContentRuleListsForLoad(WTFMove(request), [weakThis = WeakPtr { *this }, handler = WTFMove(handler), originalRequest = WTFMove(originalRequest)](auto&& result) mutable {
         if (!result.has_value()) {
             ASSERT(result.error().isCancellation());
@@ -339,7 +338,6 @@ void NetworkLoadChecker::checkRequest(ResourceRequest&& request, ContentSecurity
     });
 #else
     this->continueCheckingRequestOrDoSyntheticRedirect(WTFMove(originalRequest), WTFMove(request), WTFMove(handler));
-#endif
 }
 
 void NetworkLoadChecker::continueCheckingRequestOrDoSyntheticRedirect(ResourceRequest&& originalRequest, ResourceRequest&& currentRequest, ValidationHandler&& handler)
@@ -548,7 +546,6 @@ ContentSecurityPolicy* NetworkLoadChecker::contentSecurityPolicy()
     return m_contentSecurityPolicy.get();
 }
 
-#if ENABLE(CONTENT_EXTENSIONS)
 void NetworkLoadChecker::processContentRuleListsForLoad(ResourceRequest&& request, ContentExtensionCallback&& callback)
 {
     // FIXME: Enable content blockers for navigation loads.
@@ -570,7 +567,6 @@ void NetworkLoadChecker::processContentRuleListsForLoad(ResourceRequest&& reques
         callback(ContentExtensionResult { WTFMove(request), results });
     });
 }
-#endif // ENABLE(CONTENT_EXTENSIONS)
 
 void NetworkLoadChecker::storeRedirectionIfNeeded(const ResourceRequest& request, const ResourceResponse& response)
 {

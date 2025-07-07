@@ -202,10 +202,8 @@ public:
     const String& sourceApplicationSecondaryIdentifier() const { return m_sourceApplicationSecondaryIdentifier; }
     void setSourceApplicationSecondaryIdentifier(String&& identifier) { m_sourceApplicationSecondaryIdentifier = WTFMove(identifier); }
     
-#if ENABLE(CONTENT_EXTENSIONS)
     const String& resourceMonitorThrottlerDirectory() const { return m_directories.resourceMonitorThrottlerDirectory; }
     void setResourceMonitorThrottlerDirectory(String&& directory) { m_directories.resourceMonitorThrottlerDirectory = WTFMove(directory); }
-#endif
 
     const URL& httpProxy() const { return m_httpProxy; }
     void setHTTPProxy(URL&& proxy) { m_httpProxy = WTFMove(proxy); }
@@ -289,9 +287,7 @@ public:
 #if ENABLE(ARKIT_INLINE_PREVIEW)
         String modelElementCacheDirectory;
 #endif
-#if ENABLE(CONTENT_EXTENSIONS)
         String resourceMonitorThrottlerDirectory;
-#endif
         Directories isolatedCopy() const&;
         Directories isolatedCopy() &&;
     };

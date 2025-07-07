@@ -25,8 +25,6 @@
 
 #pragma once
 
-#if ENABLE(CONTENT_EXTENSIONS)
-
 #include <wtf/Vector.h>
 
 #define CONTENT_EXTENSIONS_STATE_MACHINE_DEBUGGING 0
@@ -45,4 +43,3 @@ typedef UnsafeVectorOverflow ContentExtensionsOverflowHandler;
 #define LOG_LARGE_STRUCTURES(name, size)
 #endif
 
-#endif // ENABLE(CONTENT_EXTENSIONS)

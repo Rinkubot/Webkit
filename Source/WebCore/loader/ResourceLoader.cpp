@@ -64,19 +64,13 @@
 #include <wtf/Ref.h>
 #include <wtf/text/MakeString.h>
 
-#if ENABLE(CONTENT_EXTENSIONS)
 #include "UserContentController.h"
-#endif
 
 #if USE(QUICK_LOOK)
 #include "LegacyPreviewLoader.h"
 #include "PreviewConverter.h"
-#endif
-
 #if PLATFORM(COCOA)
 #include "BundleResourceLoader.h"
-#endif
-
 #undef RESOURCELOADER_RELEASE_LOG
 #define PAGE_ID (this->frame() && this->frame()->pageID() ? this->frame()->pageID()->toUInt64() : 0)
 #define FRAME_ID (this->frame() ? this->frame()->frameID().toUInt64() : 0)
@@ -199,8 +193,6 @@ void ResourceLoader::init(ResourceRequest&& clientRequest, CompletionHandler<voi
             RESOURCELOADER_RELEASE_LOG("init: Cancelling load because it was stopped as a result of willSendRequest.");
             return completionHandler(false);
         }
-#endif
-
         if (request.isNull()) {
             RESOURCELOADER_RELEASE_LOG("init: Cancelling load because the request is null.");
             cancel();
@@ -243,8 +235,6 @@ void ResourceLoader::start()
         if (documentLoader->scheduleArchiveLoad(*this, m_request))
             return;
     }
-#endif
-
     if (RefPtr documentLoader = m_documentLoader) {
         if (documentLoader->applicationCacheHost().maybeLoadResource(*this, m_request, m_request.url()))
             return;
@@ -268,15 +258,11 @@ void ResourceLoader::start()
         BundleResourceLoader::loadResourceFromBundle(*this, "pdfjs/"_s);
         return;
     }
-#endif
-
 #if USE(SOUP)
     if (m_request.url().protocolIs("resource"_s) || isPDFJSResourceLoad()) {
         loadGResource();
         return;
     }
-#endif
-
     RefPtr subresourceLoader = dynamicDowncast<SubresourceLoader>(*this);
     RefPtr sourceOrigin = subresourceLoader ? subresourceLoader->origin() : nullptr;
     RefPtr frameLoader = this->frameLoader();
@@ -423,9 +409,7 @@ void ResourceLoader::willSendRequestInternal(ResourceRequest&& request, const Re
     Ref protectedThis { *this };
 
     ASSERT(!m_reachedTerminalState);
-#if ENABLE(CONTENT_EXTENSIONS)
     ASSERT(!m_resourceType.isEmpty());
-#endif
 
     // We need a resource identifier for all requests, even if FrameLoader is never going to see it (such as with CORS preflight requests).
     bool createdResourceIdentifier = false;
@@ -435,7 +419,6 @@ void ResourceLoader::willSendRequestInternal(ResourceRequest&& request, const Re
     }
 
     RefPtr frameLoader = this->frameLoader();
-#if ENABLE(CONTENT_EXTENSIONS)
     if (!redirectResponse.isNull() && frameLoader) {
         RefPtr page = frameLoader->frame().page();
         RefPtr documentLoader = m_documentLoader;
@@ -450,7 +433,6 @@ void ResourceLoader::willSendRequestInternal(ResourceRequest&& request, const Re
             }
         }
     }
-#endif
 
     if (request.isNull()) {
         RESOURCELOADER_RELEASE_LOG("willSendRequestInternal: resource load canceled because of empty request");
@@ -479,8 +461,6 @@ void ResourceLoader::willSendRequestInternal(ResourceRequest&& request, const Re
             completionHandler(WTFMove(request));
             return;
         }
-#endif
-
         if (frameLoader)
             frameLoader->notifier().willSendRequest(*this, *m_identifier, request, redirectResponse);
     } else if (RefPtr frame = m_frame.get())
@@ -491,8 +471,6 @@ void ResourceLoader::willSendRequestInternal(ResourceRequest&& request, const Re
         if (RefPtr previewConverter = m_documentLoader->previewConverter())
             request = previewConverter->safeRequest(request);
     }
-#endif
-
     bool isRedirect = !redirectResponse.isNull();
     if (isRedirect) {
         RESOURCELOADER_RELEASE_LOG("willSendRequestInternal: Processing cross-origin redirect");
@@ -940,8 +918,6 @@ RetainPtr<CFDictionaryRef> ResourceLoader::connectionProperties(ResourceHandle*)
     return frameLoader->connectionProperties(this);
 }
 
-#endif
-
 void ResourceLoader::receivedCancellation(const AuthenticationChallenge&)
 {
     cancel();
@@ -961,15 +937,11 @@ void ResourceLoader::unschedule(SchedulePair& pair)
         handle->unschedule(pair);
 }
 
-#endif
-
 #if USE(QUICK_LOOK)
 bool ResourceLoader::isQuickLookResource() const
 {
     return !!m_previewLoader;
 }
-#endif
-
 bool ResourceLoader::isPDFJSResourceLoad() const
 {
 #if ENABLE(PDFJS)
@@ -994,7 +966,6 @@ LocalFrame* ResourceLoader::frame() const
     return m_frame.get();
 }
 
-#if ENABLE(CONTENT_EXTENSIONS)
 ResourceMonitor* ResourceLoader::resourceMonitorIfExists()
 {
     RefPtr frame = m_frame.get();
@@ -1002,7 +973,6 @@ ResourceMonitor* ResourceLoader::resourceMonitorIfExists()
         return document->resourceMonitorIfExists();
     return nullptr;
 }
-#endif
 
 } // namespace WebCore
 

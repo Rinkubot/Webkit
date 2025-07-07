@@ -71,9 +71,7 @@
 #if USE(CURL)
 #include "NetworkSessionCurl.h"
 #endif
-#if ENABLE(CONTENT_EXTENSIONS)
 #include <WebCore/ResourceMonitorThrottlerHolder.h>
-#endif
 
 namespace WebKit {
 using namespace WebCore;
@@ -174,9 +172,7 @@ NetworkSession::NetworkSession(NetworkProcess& networkProcess, const NetworkSess
 #if ENABLE(DECLARATIVE_WEB_PUSH)
     , m_isDeclarativeWebPushEnabled(parameters.isDeclarativeWebPushEnabled)
 #endif
-#if ENABLE(CONTENT_EXTENSIONS)
     , m_resourceMonitorThrottlerDirectory(parameters.resourceMonitorThrottlerDirectory)
-#endif
 #if HAVE(WEBCONTENTRESTRICTIONS_PATH_SPI)
     , m_webContentRestrictionsConfigurationFile(parameters.webContentRestrictionsConfigurationFile)
 #endif
@@ -222,9 +218,7 @@ NetworkSession::NetworkSession(NetworkProcess& networkProcess, const NetworkSess
         parameters.serviceWorkerProcessTerminationDelayEnabled
     };
 
-#if ENABLE(CONTENT_EXTENSIONS)
     SandboxExtension::consumePermanently(parameters.resourceMonitorThrottlerDirectoryExtensionHandle);
-#endif
 #if HAVE(WEBCONTENTRESTRICTIONS_PATH_SPI)
     SandboxExtension::consumePermanently(parameters.webContentRestrictionsConfigurationExtensionHandle);
 #endif
@@ -941,7 +935,6 @@ Ref<NetworkBroadcastChannelRegistry> NetworkSession::protectedBroadcastChannelRe
     return m_broadcastChannelRegistry;
 }
 
-#if ENABLE(CONTENT_EXTENSIONS)
 WebCore::ResourceMonitorThrottlerHolder& NetworkSession::resourceMonitorThrottler()
 {
     if (!m_resourceMonitorThrottler) {
@@ -962,6 +955,5 @@ void NetworkSession::clearResourceMonitorThrottlerData(CompletionHandler<void()>
     protectedResourceMonitorThrottler()->clearAllData(WTFMove(completionHandler));
 }
 
-#endif
 
 } // namespace WebKit

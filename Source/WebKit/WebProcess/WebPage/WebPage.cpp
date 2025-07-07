@@ -1118,9 +1118,7 @@ WebPage::WebPage(PageIdentifier pageID, WebPageCreationParameters&& parameters)
     m_userContentController->addUserScripts(WTFMove(parameters.userContentControllerParameters.userScripts), InjectUserScriptImmediately::No);
     m_userContentController->addUserStyleSheets(parameters.userContentControllerParameters.userStyleSheets);
     m_userContentController->addUserScriptMessageHandlers(parameters.userContentControllerParameters.messageHandlers);
-#if ENABLE(CONTENT_EXTENSIONS)
     m_userContentController->addContentRuleLists(WTFMove(parameters.userContentControllerParameters.contentRuleLists));
-#endif
 
 #if PLATFORM(IOS_FAMILY)
     setViewportConfigurationViewLayoutSize(parameters.viewportConfigurationViewLayoutSize, parameters.viewportConfigurationLayoutSizeScaleFactorFromClient, parameters.viewportConfigurationMinimumEffectiveDeviceWidth);

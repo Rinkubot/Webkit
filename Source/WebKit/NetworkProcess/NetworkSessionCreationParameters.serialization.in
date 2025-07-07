@@ -34,11 +34,9 @@ enum class WebKit::AllowsCellularAccess : bool;
     bool shouldLogCookieInformation;
     URL httpProxy;
     URL httpsProxy;
-#endif
 #if HAVE(ALTERNATIVE_SERVICE)
     String alternativeServiceDirectory;
     WebKit::SandboxExtensionHandle alternativeServiceDirectoryExtensionHandle;
-#endif
     String hstsStorageDirectory;
     WebKit::SandboxExtensionHandle hstsStorageDirectoryExtensionHandle;
 #if USE(SOUP)
@@ -48,11 +46,9 @@ enum class WebKit::AllowsCellularAccess : bool;
     bool ignoreTLSErrors;
     WebCore::SoupNetworkProxySettings proxySettings;
     WebCore::HTTPCookieAcceptPolicy cookieAcceptPolicy;
-#endif
 #if USE(CURL)
     String cookiePersistentStorageFile;
     WebCore::CurlProxySettings proxySettings;
-#endif
     bool deviceManagementRestrictionsEnabled;
     bool allLoadsBlockedByDeviceManagementRestrictionsForTesting;
     WebKit::WebPushD::WebPushDaemonConnectionConfiguration webPushDaemonConnectionConfiguration;
@@ -102,23 +98,16 @@ enum class WebKit::AllowsCellularAccess : bool;
     bool storageSiteValidationEnabled;
 #if ENABLE(DECLARATIVE_WEB_PUSH)
     bool isDeclarativeWebPushEnabled;
-#endif
 #if HAVE(NW_PROXY_CONFIG)
     std::optional<Vector<std::pair<Vector<uint8_t>, std::optional<WTF::UUID>>>> proxyConfigData;
-#endif
     WebKit::ResourceLoadStatisticsParameters resourceLoadStatisticsParameters;
 
-#if ENABLE(CONTENT_EXTENSIONS)
     String resourceMonitorThrottlerDirectory;
     WebKit::SandboxExtensionHandle resourceMonitorThrottlerDirectoryExtensionHandle;
-#endif
     bool isLegacyTLSAllowed;
 #if HAVE(WEBCONTENTRESTRICTIONS_PATH_SPI)
     String webContentRestrictionsConfigurationFile;
     WebKit::SandboxExtension::Handle webContentRestrictionsConfigurationExtensionHandle;
-#endif
 };
-
 #if USE(SOUP)
 enum class WebKit::SoupCookiePersistentStorageType : bool
-#endif

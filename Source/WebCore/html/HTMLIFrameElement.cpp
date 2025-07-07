@@ -56,10 +56,8 @@ inline HTMLIFrameElement::HTMLIFrameElement(const QualifiedName& tagName, Docume
 {
     ASSERT(hasTagName(iframeTag));
 
-#if ENABLE(CONTENT_EXTENSIONS)
     if (document.settings().iFrameResourceMonitoringEnabled())
         setInitiatorSourceURL(document.currentSourceURL());
-#endif
 }
 
 HTMLIFrameElement::~HTMLIFrameElement() = default;

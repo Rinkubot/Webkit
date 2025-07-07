@@ -25,8 +25,6 @@
 
 #pragma once
 
-#if ENABLE(CONTENT_EXTENSIONS)
-
 #include "CSSStyleSheet.h"
 #include <wtf/HashSet.h>
 #include <wtf/Ref.h>
@@ -61,4 +59,3 @@ private:
 } // namespace ContentExtensions
 } // namespace WebCore
 
-#endif // ENABLE(CONTENT_EXTENSIONS)

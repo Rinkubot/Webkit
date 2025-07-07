@@ -237,9 +237,7 @@ public:
 
     void updateProcessAssertion();
 
-#if ENABLE(CONTENT_EXTENSIONS)
     void didDestroyWebUserContentControllerProxy(WebUserContentControllerProxy&);
-#endif
 
     enum class SendParametersToNetworkProcess : bool { No, Yes };
     void addSession(WebsiteDataStore&, SendParametersToNetworkProcess);
@@ -344,9 +342,7 @@ public:
     void fetchLocalStorage(PAL::SessionID, CompletionHandler<void(std::optional<HashMap<WebCore::ClientOrigin, HashMap<String, String>>>&&)>&&);
     void restoreLocalStorage(PAL::SessionID, HashMap<WebCore::ClientOrigin, HashMap<String, String>>&&, CompletionHandler<void(bool)>&&);
 
-#if ENABLE(CONTENT_EXTENSIONS)
     void resetResourceMonitorThrottlerForTesting(PAL::SessionID, CompletionHandler<void()>&&);
-#endif
 
 private:
     explicit NetworkProcessProxy();
@@ -384,9 +380,7 @@ private:
     void logDiagnosticMessageWithValue(WebPageProxyIdentifier, const String& message, const String& description, double value, unsigned significantFigures, WebCore::ShouldSample);
     void logTestingEvent(PAL::SessionID, const String& event);
 
-#if ENABLE(CONTENT_EXTENSIONS)
     void contentExtensionRules(UserContentControllerIdentifier);
-#endif
 
 #if USE(RUNNINGBOARD)
     void wakeUpWebProcessForIPC(WebCore::ProcessIdentifier);
@@ -443,9 +437,7 @@ private:
 
     RefPtr<ProcessThrottler::Activity> m_activityFromWebProcesses;
 
-#if ENABLE(CONTENT_EXTENSIONS)
     WeakHashSet<WebUserContentControllerProxy> m_webUserContentControllerProxies;
-#endif
 
 #if ENABLE(ADVANCED_PRIVACY_PROTECTIONS)
     RefPtr<ListDataObserver> m_storageAccessPromptQuirksDataUpdateObserver;

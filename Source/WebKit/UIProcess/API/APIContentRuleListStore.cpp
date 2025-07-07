@@ -26,7 +26,6 @@
 #include "config.h"
 #include "APIContentRuleListStore.h"
 
-#if ENABLE(CONTENT_EXTENSIONS)
 
 #include "APIContentRuleList.h"
 #include "Logging.h"
@@ -798,4 +797,3 @@ const std::error_category& contentRuleListStoreErrorCategory()
 
 } // namespace API
 
-#endif // ENABLE(CONTENT_EXTENSIONS)

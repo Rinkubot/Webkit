@@ -25,8 +25,6 @@
 
 #include "config.h"
 
-#if ENABLE(CONTENT_EXTENSIONS)
-
 #include "DFAHelpers.h"
 #include <wtf/MainThread.h>
 
@@ -121,5 +119,3 @@ TEST_F(DFAMinimizerTest, SimpleFallBackTransitionDifferentiator2)
 }
 
 } // namespace TestWebKitAPI
-
-#endif // ENABLE(CONTENT_EXTENSIONS)

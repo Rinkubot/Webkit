@@ -11677,7 +11677,6 @@ Ref<FrameMemoryMonitor> Document::protectedFrameMemoryMonitor()
     return frameMemoryMonitor();
 }
 
-#if ENABLE(CONTENT_EXTENSIONS)
 
 ResourceMonitor* Document::resourceMonitorIfExists()
 {
@@ -11708,7 +11707,6 @@ ResourceMonitor* Document::parentResourceMonitorIfExists()
     return nullptr;
 }
 
-#endif
 
 double Document::lookupCSSRandomBaseValue(const CSSCalc::RandomCachingKey& key) const
 {

@@ -50,9 +50,7 @@ namespace WebCore {
 
 WTF_MAKE_TZONE_ALLOCATED_IMPL(ExtensionStyleSheets);
 
-#if ENABLE(CONTENT_EXTENSIONS)
 using namespace ContentExtensions;
-#endif
 using namespace HTMLNames;
 
 ExtensionStyleSheets::ExtensionStyleSheets(Document& document)
@@ -220,7 +218,6 @@ void ExtensionStyleSheets::addAuthorStyleSheetForTesting(Ref<StyleSheetContents>
     protectedDocument()->styleScope().didChangeStyleSheetEnvironment();
 }
 
-#if ENABLE(CONTENT_EXTENSIONS)
 void ExtensionStyleSheets::addDisplayNoneSelector(const String& identifier, const String& selector, uint32_t selectorID)
 {
     auto result = m_contentExtensionSelectorSheets.add(identifier, nullptr);
@@ -246,7 +243,6 @@ void ExtensionStyleSheets::maybeAddContentExtensionSheet(const String& identifie
     protectedDocument()->styleScope().didChangeStyleSheetEnvironment();
 
 }
-#endif // ENABLE(CONTENT_EXTENSIONS)
 
 String ExtensionStyleSheets::contentForInjectedStyleSheet(const RefPtr<CSSStyleSheet>& styleSheet) const
 {

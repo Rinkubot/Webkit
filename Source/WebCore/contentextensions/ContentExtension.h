@@ -25,8 +25,6 @@
 
 #pragma once
 
-#if ENABLE(CONTENT_EXTENSIONS)
-
 #include "DFABytecodeInterpreter.h"
 #include "StyleSheetContents.h"
 #include <wtf/Ref.h>
@@ -77,4 +75,3 @@ private:
 } // namespace ContentExtensions
 } // namespace WebCore
 
-#endif // ENABLE(CONTENT_EXTENSIONS)

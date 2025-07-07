@@ -25,8 +25,6 @@
 
 #pragma once
 
-#if ENABLE(CONTENT_EXTENSIONS)
-
 #include <WebCore/CombinedURLFilters.h>
 #include <WebCore/NFA.h>
 #include <WebCore/NFAToDFA.h>
@@ -69,5 +67,3 @@ static ContentExtensions::DFA buildDFAFromPatterns(const Vector<ASCIILiteral>& p
 }
 
 } // namespace TestWebKitAPI
-
-#endif // ENABLE(CONTENT_EXTENSIONS)

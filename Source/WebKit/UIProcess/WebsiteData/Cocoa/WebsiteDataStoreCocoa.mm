@@ -547,7 +547,6 @@ String WebsiteDataStore::defaultModelElementCacheDirectory(const String& baseDir
 }
 #endif
 
-#if ENABLE(CONTENT_EXTENSIONS)
 String WebsiteDataStore::defaultResourceMonitorThrottlerDirectory(const String& baseDirectory)
 {
     if (!baseDirectory.isEmpty())
@@ -555,7 +554,6 @@ String WebsiteDataStore::defaultResourceMonitorThrottlerDirectory(const String& 
 
     return websiteDataDirectoryFileSystemRepresentation("ResourceMonitorThrottler"_s, { }, ShouldCreateDirectory::No);
 }
-#endif
 
 String WebsiteDataStore::tempDirectoryFileSystemRepresentation(const String& directoryName, ShouldCreateDirectory shouldCreateDirectory)
 {

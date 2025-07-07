@@ -25,8 +25,6 @@
 
 #include "config.h"
 
-#if ENABLE(CONTENT_EXTENSIONS)
-
 #include "Utilities.h"
 #include <JavaScriptCore/InitializeThreading.h>
 #include <WebCore/CSSParserContext.h>
@@ -3461,5 +3459,3 @@ TEST_F(ContentExtensionTest, IgnoreFollowingRules)
 }
 
 } // namespace TestWebKitAPI
-
-#endif // ENABLE(CONTENT_EXTENSIONS)

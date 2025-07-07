@@ -118,7 +118,6 @@ public:
     void removeAllUserMessageHandlers(API::ContentWorld&);
     void removeAllUserMessageHandlers();
 
-#if ENABLE(CONTENT_EXTENSIONS)
     void addNetworkProcess(NetworkProcessProxy&);
     void removeNetworkProcess(NetworkProcessProxy&);
 
@@ -128,7 +127,6 @@ public:
     void removeAllContentRuleLists(RemoveWebExtensions = RemoveWebExtensions::No);
 #else
     void removeAllContentRuleLists();
-#endif
 
     const HashMap<String, std::pair<Ref<API::ContentRuleList>, URL>>& contentExtensionRules() { return m_contentRuleLists; }
     Vector<std::pair<WebCompiledContentRuleListData, URL>> contentRuleListData() const;
@@ -152,10 +150,8 @@ private:
     HashMap<ScriptMessageHandlerIdentifier, RefPtr<WebScriptMessageHandler>> m_scriptMessageHandlers;
     HashSet<ContentWorldIdentifier> m_associatedContentWorlds;
 
-#if ENABLE(CONTENT_EXTENSIONS)
     WeakHashSet<NetworkProcessProxy> m_networkProcesses;
     HashMap<String, std::pair<Ref<API::ContentRuleList>, URL>> m_contentRuleLists;
-#endif
 };
 
 } // namespace WebKit

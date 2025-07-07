@@ -26,8 +26,6 @@
 #include "config.h"
 #include "URLFilterParser.h"
 
-#if ENABLE(CONTENT_EXTENSIONS)
-
 #include "CombinedURLFilters.h"
 #include "Term.h"
 #include <JavaScriptCore/YarrParser.h>
@@ -441,4 +439,3 @@ ASCIILiteral URLFilterParser::statusString(ParseStatus status)
 } // namespace ContentExtensions
 } // namespace WebCore
 
-#endif // ENABLE(CONTENT_EXTENSIONS)

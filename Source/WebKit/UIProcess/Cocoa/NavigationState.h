@@ -152,9 +152,7 @@ private:
         bool didChangeBackForwardList(WebPageProxy&, WebBackForwardListItem*, const Vector<Ref<WebBackForwardListItem>>&) final;
         void shouldGoToBackForwardListItem(WebPageProxy&, WebBackForwardListItem&, bool inBackForwardCache, CompletionHandler<void(bool)>&&) final;
 
-#if ENABLE(CONTENT_EXTENSIONS)
         void contentRuleListNotification(WebPageProxy&, URL&&, WebCore::ContentRuleListResults&&) final;
-#endif
         void decidePolicyForNavigationAction(WebPageProxy&, Ref<API::NavigationAction>&&, Ref<WebFramePolicyListenerProxy>&&) override;
         void decidePolicyForNavigationResponse(WebPageProxy&, Ref<API::NavigationResponse>&&, Ref<WebFramePolicyListenerProxy>&&) override;
 

@@ -46,10 +46,8 @@ void LocalFrameLoaderClient::deref() const
     m_loader->deref();
 }
 
-#if ENABLE(CONTENT_EXTENSIONS)
 void LocalFrameLoaderClient::didExceedNetworkUsageThreshold()
 {
 }
-#endif
 
 } // namespace WebCore

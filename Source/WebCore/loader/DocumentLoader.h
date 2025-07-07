@@ -67,12 +67,8 @@
 
 #if ENABLE(APPLICATION_MANIFEST)
 #include "ApplicationManifest.h"
-#endif
-
 #if PLATFORM(COCOA)
 #include <wtf/SchedulePair.h>
-#endif
-
 namespace WebCore {
 class DataLoadToken;
 }
@@ -203,8 +199,6 @@ public:
 #if ENABLE(CONTENT_FILTERING)
     void ref() const final { RefCounted::ref(); }
     void deref() const final { RefCounted::deref(); }
-#endif
-
     static Ref<DocumentLoader> create(ResourceRequest&& request, SubstituteData&& data)
     {
         return adoptRef(*new DocumentLoader(WTFMove(request), WTFMove(data)));
@@ -277,8 +271,6 @@ public:
 #if PLATFORM(COCOA)
     void schedule(SchedulePair&);
     void unschedule(SchedulePair&);
-#endif
-
 #if ENABLE(WEB_ARCHIVE) || ENABLE(MHTML)
     void setArchive(Ref<Archive>&&);
     WEBCORE_EXPORT void addAllArchiveResources(Archive&);
@@ -288,8 +280,6 @@ public:
 
     bool hasArchiveResourceCollection() const { return !!m_archiveResourceCollection; }
     WEBCORE_EXPORT bool scheduleArchiveLoad(ResourceLoader&, const ResourceRequest&);
-#endif
-
     void scheduleSubstituteResourceLoad(ResourceLoader&, SubstituteResource&);
     void scheduleCannotShowURLError(ResourceLoader&);
 
@@ -369,8 +359,6 @@ public:
 #if ENABLE(DEVICE_ORIENTATION)
     DeviceOrientationOrMotionPermissionState deviceOrientationAndMotionAccessState() const { return m_deviceOrientationAndMotionAccessState; }
     void setDeviceOrientationAndMotionAccessState(DeviceOrientationOrMotionPermissionState state) { m_deviceOrientationAndMotionAccessState = state; }
-#endif
-
     AutoplayPolicy autoplayPolicy() const { return m_autoplayPolicy; }
     void setAutoplayPolicy(AutoplayPolicy policy) { m_autoplayPolicy = policy; }
 
@@ -455,12 +443,8 @@ public:
 #if USE(QUICK_LOOK)
     void setPreviewConverter(RefPtr<PreviewConverter>&&);
     PreviewConverter* previewConverter() const;
-#endif
-
-#if ENABLE(CONTENT_EXTENSIONS)
     void addPendingContentExtensionSheet(const String& identifier, StyleSheetContents&);
     void addPendingContentExtensionDisplayNoneSelector(const String& identifier, const String& selector, uint32_t selectorID);
-#endif
 
     void setShouldOpenExternalURLsPolicy(ShouldOpenExternalURLsPolicy shouldOpenExternalURLsPolicy) { m_shouldOpenExternalURLsPolicy = shouldOpenExternalURLsPolicy; }
     ShouldOpenExternalURLsPolicy shouldOpenExternalURLsPolicyToPropagate() const;
@@ -473,8 +457,6 @@ public:
     ContentFilter* contentFilter() const { return m_contentFilter.get(); }
 
     WEBCORE_EXPORT ResourceError handleContentFilterDidBlock(ContentFilterUnblockHandler, String&& unblockRequestDeniedScript);
-#endif
-
     void startIconLoading();
     WEBCORE_EXPORT void didGetLoadDecisionForIcon(bool decision, uint64_t loadIdentifier, CompletionHandler<void(FragmentedSharedBuffer*)>&&);
     void finishedLoadingIcon(IconLoader&, FragmentedSharedBuffer*);
@@ -484,8 +466,6 @@ public:
 #if ENABLE(APPLICATION_MANIFEST)
     WEBCORE_EXPORT void loadApplicationManifest(CompletionHandler<void(const std::optional<ApplicationManifest>&)>&&);
     void finishedLoadingApplicationManifest(ApplicationManifestLoader&);
-#endif
-
     WEBCORE_EXPORT void setCustomHeaderFields(Vector<CustomHeaderFields>&&);
     const Vector<CustomHeaderFields>& customHeaderFields() const { return m_customHeaderFields; }
 
@@ -535,8 +515,6 @@ public:
 #if ENABLE(CONTENT_FILTERING)
     bool contentFilterWillHandleProvisionalLoadFailure(const ResourceError&);
     void contentFilterHandleProvisionalLoadFailure(const ResourceError&);
-#endif
-
     std::optional<NavigationIdentifier> navigationID() const { return m_navigationID.asOptional(); }
     WEBCORE_EXPORT void setNavigationID(NavigationIdentifier);
 
@@ -575,8 +553,6 @@ private:
     bool maybeCreateArchive();
 #if ENABLE(WEB_ARCHIVE) || ENABLE(MHTML)
     void clearArchiveResources();
-#endif
-
     void willSendRequest(ResourceRequest&&, const ResourceResponse&, CompletionHandler<void(ResourceRequest&&)>&&);
     void finishedLoading();
     void mainReceivedError(const ResourceError&, LoadWillContinueInAnotherProcess = LoadWillContinueInAnotherProcess::No);
@@ -586,8 +562,6 @@ private:
     WEBCORE_EXPORT void notifyFinished(CachedResource&, const NetworkLoadMetrics&, LoadWillContinueInAnotherProcess) override;
 #if USE(QUICK_LOOK)
     WEBCORE_EXPORT void previewResponseReceived(const CachedResource&, const ResourceResponse&) override;
-#endif
-
     void responseReceived(ResourceResponse&&, CompletionHandler<void()>&&);
 
 #if ENABLE(CONTENT_FILTERING)
@@ -636,8 +610,6 @@ private:
 
 #if ENABLE(APPLICATION_MANIFEST)
     void notifyFinishedLoadingApplicationManifest();
-#endif
-
     // ContentSecurityPolicyClient
     WEBCORE_EXPORT void addConsoleMessage(MessageSource, MessageLevel, const String&, unsigned long requestIdentifier) final;
     WEBCORE_EXPORT void enqueueSecurityPolicyViolationEvent(SecurityPolicyViolationEventInit&&) final;
@@ -706,8 +678,6 @@ private:
 #if ENABLE(WEB_ARCHIVE) || ENABLE(MHTML)
     RefPtr<Archive> m_archive;
     RefPtr<SharedBuffer> m_parsedArchiveData;
-#endif
-
     MemoryCompactRobinHoodHashSet<String> m_resourcesClientKnowsAbout;
     Vector<ResourceRequest> m_resourcesLoadedFromMemoryCacheForClientNotification;
     
@@ -725,8 +695,6 @@ private:
 #if ENABLE(APPLICATION_MANIFEST)
     std::unique_ptr<ApplicationManifestLoader> m_applicationManifestLoader;
     Vector<CompletionHandler<void(const std::optional<ApplicationManifest>&)>> m_loadApplicationManifestCallbacks;
-#endif
-
     Vector<CustomHeaderFields> m_customHeaderFields;
 
     std::unique_ptr<ApplicationCacheHost> m_applicationCacheHost;
@@ -743,12 +711,8 @@ private:
 
 #if USE(QUICK_LOOK)
     RefPtr<PreviewConverter> m_previewConverter;
-#endif
-
-#if ENABLE(CONTENT_EXTENSIONS)
     MemoryCompactRobinHoodHashMap<String, RefPtr<StyleSheetContents>> m_pendingNamedContentExtensionStyleSheets;
     MemoryCompactRobinHoodHashMap<String, Vector<std::pair<String, uint32_t>>> m_pendingContentExtensionDisplayNoneSelectors;
-#endif
     String m_customUserAgent;
     String m_customUserAgentAsSiteSpecificQuirks;
     String m_customNavigatorPlatform;
@@ -763,8 +727,6 @@ private:
 
 #if ENABLE(DEVICE_ORIENTATION)
     DeviceOrientationOrMotionPermissionState m_deviceOrientationAndMotionAccessState { DeviceOrientationOrMotionPermissionState::Prompt };
-#endif
-
     OptionSet<AdvancedPrivacyProtections> m_advancedPrivacyProtections;
     std::optional<OptionSet<AdvancedPrivacyProtections>> m_originatorAdvancedPrivacyProtections;
     AutoplayPolicy m_autoplayPolicy { AutoplayPolicy::Default };
@@ -816,18 +778,12 @@ private:
 
 #if ENABLE(APPLICATION_MANIFEST)
     bool m_finishedLoadingApplicationManifest { false };
-#endif
-
 #if ENABLE(CONTENT_FILTERING)
     bool m_blockedByContentFilter { false };
-#endif
-
     bool m_canUseServiceWorkers { true };
 
 #if ASSERT_ENABLED
     bool m_hasEverBeenAttached { false };
-#endif
-
     bool m_isHandledByAboutSchemeHandler { false };
 };
 

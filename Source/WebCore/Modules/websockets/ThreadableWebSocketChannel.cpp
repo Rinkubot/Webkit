@@ -77,7 +77,6 @@ std::optional<ThreadableWebSocketChannel::ValidatedURL> ThreadableWebSocketChann
         if (!page->allowsLoadFromURL(requestedURL, MainFrameMainResource::No))
             return { };
 
-#if ENABLE(CONTENT_EXTENSIONS)
         if (RefPtr documentLoader = document.loader()) {
             auto results = page->protectedUserContentProvider()->processContentRuleListsForLoad(*page, validatedURL.url, ContentExtensions::ResourceType::WebSocket, *documentLoader);
             if (results.shouldBlock())
@@ -92,7 +91,6 @@ std::optional<ThreadableWebSocketChannel::ValidatedURL> ThreadableWebSocketChann
         }
 #else
         UNUSED_PARAM(document);
-#endif
     }
 
     return validatedURL;

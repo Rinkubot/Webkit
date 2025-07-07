@@ -25,8 +25,6 @@
 
 #pragma once
 
-#if ENABLE(CONTENT_EXTENSIONS)
-
 #include "ContentExtensionStringSerialization.h"
 #include <wtf/JSONValues.h>
 #include <wtf/Hasher.h>
@@ -327,4 +325,3 @@ template<> struct HashTraits<WebCore::ContentExtensions::ModifyHeadersAction> : 
 
 } // namespace WTF
 
-#endif // ENABLE(CONTENT_EXTENSIONS)

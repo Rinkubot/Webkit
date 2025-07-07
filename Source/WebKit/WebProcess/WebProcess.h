@@ -412,10 +412,8 @@ public:
     void setNotifyState(const String&, uint64_t state);
 #endif
 
-#if ENABLE(CONTENT_EXTENSIONS)
     void setResourceMonitorContentRuleList(WebCompiledContentRuleListData&&);
     void setResourceMonitorContentRuleListAsync(WebCompiledContentRuleListData&&, CompletionHandler<void()>&&);
-#endif
 
     bool areAllPagesThrottleable() const;
 

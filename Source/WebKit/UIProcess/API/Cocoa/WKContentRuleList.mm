@@ -52,11 +52,9 @@
 
 - (NSString *)identifier
 {
-#if ENABLE(CONTENT_EXTENSIONS)
     return Ref { *_contentRuleList }->name().createNSString().autorelease();
 #else
     return nil;
-#endif
 }
 
 @end
@@ -65,16 +63,13 @@
 
 + (BOOL)_supportsRegularExpression:(NSString *)regex
 {
-#if ENABLE(CONTENT_EXTENSIONS)
     return API::ContentRuleList::supportsRegularExpression(regex);
 #else
     return NO;
-#endif
 }
 
 + (NSError *)_parseRuleList:(NSString *)ruleList
 {
-#if ENABLE(CONTENT_EXTENSIONS)
     std::error_code error = API::ContentRuleList::parseRuleList(ruleList, WebCore::ContentExtensions::CSSSelectorsAllowed::Yes);
     if (!error)
         return nil;
@@ -83,7 +78,6 @@
     return [NSError errorWithDomain:WKErrorDomain code:WKErrorContentRuleListStoreCompileFailed userInfo:userInfo.get()];
 #else
     return nil;
-#endif
 }
 
 @end

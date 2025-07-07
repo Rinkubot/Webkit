@@ -25,7 +25,6 @@
 
 #pragma once
 
-#if ENABLE(CONTENT_EXTENSIONS)
 
 #include "UserContentControllerIdentifier.h"
 #include "WebCompiledContentRuleListData.h"
@@ -69,4 +68,3 @@ private:
 
 } // namespace WebKit
 
-#endif // ENABLE(CONTENT_EXTENSIONS)

@@ -153,9 +153,7 @@ WTF_MAKE_TZONE_ALLOCATED_IMPL(NetworkProcess);
 
 NetworkProcess::NetworkProcess(AuxiliaryProcessInitializationParameters&& parameters)
     : m_downloadManager(*this)
-#if ENABLE(CONTENT_EXTENSIONS)
     , m_networkContentRuleListManager(*this)
-#endif
 #if USE(RUNNINGBOARD)
     , m_webSQLiteDatabaseTracker(WebSQLiteDatabaseTracker::create([weakThis = WeakPtr { *this }](bool isHoldingLockedFiles) {
         if (RefPtr protectedThis = weakThis.get())
@@ -227,12 +225,10 @@ bool NetworkProcess::shouldTerminate()
 
 bool NetworkProcess::dispatchMessage(IPC::Connection& connection, IPC::Decoder& decoder)
 {
-#if ENABLE(CONTENT_EXTENSIONS)
     if (decoder.messageReceiverName() == Messages::NetworkContentRuleListManager::messageReceiverName()) {
         protectedNetworkContentRuleListManager()->didReceiveMessage(connection, decoder);
         return true;
     }
-#endif
     return false;
 }
 
@@ -1795,10 +1791,8 @@ void NetworkProcess::deleteWebsiteDataImpl(PAL::SessionID sessionID, OptionSet<W
         session->clearAlternativeServices(modifiedSince);
 #endif
 
-#if ENABLE(CONTENT_EXTENSIONS)
     if (websiteDataTypes.contains(WebsiteDataType::DiskCache) && session)
         session->clearResourceMonitorThrottlerData([clearTasksHandler] { });
-#endif
 
     if (NetworkStorageManager::canHandleTypes(websiteDataTypes) && session)
         session->protectedStorageManager()->deleteDataModifiedSince(websiteDataTypes, modifiedSince, [clearTasksHandler] { });
@@ -3268,7 +3262,6 @@ ShouldRelaxThirdPartyCookieBlocking NetworkProcess::shouldRelaxThirdPartyCookieB
     return pageID && m_pagesWithRelaxedThirdPartyCookieBlocking.contains(*pageID) ? ShouldRelaxThirdPartyCookieBlocking::Yes : ShouldRelaxThirdPartyCookieBlocking::No;
 }
 
-#if ENABLE(CONTENT_EXTENSIONS)
 void NetworkProcess::resetResourceMonitorThrottlerForTesting(PAL::SessionID sessionID, CompletionHandler<void()>&& completionHandler)
 {
     if (CheckedPtr session = networkSession(sessionID))
@@ -3276,6 +3269,5 @@ void NetworkProcess::resetResourceMonitorThrottlerForTesting(PAL::SessionID sess
     else
         completionHandler();
 }
-#endif
 
 } // namespace WebKit

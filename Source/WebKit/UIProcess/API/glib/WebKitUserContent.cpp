@@ -353,9 +353,7 @@ API::UserScript& webkitUserScriptGetUserScript(WebKitUserScript* userScript)
 struct _WebKitUserContentFilter {
     _WebKitUserContentFilter(RefPtr<API::ContentRuleList>&& contentRuleList)
         : contentRuleList(WTFMove(contentRuleList))
-#if ENABLE(CONTENT_EXTENSIONS)
         , identifier(this->contentRuleList->name().utf8())
-#endif
         , referenceCount(1)
     {
     }

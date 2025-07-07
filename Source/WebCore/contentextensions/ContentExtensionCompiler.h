@@ -25,8 +25,6 @@
 
 #pragma once
 
-#if ENABLE(CONTENT_EXTENSIONS)
-
 #include "CompiledContentExtension.h"
 #include <system_error>
 #include <wtf/Forward.h>
@@ -51,4 +49,3 @@ WEBCORE_EXPORT std::error_code compileRuleList(ContentExtensionCompilationClient
 
 } // namespace WebCore::ContentExtensions
 
-#endif // ENABLE(CONTENT_EXTENSIONS)

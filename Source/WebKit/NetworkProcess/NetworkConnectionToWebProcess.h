@@ -486,9 +486,7 @@ private:
         std::optional<SharedPreferencesForWebProcess> sharedPreferencesForWebPaymentMessages() const final;
 #endif // ENABLE(APPLE_PAY_REMOTE_UI)
 
-#if ENABLE(CONTENT_EXTENSIONS)
     void shouldOffloadIFrameForHost(const String& host, CompletionHandler<void(bool)>&&);
-#endif
 
     const Ref<IPC::Connection> m_connection;
     const Ref<NetworkProcess> m_networkProcess;

@@ -25,8 +25,6 @@
 
 #pragma once
 
-#if ENABLE(CONTENT_EXTENSIONS)
-
 #include <wtf/Vector.h>
 #include <wtf/text/WTFString.h>
 
@@ -38,4 +36,3 @@ size_t stringSerializedLength(std::span<const uint8_t>);
 
 } // namespace WebCore::ContentExtensions
 
-#endif // ENABLE(CONTENT_EXTENSIONS)

@@ -2056,8 +2056,6 @@ RefPtr<WebCore::HistoryItem> WebLocalFrameLoaderClient::createHistoryItemTree(bo
     return frame->loader().history().createItemTree(frame, clipAtTarget, itemID);
 }
 
-#if ENABLE(CONTENT_EXTENSIONS)
-
 void WebLocalFrameLoaderClient::didExceedNetworkUsageThreshold()
 {
     ASSERT(!m_frame->isMainFrame());
@@ -2089,8 +2087,6 @@ void WebLocalFrameLoaderClient::didExceedNetworkUsageThreshold()
     else
         WebProcess::singleton().ensureNetworkProcessConnection().connection().sendWithAsyncReply(Messages::NetworkConnectionToWebProcess::ShouldOffloadIFrameForHost(url.host().toStringWithoutCopying()), WTFMove(action), 0);
 }
-
-#endif
 
 } // namespace WebKit
 

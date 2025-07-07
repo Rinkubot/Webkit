@@ -95,12 +95,8 @@
 
 #if ENABLE(APPLICATION_MANIFEST)
 #include "CachedApplicationManifest.h"
-#endif
-
 #if PLATFORM(IOS_FAMILY)
 #import <pal/system/ios/Device.h>
-#endif
-
 #undef CACHEDRESOURCELOADER_RELEASE_LOG
 #define PAGE_ID(frame) (frame.pageID() ? frame.pageID()->toUInt64() : 0)
 #define FRAME_ID(frame) (frame.frameID().toUInt64())
@@ -293,8 +289,6 @@ ResourceErrorOr<CachedResourceHandle<CachedTextTrack>> CachedResourceLoader::req
 {
     return castCachedResourceTo<CachedTextTrack>(requestResource(CachedResource::Type::TextTrackResource, WTFMove(request)));
 }
-#endif
-
 ResourceErrorOr<CachedResourceHandle<CachedCSSStyleSheet>> CachedResourceLoader::requestCSSStyleSheet(CachedResourceRequest&& request)
 {
     return castCachedResourceTo<CachedCSSStyleSheet>(requestResource(CachedResource::Type::CSSStyleSheet, WTFMove(request)));
@@ -338,8 +332,6 @@ ResourceErrorOr<CachedResourceHandle<CachedXSLStyleSheet>> CachedResourceLoader:
 {
     return castCachedResourceTo<CachedXSLStyleSheet>(requestResource(CachedResource::Type::XSLStyleSheet, WTFMove(request)));
 }
-#endif
-
 ResourceErrorOr<CachedResourceHandle<CachedSVGDocument>> CachedResourceLoader::requestSVGDocument(CachedResourceRequest&& request)
 {
     return castCachedResourceTo<CachedSVGDocument>(requestResource(CachedResource::Type::SVGDocumentResource, WTFMove(request)));
@@ -420,8 +412,6 @@ ResourceErrorOr<CachedResourceHandle<CachedRawResource>> CachedResourceLoader::r
 {
     return castCachedResourceTo<CachedRawResource>(requestResource(CachedResource::Type::ModelResource, WTFMove(request)));
 }
-#endif
-
 static MixedContentChecker::ContentType contentTypeFromResourceType(CachedResource::Type type)
 {
     switch (type) {
@@ -453,8 +443,6 @@ static MixedContentChecker::ContentType contentTypeFromResourceType(CachedResour
 #if ENABLE(XSLT)
     case CachedResource::Type::XSLStyleSheet:
         return MixedContentChecker::ContentType::Active;
-#endif
-
     case CachedResource::Type::LinkPrefetch:
         return MixedContentChecker::ContentType::Active;
 
@@ -937,8 +925,6 @@ bool CachedResourceLoader::shouldUpdateCachedResourceWithCurrentRequest(const Ca
     // Load is same-origin, we do not check for CORS.
     if (resource.type() == CachedResource::Type::XSLStyleSheet)
         return false;
-#endif
-
     // FIXME: We should enable resource reuse for these resource types
     switch (resource.type()) {
     case CachedResource::Type::SVGDocumentResource:
@@ -1185,7 +1171,6 @@ ResourceErrorOr<CachedResourceHandle<CachedResource>> CachedResourceLoader::requ
 
     if (RefPtr documentLoader = m_documentLoader.get()) {
         bool madeHTTPS { request.resourceRequest().wasSchemeOptimisticallyUpgraded() };
-#if ENABLE(CONTENT_EXTENSIONS)
         const auto& resourceRequest = request.resourceRequest();
         if (request.options().shouldEnableContentExtensionsCheck == ShouldEnableContentExtensionsCheck::Yes) {
             RegistrableDomain originalDomain { resourceRequest.url() };
@@ -1214,7 +1199,6 @@ ResourceErrorOr<CachedResourceHandle<CachedResource>> CachedResourceLoader::requ
                 return makeUnexpected(ResourceError { errorDomainWebKitInternal, 0, url, "Loading in a new process"_s, ResourceError::Type::Cancellation });
             }
         }
-#endif
         // FIXME: Propagate a better error code
         bool isHTTPSOnlyActive = (m_documentLoader->httpsByDefaultMode() == HTTPSByDefaultMode::UpgradeWithUserMediatedFallback || m_documentLoader->httpsByDefaultMode() == HTTPSByDefaultMode::UpgradeAndNoFallback)
             && !m_documentLoader->advancedPrivacyProtections().contains(AdvancedPrivacyProtections::HTTPSOnlyExplicitlyBypassedForDomain)

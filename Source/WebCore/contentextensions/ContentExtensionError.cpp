@@ -26,8 +26,6 @@
 #include "config.h"
 #include "ContentExtensionError.h"
 
-#if ENABLE(CONTENT_EXTENSIONS)
-
 #include <string>
 #include <wtf/NeverDestroyed.h>
 #include <wtf/text/ASCIILiteral.h>
@@ -143,4 +141,3 @@ const std::error_category& contentExtensionErrorCategory()
 } // namespace ContentExtensions
 } // namespace WebCore
 
-#endif // ENABLE(CONTENT_EXTENSIONS)

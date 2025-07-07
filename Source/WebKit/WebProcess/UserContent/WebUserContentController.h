@@ -35,9 +35,7 @@
 #include <WebCore/UserContentProvider.h>
 #include <wtf/HashMap.h>
 
-#if ENABLE(CONTENT_EXTENSIONS)
 #include <WebCore/ContentExtensionsBackend.h>
-#endif
 
 namespace WebCore {
 namespace ContentExtensions {
@@ -77,9 +75,7 @@ public:
     void addUserScripts(Vector<WebUserScriptData>&&, InjectUserScriptImmediately);
     void addUserStyleSheets(const Vector<WebUserStyleSheetData>&);
     void addUserScriptMessageHandlers(const Vector<WebScriptMessageHandlerData>&);
-#if ENABLE(CONTENT_EXTENSIONS)
     void addContentRuleLists(Vector<std::pair<WebCompiledContentRuleListData, URL>>&&);
-#endif
 
 private:
     explicit WebUserContentController(UserContentControllerIdentifier);
@@ -90,9 +86,7 @@ private:
 #if ENABLE(USER_MESSAGE_HANDLERS)
     void forEachUserMessageHandler(NOESCAPE const Function<void(const WebCore::UserMessageHandlerDescriptor&)>&) const final;
 #endif
-#if ENABLE(CONTENT_EXTENSIONS)
     WebCore::ContentExtensions::ContentExtensionsBackend& userContentExtensionBackend() override { return m_contentExtensionBackend; }
-#endif
 
     // IPC::MessageReceiver.
     void didReceiveMessage(IPC::Connection&, IPC::Decoder&) override;
@@ -109,10 +103,8 @@ private:
     void removeAllUserScriptMessageHandlersForWorlds(const Vector<ContentWorldIdentifier>&);
     void removeAllUserScriptMessageHandlers();
 
-#if ENABLE(CONTENT_EXTENSIONS)
     void removeContentRuleList(const String& name);
     void removeAllContentRuleLists();
-#endif
 
     void addUserScriptInternal(InjectedBundleScriptWorld&, const std::optional<UserScriptIdentifier>&, WebCore::UserScript&&, InjectUserScriptImmediately);
     void removeUserScriptInternal(InjectedBundleScriptWorld&, UserScriptIdentifier);
@@ -135,9 +127,7 @@ private:
     typedef HashMap<RefPtr<InjectedBundleScriptWorld>, Vector<std::pair<ScriptMessageHandlerIdentifier, RefPtr<WebUserMessageHandlerDescriptorProxy>>>> WorldToUserMessageHandlerVectorMap;
     WorldToUserMessageHandlerVectorMap m_userMessageHandlers;
 #endif
-#if ENABLE(CONTENT_EXTENSIONS)
     WebCore::ContentExtensions::ContentExtensionsBackend m_contentExtensionBackend;
-#endif
 };
 
 } // namespace WebKit

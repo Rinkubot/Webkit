@@ -25,7 +25,6 @@
 
 #pragma once
 
-#if ENABLE(CONTENT_EXTENSIONS)
 
 #include <WebCore/SharedBuffer.h>
 #include <WebCore/SharedMemory.h>
@@ -67,4 +66,3 @@ public:
 
 }
 
-#endif // ENABLE(CONTENT_EXTENSIONS)

@@ -25,8 +25,6 @@
 
 #pragma once
 
-#if ENABLE(CONTENT_EXTENSIONS)
-
 #include "ContentExtensionsDebugging.h"
 #include <wtf/Vector.h>
 
@@ -169,4 +167,3 @@ static_assert(sizeof(DFANode) <= 16, "Keep the DFANodes small");
 } // namespace ContentExtensions
 } // namespace WebCore
 
-#endif // ENABLE(CONTENT_EXTENSIONS)

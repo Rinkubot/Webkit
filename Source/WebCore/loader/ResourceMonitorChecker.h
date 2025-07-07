@@ -25,7 +25,6 @@
 
 #pragma once
 
-#if ENABLE(CONTENT_EXTENSIONS)
 
 #include "ContentExtensionsBackend.h"
 #include <wtf/CompletionHandler.h>
@@ -83,4 +82,3 @@ private:
 
 } // namespace WebCore
 
-#endif

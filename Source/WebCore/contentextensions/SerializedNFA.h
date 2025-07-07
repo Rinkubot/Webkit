@@ -25,8 +25,6 @@
 
 #pragma once
 
-#if ENABLE(CONTENT_EXTENSIONS)
-
 #include "ImmutableNFA.h"
 #include <wtf/MappedFileData.h>
 #include <wtf/StdLibExtras.h>
@@ -190,4 +188,3 @@ private:
 } // namespace ContentExtensions
 } // namespace WebCore
 
-#endif // ENABLE(CONTENT_EXTENSIONS)

@@ -115,10 +115,8 @@ struct NetworkResourceLoadParameters {
     std::optional<WebCore::FetchIdentifier> navigationPreloadIdentifier { };
     WebCore::FetchingWorkerIdentifier workerIdentifier { };
 
-#if ENABLE(CONTENT_EXTENSIONS)
     URL mainDocumentURL { };
     std::optional<UserContentControllerIdentifier> userContentControllerIdentifier { };
-#endif
 
 #if ENABLE(WK_WEB_EXTENSIONS)
     bool pageHasLoadedWebExtensions { false };

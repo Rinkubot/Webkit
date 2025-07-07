@@ -26,7 +26,6 @@
 #include "config.h"
 #include "APIContentRuleList.h"
 
-#if ENABLE(CONTENT_EXTENSIONS)
 
 #include "WebCompiledContentRuleList.h"
 #include <WebCore/CombinedURLFilters.h>
@@ -89,4 +88,3 @@ std::error_code ContentRuleList::parseRuleList(const WTF::String& ruleList, WebC
 
 } // namespace API
 
-#endif // ENABLE(CONTENT_EXTENSIONS)

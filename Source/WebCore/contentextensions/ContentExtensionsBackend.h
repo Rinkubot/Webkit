@@ -25,8 +25,6 @@
 
 #pragma once
 
-#if ENABLE(CONTENT_EXTENSIONS)
-
 #include "CompiledContentExtension.h"
 #include "ContentExtension.h"
 #include "ContentExtensionRule.h"
@@ -104,5 +102,3 @@ std::optional<String> customTrackerBlockingMessageForConsole(const ContentRuleLi
 
 } // namespace WebCore::ContentExtensions
 } // namespace WebCore
-
-#endif // ENABLE(CONTENT_EXTENSIONS)

@@ -34,9 +34,7 @@ class WebCompiledContentRuleListData;
 
 struct RemoteWorkerInitializationData {
     UserContentControllerIdentifier userContentControllerIdentifier;
-#if ENABLE(CONTENT_EXTENSIONS)
     Vector<std::pair<WebCompiledContentRuleListData, URL>> contentRuleLists;
-#endif
 };
 
 } // namespace WebKit

@@ -2011,7 +2011,6 @@ void SWServer::Connection::retrieveRecordResponseBody(BackgroundFetchRecordIdent
         callback(makeUnexpected(ResourceError { errorDomainWebKitInternal, 0, { }, "No server found"_s }));
 }
 
-#if ENABLE(CONTENT_EXTENSIONS)
 void SWServer::reportNetworkUsageToAllWorkerClients(ServiceWorkerIdentifier identifier, size_t bytesTransferredOverNetworkDelta)
 {
     if (RefPtr worker = workerByID(identifier)) {
@@ -2024,6 +2023,5 @@ void SWServer::reportNetworkUsageToAllWorkerClients(ServiceWorkerIdentifier iden
         }
     }
 }
-#endif
 
 } // namespace WebCore

@@ -186,9 +186,7 @@ bool defaultScreenTimeEnabled();
 bool defaultFormControlRefreshEnabled();
 #endif
 
-#if ENABLE(CONTENT_EXTENSIONS)
 bool defaultIFrameResourceMonitoringEnabled();
-#endif
 
 #if HAVE(SPATIAL_AUDIO_EXPERIENCE)
 bool defaultPreferSpatialAudioExperience();

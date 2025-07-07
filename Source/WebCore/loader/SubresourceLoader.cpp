@@ -60,17 +60,11 @@
 
 #if PLATFORM(IOS_FAMILY)
 #include <wtf/cocoa/RuntimeApplicationChecksCocoa.h>
-#endif
-
-#if ENABLE(CONTENT_EXTENSIONS)
 #include "ResourceLoadInfo.h"
-#endif
 
 #if USE(QUICK_LOOK)
 #include "LegacyPreviewLoader.h"
 #include "PreviewConverter.h"
-#endif
-
 #undef SUBRESOURCELOADER_RELEASE_LOG
 #undef SUBRESOURCELOADER_RELEASE_LOG_ERROR
 #define PAGE_ID (this->frame() && this->frame()->pageID() ? this->frame()->pageID()->toUInt64() : 0)
@@ -81,8 +75,6 @@
 #else
 #define SUBRESOURCELOADER_RELEASE_LOG(fmt, ...) RELEASE_LOG_FORWARDABLE(ResourceLoading, fmt, PAGE_ID, FRAME_ID, identifier() ? identifier()->toUInt64() : 0, ##__VA_ARGS__)
 #define SUBRESOURCELOADER_RELEASE_LOG_ERROR(fmt, ...) RELEASE_LOG_ERROR(ResourceLoading, "%p - [pageID=%" PRIu64 ", frameID=%" PRIu64 ", frameLoader=%p, resourceID=%" PRIu64 "] SubresourceLoader::" fmt, this, PAGE_ID, FRAME_ID, frameLoader(), identifier() ? identifier()->toUInt64() : 0, ##__VA_ARGS__)
-#endif
-
 namespace WebCore {
 
 DEFINE_DEBUG_ONLY_GLOBAL(WTF::RefCountedLeakCounter, subresourceLoaderCounter, ("SubresourceLoader"));
@@ -124,9 +116,7 @@ SubresourceLoader::SubresourceLoader(LocalFrame& frame, CachedResource& resource
 #ifndef NDEBUG
     subresourceLoaderCounter.increment();
 #endif
-#if ENABLE(CONTENT_EXTENSIONS)
     m_resourceType = ContentExtensions::toResourceType(resource.type(), resource.resourceRequest().requester(), frame.isMainFrame());
-#endif
     m_canCrossOriginRequestsAskUserForCredentials = resource.type() == CachedResource::Type::MainResource;
 
     m_site = CachedResourceLoader::computeFetchMetadataSite(resource.resourceRequest(), resource.type(), options.mode, frame, frame.isMainFrame() && m_documentLoader && m_documentLoader->isRequestFromClientOrUserInput());
@@ -173,8 +163,6 @@ void SubresourceLoader::startLoading()
         start();
     });
 }
-#endif
-
 void SubresourceLoader::cancelIfNotFinishing()
 {
     if (m_state != Initialized)
@@ -375,8 +363,6 @@ void SubresourceLoader::didReceivePreviewResponse(ResourceResponse&& response)
     protectedCachedResource()->previewResponseReceived(WTFMove(response));
 }
 
-#endif
-
 static bool isLocationURLFailure(const ResourceResponse& response)
 {
     auto locationString = response.httpHeaderField(HTTPHeaderName::Location);
@@ -423,8 +409,6 @@ void SubresourceLoader::didReceiveResponse(ResourceResponse&& response, Completi
     // cases of too many redirects from CFNetwork (<rdar://problem/30610988>).
 #if !PLATFORM(COCOA)
     ASSERT(response.httpStatusCode() < httpStatus300MultipleChoices || response.httpStatusCode() >= httpStatus400BadRequest || response.httpStatusCode() == httpStatus304NotModified || response.httpHeaderField(HTTPHeaderName::Location).isEmpty() || response.type() == ResourceResponse::Type::Opaqueredirect);
-#endif
-
     // Reference the object in this method since the additional processing can do
     // anything including removing the last reference to this object; one example of this is 3266216.
     Ref protectedThis { *this };
@@ -559,8 +543,6 @@ void SubresourceLoader::didReceiveBuffer(const FragmentedSharedBuffer& buffer, l
         if (previewLoader->didReceiveData(buffer.makeContiguous()))
             return;
     }
-#endif
-
     CachedResourceHandle resource = m_resource.get();
     ASSERT(resource);
 
@@ -744,8 +726,6 @@ void SubresourceLoader::didFinishLoading(const NetworkLoadMetrics& networkLoadMe
         if (previewLoader->didFinishLoading())
             return;
     }
-#endif
-
     if (m_state != Initialized)
         return;
 
@@ -806,8 +786,6 @@ void SubresourceLoader::didFail(const ResourceError& error)
 #if USE(QUICK_LOOK)
     if (auto previewLoader = m_previewLoader.get())
         previewLoader->didFail();
-#endif
-
     if (m_state != Initialized)
         return;
 

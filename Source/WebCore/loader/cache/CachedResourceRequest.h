@@ -94,9 +94,7 @@ public:
     void disableCachingIfNeeded();
 
     void removeFragmentIdentifierIfNeeded();
-#if ENABLE(CONTENT_EXTENSIONS)
     void applyResults(ContentRuleListResults&&, Page*);
-#endif
     void setDomainForCachePartition(Document&);
     void setDomainForCachePartition(const String&);
     bool isLinkPreload() const { return m_isLinkPreload; }

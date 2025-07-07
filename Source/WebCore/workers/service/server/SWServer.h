@@ -308,9 +308,7 @@ public:
 
     unsigned runningOrTerminatingCount() const { return m_runningOrTerminatingWorkers.size(); }
 
-#if ENABLE(CONTENT_EXTENSIONS)
     WEBCORE_EXPORT void reportNetworkUsageToAllWorkerClients(ServiceWorkerIdentifier, size_t bytesTransferredOverNetworkDelta);
-#endif
 
     WEBCORE_EXPORT void addRoutes(ServiceWorkerRegistrationIdentifier, Vector<ServiceWorkerRoute>&&, CompletionHandler<void(Expected<void, ExceptionData>&&)>&&);
     WEBCORE_EXPORT bool addHandlerIfHasControlledClients(CompletionHandler<void()>&&);

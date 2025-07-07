@@ -25,8 +25,6 @@
 
 #pragma once
 
-#if ENABLE(CONTENT_EXTENSIONS)
-
 #include "ContentExtensionActions.h"
 #include "ResourceLoadInfo.h"
 #include <wtf/Hasher.h>
@@ -162,4 +160,3 @@ private:
 
 } // namespace WebCore::ContentExtensions
 
-#endif // ENABLE(CONTENT_EXTENSIONS)

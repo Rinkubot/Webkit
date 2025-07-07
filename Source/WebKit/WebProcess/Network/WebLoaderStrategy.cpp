@@ -493,13 +493,11 @@ void WebLoaderStrategy::scheduleLoadFromNetworkProcess(ResourceLoader& resourceL
 
     if (document) {
         loadParameters.frameURL = document->url();
-#if ENABLE(CONTENT_EXTENSIONS)
         if (RefPtr page = document->page())
             loadParameters.mainDocumentURL = page->mainFrameURL();
         // FIXME: Instead of passing userContentControllerIdentifier, the NetworkProcess should be able to get it using webPageId.
         if (RefPtr webPage = webFrame ? webFrame->page() : nullptr)
             loadParameters.userContentControllerIdentifier = webPage->userContentControllerIdentifier();
-#endif
     }
 
     // FIXME: All loaders should provide their origin if navigation mode is cors/no-cors/same-origin.
@@ -923,12 +921,10 @@ void WebLoaderStrategy::startPingLoad(LocalFrame& frame, ResourceRequest& reques
 #endif
 
     loadParameters.frameURL = document->url();
-#if ENABLE(CONTENT_EXTENSIONS)
     if (RefPtr page = document->page())
         loadParameters.mainDocumentURL = page->mainFrameURL();
     // FIXME: Instead of passing userContentControllerIdentifier, we should just pass webPageId to NetworkProcess.
     loadParameters.userContentControllerIdentifier = webPage->userContentControllerIdentifier();
-#endif
 
     if (completionHandler)
         m_pingLoadCompletionHandlers.add(*loadParameters.identifier, WTFMove(completionHandler));

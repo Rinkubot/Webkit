@@ -553,11 +553,9 @@ public:
     HashMap<WebCore::PageIdentifier, CoreIPCAuditToken> presentingApplicationAuditTokens() const;
 #endif
 
-#if ENABLE(CONTENT_EXTENSIONS)
     void requestResourceMonitorRuleLists(bool forTesting);
     void setResourceMonitorRuleListsIfRequired(RefPtr<WebCompiledContentRuleList>);
     void setResourceMonitorRuleLists(RefPtr<WebCompiledContentRuleList>, CompletionHandler<void()>&&);
-#endif
 
 private:
     Type type() const final { return Type::WebContent; }
@@ -866,10 +864,8 @@ private:
 #endif
 #endif
 
-#if ENABLE(CONTENT_EXTENSIONS)
     bool m_resourceMonitorRuleListRequestedBySomePage { false };
     RefPtr<WebCompiledContentRuleList> m_resourceMonitorRuleList;
-#endif
 #if ENABLE(REMOTE_INSPECTOR) && PLATFORM(COCOA)
     HashMap<WebCore::ServiceWorkerIdentifier, Ref<ServiceWorkerDebuggableProxy>> m_serviceWorkerDebuggableProxies;
 #endif

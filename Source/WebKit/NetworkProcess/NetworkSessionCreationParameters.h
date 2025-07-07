@@ -134,10 +134,8 @@ struct NetworkSessionCreationParameters {
 #endif
     ResourceLoadStatisticsParameters resourceLoadStatisticsParameters;
 
-#if ENABLE(CONTENT_EXTENSIONS)
     String resourceMonitorThrottlerDirectory;
     SandboxExtension::Handle resourceMonitorThrottlerDirectoryExtensionHandle;
-#endif
 #if ENABLE(TLS_1_2_DEFAULT_MINIMUM)
     bool isLegacyTLSAllowed { false };
 #else

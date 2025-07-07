@@ -785,7 +785,6 @@ void WKWebsiteDataStoreGetAllStorageAccessEntries(WKWebsiteDataStoreRef dataStor
 
 void WKWebsiteDataStoreResetResourceMonitorThrottler(WKWebsiteDataStoreRef dataStoreRef, void* context, KWebsiteDataStoreResetResourceMonitorThrottler callback)
 {
-#if ENABLE(CONTENT_EXTENSIONS)
     WebKit::toProtectedImpl(dataStoreRef)->resetResourceMonitorThrottlerForTesting([context, callback] () {
         if (callback)
             callback(context);
@@ -794,5 +793,4 @@ void WKWebsiteDataStoreResetResourceMonitorThrottler(WKWebsiteDataStoreRef dataS
     UNUSED_PARAM(dataStoreRef);
     if (callback)
         callback(context);
-#endif
 }

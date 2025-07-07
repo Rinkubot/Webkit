@@ -115,9 +115,7 @@
 #include <WebCore/MockContentFilterSettings.h>
 #endif
 
-#if ENABLE(CONTENT_EXTENSIONS)
 #include <WebCore/ResourceMonitorThrottlerHolder.h>
-#endif
 
 #define CONNECTION_RELEASE_LOG(channel, fmt, ...) RELEASE_LOG(channel, "%p - [webProcessIdentifier=%" PRIu64 "] NetworkConnectionToWebProcess::" fmt, this, this->webProcessIdentifier().toUInt64(), ##__VA_ARGS__)
 #define CONNECTION_RELEASE_LOG_ERROR(channel, fmt, ...) RELEASE_LOG_ERROR(channel, "%p - [webProcessIdentifier=%" PRIu64 "] NetworkConnectionToWebProcess::" fmt, this, this->webProcessIdentifier().toUInt64(), ##__VA_ARGS__)
@@ -1787,7 +1785,6 @@ void NetworkConnectionToWebProcess::updateSharedPreferencesForWebProcess(SharedP
         session->protectedStorageManager()->updateSharedPreferencesForConnection(m_connection, m_sharedPreferencesForWebProcess);
 }
 
-#if ENABLE(CONTENT_EXTENSIONS)
 void NetworkConnectionToWebProcess::shouldOffloadIFrameForHost(const String& host, CompletionHandler<void(bool)>&& completionHandler)
 {
     CONNECTION_RELEASE_LOG(ResourceMonitoring, "shouldOffloadIFrameForHost: (host=%" SENSITIVE_LOG_STRING ")", host.utf8().data());
@@ -1796,7 +1793,6 @@ void NetworkConnectionToWebProcess::shouldOffloadIFrameForHost(const String& hos
     else
         completionHandler(false);
 }
-#endif
 
 } // namespace WebKit
 

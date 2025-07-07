@@ -104,9 +104,7 @@ public:
     void registerServiceWorkerClientInternal(WebCore::ClientOrigin&&, WebCore::ServiceWorkerClientData&&, const std::optional<WebCore::ServiceWorkerRegistrationIdentifier>&, String&& userAgent, WebCore::SWServer::IsBeingCreatedClient);
     void unregisterServiceWorkerClient(const WebCore::ScriptExecutionContextIdentifier&);
 
-#if ENABLE(CONTENT_EXTENSIONS)
     void reportNetworkUsageToWorkerClient(WebCore::ScriptExecutionContextIdentifier, uint64_t bytesTransferredOverNetworkDelta);
-#endif
 
 private:
     WebSWServerConnection(NetworkConnectionToWebProcess&, WebCore::SWServer&, IPC::Connection&, WebCore::ProcessIdentifier);

@@ -25,8 +25,6 @@
 
 #pragma once
 
-#if ENABLE(CONTENT_EXTENSIONS)
-
 #include "DFA.h"
 #include <wtf/Function.h>
 #include <wtf/Vector.h>
@@ -53,4 +51,3 @@ inline void DFACombiner::addDFA(DFA&& dfa)
 } // namespace ContentExtensions
 } // namespace WebCore
 
-#endif // ENABLE(CONTENT_EXTENSIONS)

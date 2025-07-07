@@ -26,7 +26,6 @@
 #include "config.h"
 #include "APIContentRuleListAction.h"
 
-#if ENABLE(CONTENT_EXTENSIONS)
 
 namespace API {
 
@@ -74,4 +73,3 @@ const Vector<WTF::String>& ContentRuleListAction::notifications() const
 
 } // namespace API
 
-#endif // ENABLE(CONTENT_EXTENSIONS)

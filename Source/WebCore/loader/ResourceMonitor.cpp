@@ -41,7 +41,6 @@
 
 namespace WebCore {
 
-#if ENABLE(CONTENT_EXTENSIONS)
 
 #define RESOURCEMONITOR_RELEASE_LOG(fmt, ...) RELEASE_LOG_IF(m_frame, ResourceMonitoring, "ResourceMonitor(frame %" PRIu64 ")::" fmt, m_frame->frameID().toUInt64(), ##__VA_ARGS__)
 
@@ -126,7 +125,6 @@ static ASCIILiteral eligibilityToString(ResourceMonitorEligibility eligibility)
 {
     return eligibility == ResourceMonitorEligibility::Eligible ? "eligible"_s : "not eligible"_s;
 }
-#endif
 
 void ResourceMonitor::continueAfterDidReceiveEligibility(Eligibility eligibility, const URL& url, OptionSet<ContentExtensions::ResourceType> resourceType)
 {
@@ -241,7 +239,5 @@ ResourceMonitor* ResourceMonitor::parentResourceMonitorIfExists() const
 }
 
 #undef RESOURCEMONITOR_RELEASE_LOG
-
-#endif
 
 } // namespace WebCore

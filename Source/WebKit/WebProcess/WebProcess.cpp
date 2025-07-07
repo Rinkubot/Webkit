@@ -235,10 +235,8 @@
 #include "WebMockContentFilterManager.h"
 #endif
 
-#if ENABLE(CONTENT_EXTENSIONS)
 #include "WebCompiledContentRuleList.h"
 #include <WebCore/ResourceMonitorChecker.h>
-#endif
 
 #if HAVE(LSDATABASECONTEXT)
 #include "LaunchServicesDatabaseManager.h"
@@ -2583,7 +2581,6 @@ Ref<WebCookieJar> WebProcess::protectedCookieJar()
     return m_cookieJar;
 }
 
-#if ENABLE(CONTENT_EXTENSIONS)
 void WebProcess::setResourceMonitorContentRuleList(WebCompiledContentRuleListData&& ruleListData)
 {
     WEBPROCESS_RELEASE_LOG(ResourceMonitoring, "setResourceMonitorContentRuleList");
@@ -2607,7 +2604,6 @@ void WebProcess::setResourceMonitorContentRuleListAsync(WebCompiledContentRuleLi
     setResourceMonitorContentRuleList(WTFMove(ruleListData));
     completionHandler();
 }
-#endif
 
 } // namespace WebKit
 

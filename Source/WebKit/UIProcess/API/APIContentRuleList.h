@@ -38,7 +38,6 @@ namespace API {
 
 class ContentRuleList final : public ObjectImpl<Object::Type::ContentRuleList> {
 public:
-#if ENABLE(CONTENT_EXTENSIONS)
     static Ref<ContentRuleList> create(Ref<WebKit::WebCompiledContentRuleList>&& contentRuleList, WebKit::NetworkCache::Data&& mappedFile)
     {
         return adoptRef(*new ContentRuleList(WTFMove(contentRuleList), WTFMove(mappedFile)));
@@ -56,7 +55,6 @@ public:
 private:
     Ref<WebKit::WebCompiledContentRuleList> m_compiledRuleList;
     WebKit::NetworkCache::Data m_mappedFile;
-#endif // ENABLE(CONTENT_EXTENSIONS)
 };
 
 } // namespace API

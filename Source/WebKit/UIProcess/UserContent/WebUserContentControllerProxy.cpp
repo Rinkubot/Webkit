@@ -45,10 +45,8 @@
 #include <WebCore/SerializedScriptValue.h>
 #include <wtf/CheckedPtr.h>
 
-#if ENABLE(CONTENT_EXTENSIONS)
 #include "APIContentRuleList.h"
 #include "WebCompiledContentRuleList.h"
-#endif
 
 #if ENABLE(WK_WEB_EXTENSIONS)
 #include "WebExtensionMatchPattern.h"
@@ -89,13 +87,10 @@ WebUserContentControllerProxy::~WebUserContentControllerProxy()
         process->removeMessageReceiver(Messages::WebUserContentControllerProxy::messageReceiverName(), identifier());
         process->didDestroyWebUserContentControllerProxy(*this);
     }
-#if ENABLE(CONTENT_EXTENSIONS)
     for (Ref process : m_networkProcesses)
         process->didDestroyWebUserContentControllerProxy(*this);
-#endif
 }
 
-#if ENABLE(CONTENT_EXTENSIONS)
 void WebUserContentControllerProxy::addNetworkProcess(NetworkProcessProxy& proxy)
 {
     m_networkProcesses.add(proxy);
@@ -105,7 +100,6 @@ void WebUserContentControllerProxy::removeNetworkProcess(NetworkProcessProxy& pr
 {
     m_networkProcesses.remove(proxy);
 }
-#endif
 
 void WebUserContentControllerProxy::addProcess(WebProcessProxy& webProcessProxy)
 {
@@ -141,20 +135,16 @@ UserContentControllerParameters WebUserContentControllerProxy::parameters() cons
         , WTFMove(userScripts)
         , WTFMove(userStyleSheets)
         , WTFMove(messageHandlers)
-#if ENABLE(CONTENT_EXTENSIONS)
         , contentRuleListData()
-#endif
     };
 }
 
-#if ENABLE(CONTENT_EXTENSIONS)
 Vector<std::pair<WebCompiledContentRuleListData, URL>> WebUserContentControllerProxy::contentRuleListData() const
 {
     return WTF::map(m_contentRuleLists, [](const auto& keyValue) -> std::pair<WebCompiledContentRuleListData, URL> {
         return { keyValue.value.first->compiledRuleList().data(), keyValue.value.second };
     });
 }
-#endif
 
 void WebUserContentControllerProxy::removeProcess(WebProcessProxy& webProcessProxy)
 {
@@ -406,7 +396,6 @@ void WebUserContentControllerProxy::didPostMessage(WebPageProxyIdentifier pagePr
     handler->client().didPostMessageWithAsyncReply(*page, WTFMove(frameInfoData), handler->world(), WTFMove(message), WTFMove(reply));
 }
 
-#if ENABLE(CONTENT_EXTENSIONS)
 void WebUserContentControllerProxy::addContentRuleList(API::ContentRuleList& contentRuleList, const WTF::URL& extensionBaseURL)
 {
     m_contentRuleLists.set(contentRuleList.name(), std::make_pair(Ref { contentRuleList }, extensionBaseURL));
@@ -468,6 +457,5 @@ void WebUserContentControllerProxy::removeAllContentRuleLists()
         removeContentRuleList(name);
 #endif
 }
-#endif
 
 } // namespace WebKit

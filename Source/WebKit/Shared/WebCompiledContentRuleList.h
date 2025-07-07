@@ -25,7 +25,6 @@
 
 #pragma once
 
-#if ENABLE(CONTENT_EXTENSIONS)
 
 #include "WebCompiledContentRuleListData.h"
 #include <WebCore/CompiledContentExtension.h>
@@ -55,4 +54,3 @@ private:
 
 } // namespace WebKit
 
-#endif // ENABLE(CONTENT_EXTENSIONS)

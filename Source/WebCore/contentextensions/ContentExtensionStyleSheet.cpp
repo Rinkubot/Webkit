@@ -26,8 +26,6 @@
 #include "config.h"
 #include "ContentExtensionStyleSheet.h"
 
-#if ENABLE(CONTENT_EXTENSIONS)
-
 #include "CSSStyleSheet.h"
 #include "ContentExtensionParser.h"
 #include "ContentExtensionsBackend.h"
@@ -68,4 +66,3 @@ bool ContentExtensionStyleSheet::addDisplayNoneSelector(const String& selector, 
 } // namespace ContentExtensions
 } // namespace WebCore
 
-#endif // ENABLE(CONTENT_EXTENSIONS)

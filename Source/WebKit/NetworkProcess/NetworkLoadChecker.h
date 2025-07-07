@@ -96,14 +96,12 @@ public:
     void setCSPResponseHeaders(WebCore::ContentSecurityPolicyResponseHeaders&& headers) { m_cspResponseHeaders = WTFMove(headers); }
     void setParentCrossOriginEmbedderPolicy(const WebCore::CrossOriginEmbedderPolicy& parentCrossOriginEmbedderPolicy) { m_parentCrossOriginEmbedderPolicy = parentCrossOriginEmbedderPolicy; }
     void setCrossOriginEmbedderPolicy(const WebCore::CrossOriginEmbedderPolicy& crossOriginEmbedderPolicy) { m_crossOriginEmbedderPolicy = crossOriginEmbedderPolicy; }
-#if ENABLE(CONTENT_EXTENSIONS)
     void setContentExtensionController(URL&& mainDocumentURL, URL&& frameURL, std::optional<UserContentControllerIdentifier> identifier)
     {
         m_mainDocumentURL = WTFMove(mainDocumentURL);
         m_frameURL = WTFMove(frameURL);
         m_userContentControllerIdentifier = identifier;
     }
-#endif
 
     NetworkProcess& networkProcess() { return m_networkProcess; }
     Ref<NetworkProcess> protectedNetworkProcess();
@@ -146,7 +144,6 @@ private:
 
     RequestOrRedirectionTripletOrError accessControlErrorForValidationHandler(String&&);
 
-#if ENABLE(CONTENT_EXTENSIONS)
     struct ContentExtensionResult {
         WebCore::ResourceRequest request;
         const WebCore::ContentRuleListResults& results;
@@ -154,7 +151,6 @@ private:
     using ContentExtensionResultOrError = Expected<ContentExtensionResult, WebCore::ResourceError>;
     using ContentExtensionCallback = CompletionHandler<void(ContentExtensionResultOrError&&)>;
     void processContentRuleListsForLoad(WebCore::ResourceRequest&&, ContentExtensionCallback&&);
-#endif
 
     RefPtr<NetworkCORSPreflightChecker> protectedCORSPreflightChecker() const;
     RefPtr<WebCore::SecurityOrigin> protectedOrigin() const { return m_origin; }
@@ -179,11 +175,9 @@ private:
     std::optional<WebCore::ContentSecurityPolicyResponseHeaders> m_cspResponseHeaders;
     WebCore::CrossOriginEmbedderPolicy m_parentCrossOriginEmbedderPolicy;
     WebCore::CrossOriginEmbedderPolicy m_crossOriginEmbedderPolicy;
-#if ENABLE(CONTENT_EXTENSIONS)
     URL m_mainDocumentURL;
     URL m_frameURL;
     std::optional<UserContentControllerIdentifier> m_userContentControllerIdentifier;
-#endif
 
     RefPtr<NetworkCORSPreflightChecker> m_corsPreflightChecker;
     bool m_isSameOriginRequest { true };

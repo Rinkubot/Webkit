@@ -33,7 +33,6 @@
 #include <wtf/StdLibExtras.h>
 #include <wtf/text/MakeString.h>
 
-#if ENABLE(CONTENT_EXTENSIONS)
 
 #define RESOURCEMONITOR_RELEASE_LOG(fmt, ...) RELEASE_LOG(ResourceMonitoring, "ResourceMonitorPersistence::" fmt, ##__VA_ARGS__)
 
@@ -82,7 +81,6 @@ void ResourceMonitorPersistence::reportSQLError(ASCIILiteral method, ASCIILitera
 #if RELEASE_LOG_DISABLED
     UNUSED_PARAM(method);
     UNUSED_PARAM(action);
-#endif
 }
 
 static String databasePath(const String& directoryPath)
@@ -222,4 +220,3 @@ void ResourceMonitorPersistence::closeDatabase()
 
 #undef RESOURCEMONITOR_RELEASE_LOG
 
-#endif

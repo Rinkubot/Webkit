@@ -320,7 +320,6 @@ void WebSharedWorkerServer::terminateContextConnectionWhenPossible(const WebCore
     contextConnection->terminateWhenPossible();
 }
 
-#if ENABLE(CONTENT_EXTENSIONS)
 void WebSharedWorkerServer::reportNetworkUsageToAllSharedWorkerObjects(WebCore::SharedWorkerIdentifier sharedWorkerIdentifier, size_t bytesTransferredOverNetworkDelta)
 {
     RefPtr sharedWorker = WebSharedWorker::fromIdentifier(sharedWorkerIdentifier);
@@ -333,6 +332,5 @@ void WebSharedWorkerServer::reportNetworkUsageToAllSharedWorkerObjects(WebCore::
             serverConnection->reportNetworkUsageToWorkerObject(sharedWorkerObjectIdentifier, bytesTransferredOverNetworkDelta);
     });
 }
-#endif
 
 } // namespace WebKit

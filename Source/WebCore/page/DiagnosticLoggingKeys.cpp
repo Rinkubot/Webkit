@@ -826,7 +826,6 @@ String DiagnosticLoggingKeys::presentationTypeKey()
     return "presentationType"_s;
 }
 
-#if ENABLE(CONTENT_EXTENSIONS)
 String DiagnosticLoggingKeys::iframeResourceMonitoringKey()
 {
     return "IFrameResourceMonitoring"_s;
@@ -846,7 +845,6 @@ String DiagnosticLoggingKeys::unloadPreventedByStickyActivationCountKey()
 {
     return "unloadPreventedByStickyActivationCount"_s;
 }
-#endif
 
 } // namespace WebCore
 

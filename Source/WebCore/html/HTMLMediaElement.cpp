@@ -1854,14 +1854,12 @@ void HTMLMediaElement::loadResource(const URL& initialURL, const ContentType& in
     }
 #endif
 
-#if ENABLE(CONTENT_EXTENSIONS)
     if (RefPtr documentLoader = frame->loader().documentLoader()) {
         if (page->protectedUserContentProvider()->processContentRuleListsForLoad(*page, url, ContentExtensions::ResourceType::Media, *documentLoader).shouldBlock()) {
             mediaLoadingFailed(MediaPlayer::NetworkState::FormatError);
             return;
         }
     }
-#endif
 
     // The resource fetch algorithm
     m_networkState = NETWORK_LOADING;

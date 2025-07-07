@@ -42,9 +42,7 @@
 #include <wtf/RefCountedAndCanMakeWeakPtr.h>
 #include <wtf/WeakPtr.h>
 
-#if ENABLE(CONTENT_EXTENSIONS)
 #include "ResourceLoadInfo.h"
-#endif
 
 namespace WTF {
 class SchedulePair;
@@ -60,9 +58,7 @@ class LegacyPreviewLoader;
 class LocalFrame;
 class NetworkLoadMetrics;
 
-#if ENABLE(CONTENT_EXTENSIONS)
 class ResourceMonitor;
-#endif
 
 DECLARE_ALLOCATOR_WITH_HEAP_IDENTIFIER(ResourceLoader);
 class ResourceLoader : public RefCountedAndCanMakeWeakPtr<ResourceLoader>, protected ResourceHandleClient {
@@ -83,8 +79,6 @@ public:
     }
 
     virtual const ResourceRequest& iOSOriginalRequest() const { return request(); }
-#endif
-
     WEBCORE_EXPORT FrameLoader* frameLoader() const;
     WEBCORE_EXPORT RefPtr<FrameLoader> protectedFrameLoader() const;
     DocumentLoader* documentLoader() const { return m_documentLoader.get(); }
@@ -134,8 +128,6 @@ public:
 #if USE(QUICK_LOOK)
     bool isQuickLookResource() const;
     virtual void didReceivePreviewResponse(ResourceResponse&&) { };
-#endif
-
     const URL& url() const { return m_request.url(); }
     ResourceHandle* handle() const { return m_handle.get(); }
     bool shouldSendResourceLoadCallbacks() const { return m_options.sendLoadCallbacks == SendCallbackPolicy::SendCallbacks; }
@@ -162,8 +154,6 @@ public:
 #if PLATFORM(COCOA)
     void schedule(WTF::SchedulePair&);
     void unschedule(WTF::SchedulePair&);
-#endif
-
     WEBCORE_EXPORT LocalFrame* frame() const;
     RefPtr<LocalFrame> protectedFrame() const;
 
@@ -174,9 +164,7 @@ public:
 
     bool isPDFJSResourceLoad() const;
 
-#if ENABLE(CONTENT_EXTENSIONS)
     WEBCORE_EXPORT ResourceMonitor* resourceMonitorIfExists();
-#endif
 
 protected:
     ResourceLoader(LocalFrame&, ResourceLoaderOptions);
@@ -191,8 +179,6 @@ protected:
 
 #if PLATFORM(COCOA)
     void willCacheResponseAsync(ResourceHandle*, NSCachedURLResponse*, CompletionHandler<void(NSCachedURLResponse *)>&&) override;
-#endif
-
     virtual void willSendRequestInternal(ResourceRequest&&, const ResourceResponse& redirectResponse, CompletionHandler<void(ResourceRequest&&)>&&);
 
     RefPtr<ResourceHandle> m_handle;
@@ -233,12 +219,8 @@ private:
     void receivedCancellation(ResourceHandle*, const AuthenticationChallenge& challenge) override { receivedCancellation(challenge); }
 #if PLATFORM(IOS_FAMILY)
     RetainPtr<CFDictionaryRef> connectionProperties(ResourceHandle*) override;
-#endif
-
 #if USE(SOUP)
     void loadGResource();
-#endif
-
     ResourceRequest m_request;
     ResourceRequest m_originalRequest; // Before redirects.
     SharedBufferBuilder m_resourceData;
@@ -261,10 +243,8 @@ private:
     ResourceRequest m_deferredRequest;
     ResourceLoaderOptions m_options;
 
-#if ENABLE(CONTENT_EXTENSIONS)
 protected:
     OptionSet<ContentExtensions::ResourceType> m_resourceType;
-#endif
 };
 
 } // namespace WebCore

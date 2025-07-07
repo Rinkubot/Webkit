@@ -129,7 +129,7 @@
 #include "DataDetectionResultsStorage.h"
 #endif
 
-#if ENABLE(CONTENT_EXTENSIONS) && USE(APPLE_INTERNAL_SDK) && __has_include(<WebKitAdditions/LocalFrameAdditions.h>)
+#if USE(APPLE_INTERNAL_SDK) && __has_include(<WebKitAdditions/LocalFrameAdditions.h>)
 #include <WebKitAdditions/LocalFrameAdditions.h>
 #endif
 
@@ -1422,7 +1422,6 @@ void LocalFrame::setScrollingMode(ScrollbarMode scrollingMode)
         view->setCanHaveScrollbars(m_scrollingMode != ScrollbarMode::AlwaysOff);
 }
 
-#if ENABLE(CONTENT_EXTENSIONS)
 
 static String generateResourceMonitorErrorHTML(OptionSet<ColorScheme> colorScheme)
 {
@@ -1432,7 +1431,6 @@ static String generateResourceMonitorErrorHTML(OptionSet<ColorScheme> colorSchem
 #else
     UNUSED_PARAM(colorScheme);
     return generateResourceMonitorErrorHTMLForCocoa();
-#endif
 #else
     constexpr auto lightAndDarkColorScheme = ":root { color-scheme: light dark } "_s;
     constexpr auto darkOnlyColorScheme = ":root { color-scheme: only dark } "_s;

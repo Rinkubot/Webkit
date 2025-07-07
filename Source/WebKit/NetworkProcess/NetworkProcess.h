@@ -333,10 +333,8 @@ public:
 
     void connectionToWebProcessClosed(IPC::Connection&, PAL::SessionID);
 
-#if ENABLE(CONTENT_EXTENSIONS)
     NetworkContentRuleListManager& networkContentRuleListManager() { return m_networkContentRuleListManager; }
     Ref<NetworkContentRuleListManager> protectedNetworkContentRuleListManager() { return m_networkContentRuleListManager; }
-#endif
 
     void syncLocalStorage(CompletionHandler<void()>&&);
     void storeServiceWorkerRegistrations(PAL::SessionID, CompletionHandler<void()>&&);
@@ -583,9 +581,7 @@ private:
 
     void setShouldRelaxThirdPartyCookieBlockingForPage(WebPageProxyIdentifier);
 
-#if ENABLE(CONTENT_EXTENSIONS)
     void resetResourceMonitorThrottlerForTesting(PAL::SessionID, CompletionHandler<void()>&&);
-#endif
 
     struct TaskIdentifierType;
     using TaskIdentifier = ObjectIdentifier<TaskIdentifierType>;
@@ -621,9 +617,7 @@ private:
     OSObjectPtr<dispatch_group_t> m_clearCacheDispatchGroup;
 #endif
 
-#if ENABLE(CONTENT_EXTENSIONS)
     NetworkContentRuleListManager m_networkContentRuleListManager;
-#endif
 
 #if USE(RUNNINGBOARD)
     Ref<WebSQLiteDatabaseTracker> m_webSQLiteDatabaseTracker;

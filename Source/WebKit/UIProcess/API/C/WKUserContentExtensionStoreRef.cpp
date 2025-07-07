@@ -35,24 +35,19 @@ using namespace WebKit;
 
 WKTypeID WKUserContentExtensionStoreGetTypeID()
 {
-#if ENABLE(CONTENT_EXTENSIONS)
     return toAPI(API::ContentRuleListStore::APIType);
 #else
     return 0;
-#endif
 }
 
 WKUserContentExtensionStoreRef WKUserContentExtensionStoreCreate(WKStringRef path)
 {
-#if ENABLE(CONTENT_EXTENSIONS)
     return toAPILeakingRef(API::ContentRuleListStore::storeWithPath(toWTFString(path)));
 #else
     UNUSED_PARAM(path);
     return nullptr;
-#endif
 }
 
-#if ENABLE(CONTENT_EXTENSIONS)
 static inline WKUserContentExtensionStoreResult toResult(const std::error_code& error)
 {
     if (!error)
@@ -71,38 +66,31 @@ static inline WKUserContentExtensionStoreResult toResult(const std::error_code& 
 
     RELEASE_ASSERT_NOT_REACHED();
 }
-#endif
 
 void WKUserContentExtensionStoreCompile(WKUserContentExtensionStoreRef store, WKStringRef identifier, WKStringRef jsonSource, void* context, WKUserContentExtensionStoreFunction callback)
 {
-#if ENABLE(CONTENT_EXTENSIONS)
     toProtectedImpl(store)->compileContentRuleList(toWTFString(identifier), toWTFString(jsonSource), [context, callback](RefPtr<API::ContentRuleList> contentRuleList, std::error_code error) {
         callback(error ? nullptr : toAPILeakingRef(WTFMove(contentRuleList)), toResult(error), context);
     });
 #else
     UNUSED_PARAM(jsonSource);
     callback(nullptr, kWKUserContentExtensionStoreCompileFailed, context);
-#endif
 }
 
 void WKUserContentExtensionStoreLookup(WKUserContentExtensionStoreRef store, WKStringRef identifier, void* context, WKUserContentExtensionStoreFunction callback)
 {
-#if ENABLE(CONTENT_EXTENSIONS)
     toProtectedImpl(store)->lookupContentRuleList(toWTFString(identifier), [context, callback](RefPtr<API::ContentRuleList> contentRuleList, std::error_code error) {
         callback(error ? nullptr : toAPILeakingRef(WTFMove(contentRuleList)), toResult(error), context);
     });
 #else
     callback(nullptr, kWKUserContentExtensionStoreLookupFailed, context);
-#endif
 }
 
 void WKUserContentExtensionStoreRemove(WKUserContentExtensionStoreRef store, WKStringRef identifier, void* context, WKUserContentExtensionStoreFunction callback)
 {
-#if ENABLE(CONTENT_EXTENSIONS)
     toProtectedImpl(store)->removeContentRuleList(toWTFString(identifier), [context, callback](std::error_code error) {
         callback(nullptr, toResult(error), context);
     });
 #else
     callback(nullptr, kWKUserContentExtensionStoreRemoveFailed, context);
-#endif
 }

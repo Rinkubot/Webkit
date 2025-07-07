@@ -34,7 +34,6 @@
 #include <wtf/Seconds.h>
 #include <wtf/StdLibExtras.h>
 
-#if ENABLE(CONTENT_EXTENSIONS)
 
 namespace WebCore {
 
@@ -128,4 +127,3 @@ void ResourceMonitorThrottlerHolder::setCountPerDuration(size_t count, Seconds d
 
 } // namespace WebCore
 
-#endif

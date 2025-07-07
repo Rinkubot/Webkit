@@ -60,8 +60,6 @@
 
 #if USE(QUICK_LOOK)
 #include "QuickLook.h"
-#endif
-
 #define PAGE_ID (m_frame->pageID() ? m_frame->pageID()->toUInt64() : 0)
 #define FRAME_ID (m_frame->loader().frameID().toUInt64())
 #define POLICYCHECKER_RELEASE_LOG(fmt, ...) RELEASE_LOG(Loading, "%p - [pageID=%" PRIu64 ", frameID=%" PRIu64 "] PolicyChecker::" fmt, this, PAGE_ID, FRAME_ID, ##__VA_ARGS__)
@@ -191,8 +189,6 @@ void PolicyChecker::checkNavigationPolicy(ResourceRequest&& request, const Resou
         POLICYCHECKER_RELEASE_LOG("checkNavigationPolicy: continuing because quicklook-generated URL");
         return function(WTFMove(request), formState, NavigationPolicyDecision::ContinueLoad);
     }
-#endif
-
 #if ENABLE(CONTENT_FILTERING)
     if (m_contentFilterUnblockHandler.canHandleRequest(request)) {
         m_contentFilterUnblockHandler.requestUnblockAsync([frame](bool unblocked) {
@@ -203,8 +199,6 @@ void PolicyChecker::checkNavigationPolicy(ResourceRequest&& request, const Resou
         return function({ }, nullptr, NavigationPolicyDecision::IgnoreLoad);
     }
     m_contentFilterUnblockHandler = { };
-#endif
-
     frameLoader->clearProvisionalLoadForPolicyCheck();
 
     auto blobURLLifetimeExtension = extendBlobURLLifetimeIfNecessary(request, *frame->protectedDocument(), policyDecisionMode);
@@ -298,7 +292,6 @@ void PolicyChecker::checkNavigationPolicy(ResourceRequest&& request, const Resou
     auto sandboxFlags = frame->effectiveSandboxFlags();
     auto isPerformingHTTPFallback = frameLoader->isHTTPFallbackInProgress() ? IsPerformingHTTPFallback::Yes : IsPerformingHTTPFallback::No;
 
-#if ENABLE(CONTENT_EXTENSIONS)
     if (frame->loader().documentLoader() && frame->loader().documentLoader()->hasActiveContentRuleListActions()) {
         if (RefPtr page = frame->page()) {
             auto resourceType = frame->isMainFrame() ? ContentExtensions::ResourceType::TopDocument : ContentExtensions::ResourceType::ChildDocument;
@@ -306,7 +299,6 @@ void PolicyChecker::checkNavigationPolicy(ResourceRequest&& request, const Resou
             ContentExtensions::applyResultsToRequest(WTFMove(results), page.get(), request);
         }
     }
-#endif
 
     if (isInitialEmptyDocumentLoad) {
         // We ignore the response from the client for initial empty document loads and proceed with the load synchronously.

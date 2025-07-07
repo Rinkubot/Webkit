@@ -282,7 +282,6 @@ void LinkLoader::preconnectIfNeeded(const LinkLoadParameters& params, Document& 
         return;
 
     ResourceRequest request { URL { params.href } };
-#if ENABLE(CONTENT_EXTENSIONS)
     RefPtr page = document.page();
     if (!page)
         return;
@@ -296,7 +295,6 @@ void LinkLoader::preconnectIfNeeded(const LinkLoadParameters& params, Document& 
         return;
 
     ContentExtensions::applyResultsToRequest(WTFMove(results), page.get(), request);
-#endif
 
     ASSERT(document.settings().linkPreconnectEnabled());
     StoredCredentialsPolicy storageCredentialsPolicy = StoredCredentialsPolicy::Use;

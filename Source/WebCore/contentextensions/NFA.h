@@ -25,8 +25,6 @@
 
 #pragma once
 
-#if ENABLE(CONTENT_EXTENSIONS)
-
 #include "ContentExtensionsDebugging.h"
 #include "ImmutableNFANodeBuilder.h"
 #include "NFANode.h"
@@ -47,4 +45,3 @@ struct NFA : public ImmutableNFA<char, uint64_t> {
 } // namespace ContentExtensions
 } // namespace WebCore
 
-#endif // ENABLE(CONTENT_EXTENSIONS)

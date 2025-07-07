@@ -26,8 +26,6 @@
 #include "config.h"
 #include "ContentExtensionCompiler.h"
 
-#if ENABLE(CONTENT_EXTENSIONS)
-
 #include "CombinedURLFilters.h"
 #include "CompiledContentExtension.h"
 #include "ContentExtensionActions.h"
@@ -409,4 +407,3 @@ std::error_code compileRuleList(ContentExtensionCompilationClient& client, Strin
 
 } // namespace WebCore::ContentExtensions
 
-#endif // ENABLE(CONTENT_EXTENSIONS)

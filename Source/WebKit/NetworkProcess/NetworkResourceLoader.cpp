@@ -163,9 +163,7 @@ NetworkResourceLoader::NetworkResourceLoader(NetworkResourceLoadParameters&& par
             networkLoadChecker->setCSPResponseHeaders(ContentSecurityPolicyResponseHeaders { m_parameters.cspResponseHeaders.value() });
         networkLoadChecker->setParentCrossOriginEmbedderPolicy(m_parameters.parentCrossOriginEmbedderPolicy);
         networkLoadChecker->setCrossOriginEmbedderPolicy(m_parameters.crossOriginEmbedderPolicy);
-#if ENABLE(CONTENT_EXTENSIONS)
         networkLoadChecker->setContentExtensionController(URL { m_parameters.mainDocumentURL }, URL { m_parameters.frameURL }, m_parameters.userContentControllerIdentifier);
-#endif
     }
     if (synchronousReply)
         m_synchronousLoadData = makeUnique<SynchronousLoadData>(WTFMove(synchronousReply));
@@ -1163,10 +1161,8 @@ void NetworkResourceLoader::didFinishLoading(const NetworkLoadMetrics& networkLo
         send(Messages::WebResourceLoader::DidFinishResourceLoad(networkLoadMetrics));
     }
 
-#if ENABLE(CONTENT_EXTENSIONS)
     if (networkLoadMetrics.responseBodyBytesReceived != std::numeric_limits<uint64_t>::max())
         updateBytesTransferredOverNetwork(networkLoadMetrics.responseBodyBytesReceived);
-#endif
 
     tryStoreAsCacheEntry();
 
@@ -2238,14 +2234,11 @@ void NetworkResourceLoader::sendDidReceiveDataMessage(const FragmentedSharedBuff
     RefPtr networkLoad = m_networkLoad;
     auto bytesTransferredOverNetwork = networkLoad ? networkLoad->bytesTransferredOverNetwork() : 0;
 
-#if ENABLE(CONTENT_EXTENSIONS)
     updateBytesTransferredOverNetwork(bytesTransferredOverNetwork);
-#endif
 
     send(Messages::WebResourceLoader::DidReceiveData(IPC::SharedBufferReference(buffer), bytesTransferredOverNetwork));
 }
 
-#if ENABLE(CONTENT_EXTENSIONS)
 void NetworkResourceLoader::updateBytesTransferredOverNetwork(size_t bytesTransferredOverNetwork)
 {
     CheckedSize delta = bytesTransferredOverNetwork - m_bytesTransferredOverNetwork;
@@ -2287,7 +2280,6 @@ void NetworkResourceLoader::reportNetworkUsageToAllServiceWorkerClients(WebCore:
             server->reportNetworkUsageToAllWorkerClients(identifier, delta);
     }
 }
-#endif
 
 } // namespace WebKit
 
