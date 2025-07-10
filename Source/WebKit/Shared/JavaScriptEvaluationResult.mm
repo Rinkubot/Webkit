@@ -339,4 +339,11 @@ JSValueRef JavaScriptEvaluationResult::toJS(JSGlobalContextRef context)
     return JSValueMakeUndefined(context);
 }
 
+WTF::TextStream& operator<<(WTF::TextStream& stream, JavaScriptEvaluationResult::NullType nullType)
+{
+    stream << (nullType == JavaScriptEvaluationResult::NullType::NullPointer ? "nil" : "NSNull");
+    return stream;
+}
+
+
 }

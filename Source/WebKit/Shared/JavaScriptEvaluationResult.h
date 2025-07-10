@@ -128,4 +128,8 @@ private:
 #endif
 };
 
+#if PLATFORM(COCOA)
+WTF::TextStream& operator<<(WTF::TextStream&, JavaScriptEvaluationResult::NullType);
+#endif
+
 }
