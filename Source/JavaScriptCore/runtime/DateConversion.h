@@ -31,7 +31,7 @@ namespace JSC {
 
 class DateCache;
 
-enum DateTimeFormat {
+enum class DateTimeFormat {
     DateTimeFormatDate = 1,
     DateTimeFormatTime = 2,
     DateTimeFormatDateAndTime = DateTimeFormatDate | DateTimeFormatTime

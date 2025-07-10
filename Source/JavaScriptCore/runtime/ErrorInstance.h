@@ -47,7 +47,7 @@ public:
         return vm.errorInstanceSpace<mode>();
     }
 
-    enum SourceTextWhereErrorOccurred { FoundExactSource, FoundApproximateSource };
+    enum class SourceTextWhereErrorOccurred { FoundExactSource, FoundApproximateSource };
     typedef String (*SourceAppender) (const String& originalMessage, StringView sourceText, RuntimeType, SourceTextWhereErrorOccurred);
 
     DECLARE_EXPORT_INFO;
