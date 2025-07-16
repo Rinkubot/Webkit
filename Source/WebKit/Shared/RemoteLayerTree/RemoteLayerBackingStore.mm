@@ -138,7 +138,6 @@ RemoteLayerBackingStoreCollection* RemoteLayerBackingStore::backingStoreCollecti
 
 void RemoteLayerBackingStore::clearBackingStore()
 {
-    m_contentsBufferHandle = std::nullopt;
     setNeedsDisplay();
 }
 
@@ -179,14 +178,7 @@ static bool hasValue(const ImageBufferBackendHandle& backendHandle)
 
 void RemoteLayerBackingStore::encode(IPC::Encoder& encoder) const
 {
-    // FIXME: For simplicity this should be moved to the end of display() once the buffer handles can be created once
-    // and stored in m_bufferHandle. http://webkit.org/b/234169
-    std::optional<ImageBufferBackendHandle> handle;
-    if (m_contentsBufferHandle) {
-        ASSERT(m_parameters.type == Type::IOSurface);
-        handle = ImageBufferBackendHandle { *m_contentsBufferHandle };
-    } else
-        handle = frontBufferHandle();
+    std::optional<ImageBufferBackendHandle> handle = frontBufferHandle();
 
     // It would be nice to ASSERT(handle && hasValue(*handle)) here, but when we hit the timeout in RemoteImageBufferProxy::ensureBackendCreated(), we don't have a handle.
 #if !LOG_DISABLED
@@ -197,9 +189,10 @@ void RemoteLayerBackingStore::encode(IPC::Encoder& encoder) const
     encoder << WTFMove(handle);
 
     encoder << bufferSetIdentifier();
-
-    encodeBufferAndBackendInfos(encoder);
-    encoder << m_contentsRenderingResourceIdentifier;
+    auto [frontBufferInfo, backBufferInfo, secondaryBackBufferInfo] = collectBufferAndBackendInfos();
+    encoder << frontBufferInfo;
+    encoder << backBufferInfo;
+    encoder << secondaryBackBufferInfo;
     encoder << m_previouslyPaintedRect;
 
 #if ENABLE(RE_DYNAMIC_CONTENT_SCALING)
@@ -207,7 +200,6 @@ void RemoteLayerBackingStore::encode(IPC::Encoder& encoder) const
 #endif
 
     encoder << m_parameters.isOpaque;
-    encoder << m_parameters.type;
 #if HAVE(SUPPORT_HDR_DISPLAY)
 #if ENABLE(PIXEL_FORMAT_RGBA16F)
     encoder << (m_parameters.contentsFormat == WebCore::ContentsFormat::RGBA16F);
@@ -216,7 +208,6 @@ void RemoteLayerBackingStore::encode(IPC::Encoder& encoder) const
 #endif
     encoder << m_maxRequestedEDRHeadroom;
 #endif
-
 }
 
 WTF_MAKE_TZONE_ALLOCATED_IMPL(RemoteLayerBackingStoreProperties);
@@ -236,11 +227,13 @@ void RemoteLayerBackingStoreProperties::dump(TextStream& ts) const
     dumpBuffer("back buffer"_s, m_backBufferInfo);
     dumpBuffer("secondaryBack buffer"_s, m_secondaryBackBufferInfo);
 
-    ts.dumpProperty("has buffer handle"_s, !!bufferHandle());
 #if HAVE(SUPPORT_HDR_DISPLAY)
     ts.dumpProperty("extended-dynamic-range", m_hasExtendedDynamicRange);
     ts.dumpProperty("requested-headroom", m_maxRequestedEDRHeadroom);
 #endif
+
+    ts.dumpProperty("is opaque"_s, isOpaque());
+    ts.dumpProperty("has buffer handle"_s, !!bufferHandle());
 }
 
 bool RemoteLayerBackingStore::layerWillBeDisplayed()
@@ -362,23 +355,6 @@ PlatformCALayerRemote& RemoteLayerBackingStore::layer() const
     return m_layer;
 }
 
-void RemoteLayerBackingStore::setDelegatedContents(const PlatformCALayerRemoteDelegatedContents& contents)
-{
-    m_contentsBufferHandle = ImageBufferBackendHandle { contents.surface };
-    if (contents.finishedFence)
-        m_frontBufferFlushers.append(DelegatedContentsFenceFlusher::create(Ref { *contents.finishedFence }));
-    if (contents.surfaceIdentifier)
-        m_contentsRenderingResourceIdentifier = *contents.surfaceIdentifier;
-    else
-        m_contentsRenderingResourceIdentifier = std::nullopt;
-    m_dirtyRegion = { };
-    m_paintingRects.clear();
-#if HAVE(SUPPORT_HDR_DISPLAY)
-    m_maxRequestedEDRHeadroom = 1;
-    m_maxPaintedEDRHeadroom = 1;
-#endif
-}
-
 bool RemoteLayerBackingStore::needsDisplay() const
 {
     RefPtr collection = backingStoreCollection();
@@ -388,10 +364,6 @@ bool RemoteLayerBackingStore::needsDisplay() const
     }
 
     Ref layer = m_layer.get();
-    if (layer->owner()->platformCALayerDelegatesDisplay(layer.ptr())) {
-        LOG_WITH_STREAM(RemoteLayerBuffers, stream << "RemoteLayerBackingStore " << layer->layerID() << " needsDisplay() - delegates display");
-        return true;
-    }
 
     auto needsDisplayReason = [&]() {
         if (size().isEmpty())
@@ -410,20 +382,6 @@ bool RemoteLayerBackingStore::needsDisplay() const
     return needsDisplayReason != BackingStoreNeedsDisplayReason::None;
 }
 
-bool RemoteLayerBackingStore::performDelegatedLayerDisplay()
-{
-    Ref layer = m_layer.get();
-    auto& layerOwner = *layer->owner();
-    if (layerOwner.platformCALayerDelegatesDisplay(layer.ptr())) {
-        // This can call back to setContents(), setting m_contentsBufferHandle.
-        layerOwner.platformCALayerLayerDisplay(layer.ptr());
-        layerOwner.platformCALayerLayerDidDisplay(layer.ptr());
-        return true;
-    }
-    
-    return false;
-}
-
 void RemoteLayerBackingStore::dirtyRepaintCounterIfNecessary()
 {
     Ref layer = m_layer.get();
@@ -437,8 +395,6 @@ void RemoteLayerBackingStore::paintContents()
 {
     Ref layer = m_layer.get();
     LOG_WITH_STREAM(RemoteLayerBuffers, stream << "RemoteLayerBackingStore " << layer->layerID() << " paintContents() - has dirty region " << !hasEmptyDirtyRegion());
-    if (layer->owner()->platformCALayerDelegatesDisplay(layer.ptr()))
-        return;
 
     if (hasEmptyDirtyRegion()) {
         if (auto flusher = createFlusher(ThreadSafeImageBufferSetFlusher::FlushType::BackendHandlesOnly))
@@ -539,26 +495,8 @@ void RemoteLayerBackingStore::enumerateRectsBeingDrawn(GraphicsContext& context,
     }
 }
 
-#if HAVE(SUPPORT_HDR_DISPLAY)
-RemoteLayerBackingStoreProperties::RemoteLayerBackingStoreProperties(ImageBufferBackendHandle&& handle, WebCore::RenderingResourceIdentifier identifier, bool opaque, bool hasExtendedDynamicRange)
-#else
-RemoteLayerBackingStoreProperties::RemoteLayerBackingStoreProperties(ImageBufferBackendHandle&& handle, WebCore::RenderingResourceIdentifier identifier, bool opaque)
-#endif
-    : m_bufferHandle(WTFMove(handle))
-    , m_contentsRenderingResourceIdentifier(identifier)
-    , m_isOpaque(opaque)
-    , m_type(RemoteLayerBackingStore::Type::IOSurface)
-#if HAVE(SUPPORT_HDR_DISPLAY)
-    , m_hasExtendedDynamicRange(hasExtendedDynamicRange)
-#endif
+RetainPtr<id> RemoteLayerBackingStoreProperties::layerContentsBufferFromBackendHandle(ImageBufferBackendHandle&& backendHandle, OptionSet<ContentsBufferFromBackendHandleFlags> flags)
 {
-}
-
-RetainPtr<id> RemoteLayerBackingStoreProperties::layerContentsBufferFromBackendHandle(ImageBufferBackendHandle&& backendHandle, bool isDelegatedDisplay)
-{
-#if !HAVE(SUPPORT_HDR_DISPLAY_APIS)
-    UNUSED_PARAM(isDelegatedDisplay);
-#endif
     RetainPtr<id> contents;
     WTF::switchOn(backendHandle,
         [&] (ShareableBitmap::Handle& handle) {
@@ -568,7 +506,7 @@ RetainPtr<id> RemoteLayerBackingStoreProperties::layerContentsBufferFromBackendH
         [&] (MachSendRight& machSendRight) {
             if (auto surface = WebCore::IOSurface::createFromSendRight(WTFMove(machSendRight))) {
 #if HAVE(SUPPORT_HDR_DISPLAY_APIS)
-                if (isDelegatedDisplay && surface->hasFormat(WebCore::IOSurface::Format::RGBA16F) && !surface->contentEDRHeadroom())
+                if (!flags.contains(ContentsBufferFromBackendHandleFlags::HaveOverrideHeadroom) && surface->hasFormat(WebCore::IOSurface::Format::RGBA16F) && !surface->contentEDRHeadroom())
                     surface->loadContentEDRHeadroom();
 #endif
                 contents = surface->asCAIOSurfaceLayerContents();
@@ -587,21 +525,14 @@ RetainPtr<id> RemoteLayerBackingStoreProperties::layerContentsBufferFromBackendH
 void RemoteLayerBackingStoreProperties::applyBackingStoreToNode(RemoteLayerTreeNode& node, bool replayDynamicContentScalingDisplayListsIntoBackingStore, UIView* hostingView)
 {
     RetainPtr layer = node.layer();
-    bool isDelegatedDisplay = !m_frontBufferInfo;
 
-    // FIXME: Ideally we'd just infer wantsExtendedDynamicRangeContent
-    // from the format of the buffer itself.
     [layer setContentsOpaque:m_isOpaque];
 
 #if HAVE(SUPPORT_HDR_DISPLAY_APIS)
     ALLOW_DEPRECATED_DECLARATIONS_BEGIN
     if (m_hasExtendedDynamicRange) {
         [layer setWantsExtendedDynamicRangeContent:true];
-        // Delegated contents set headroom via surface properties, not RemoteLayerBackingStore state.
-        if (isDelegatedDisplay)
-            [layer setContentsHeadroom:0.f];
-        else
-            [layer setContentsHeadroom:m_maxRequestedEDRHeadroom];
+        [layer setContentsHeadroom:m_maxRequestedEDRHeadroom];
     } else {
         [layer setWantsExtendedDynamicRangeContent:false];
         [layer setContentsHeadroom:0.f];
@@ -627,7 +558,7 @@ void RemoteLayerBackingStoreProperties::applyBackingStoreToNode(RemoteLayerTreeN
     RetainPtr<id> contents = lookupCachedBuffer(node);
     // m_bufferHandle can be unset here if IPC with the GPU process timed out.
     if (!contents && m_bufferHandle)
-        contents = layerContentsBufferFromBackendHandle(WTFMove(*m_bufferHandle), isDelegatedDisplay);
+        contents = layerContentsBufferFromBackendHandle(WTFMove(*m_bufferHandle), ContentsBufferFromBackendHandleFlags::HaveOverrideHeadroom);
 
     if (!contents) {
         [layer _web_clearContents];
@@ -640,7 +571,7 @@ void RemoteLayerBackingStoreProperties::applyBackingStoreToNode(RemoteLayerTreeN
         if (![layer isKindOfClass:[WKCompositingLayer class]])
             return;
 
-        [layer setDrawsAsynchronously:(m_type == RemoteLayerBackingStore::Type::IOSurface)];
+        [layer setDrawsAsynchronously:true];
 
         if (!replayDynamicContentScalingDisplayListsIntoBackingStore) {
             [layer setValue:@1 forKeyPath:WKDynamicContentScalingEnabledKey];
@@ -680,7 +611,7 @@ RetainPtr<id> RemoteLayerBackingStoreProperties::lookupCachedBuffer(RemoteLayerT
         return { };
 
     cachedBuffers.removeAllMatching([&](const RemoteLayerTreeNode::CachedContentsBuffer& current) {
-        auto matches = [&](std::optional<BufferAndBackendInfo>& backendInfo) {
+        auto matches = [&](const std::optional<BufferAndBackendInfo>& backendInfo) {
             if (!backendInfo || *backendInfo != current.imageBufferInfo)
                 return false;
             return true;
@@ -716,6 +647,11 @@ RetainPtr<id> RemoteLayerBackingStoreProperties::lookupCachedBuffer(RemoteLayerT
     return result;
 }
 
+std::optional<RemoteImageBufferSetIdentifier> RemoteLayerBackingStoreProperties::bufferSetIdentifier() const
+{
+    return m_bufferSet;
+}
+
 void RemoteLayerBackingStoreProperties::setBackendHandle(BufferSetBackendHandle& bufferSetHandle)
 {
     m_bufferHandle = std::exchange(bufferSetHandle.bufferHandle, std::nullopt);
@@ -747,6 +683,45 @@ void RemoteLayerBackingStore::markFrontBufferVolatileForTesting()
         collection->markFrontBufferVolatileForTesting(*this);
 }
 
+WTF_MAKE_TZONE_ALLOCATED_IMPL(RemoteLayerContents);
+
+void RemoteLayerContents::addPendingFlusher(WebCore::PlatformCALayerDelegatedContentsFence& finishedFence)
+{
+    m_frontBufferFlushers.append(DelegatedContentsFenceFlusher::create(Ref { finishedFence }));
+}
+
+Vector<std::unique_ptr<ThreadSafeImageBufferSetFlusher>> RemoteLayerContents::takePendingFlushers()
+{
+    return std::exchange(m_frontBufferFlushers, { });
+}
+
+void RemoteLayerContents::applyContentsToLayer(CALayer *layer)
+{
+    layer.contentsOpaque = m_isOpaque;
+
+#if HAVE(SUPPORT_HDR_DISPLAY_APIS)
+    ALLOW_DEPRECATED_DECLARATIONS_BEGIN
+    [layer setWantsExtendedDynamicRangeContent:m_hasExtendedDynamicRange];
+    ALLOW_DEPRECATED_DECLARATIONS_END
+#endif
+
+    // contents can be unset here if IPC with the GPU process timed out.
+    RetainPtr<id> contents = RemoteLayerBackingStoreProperties::layerContentsBufferFromBackendHandle(WTFMove(*m_bufferHandle));
+
+    if (!contents) {
+        [layer _web_clearContents];
+        return;
+    }
+
+    layer.contents = contents.get();
+}
+
+void RemoteLayerContents::dump(TextStream& ts) const
+{
+    ts.dumpProperty("is opaque"_s, m_isOpaque);
+    ts.dumpProperty("has buffer handle"_s, !!m_bufferHandle);
+}
+
 TextStream& operator<<(TextStream& ts, const RemoteLayerBackingStore& backingStore)
 {
     backingStore.dump(ts);
@@ -756,6 +731,12 @@ TextStream& operator<<(TextStream& ts, const RemoteLayerBackingStore& backingSto
 TextStream& operator<<(TextStream& ts, const RemoteLayerBackingStoreProperties& properties)
 {
     properties.dump(ts);
+    return ts;
+}
+
+TextStream& operator<<(TextStream& ts, const RemoteLayerContents& content)
+{
+    content.dump(ts);
     return ts;
 }
 

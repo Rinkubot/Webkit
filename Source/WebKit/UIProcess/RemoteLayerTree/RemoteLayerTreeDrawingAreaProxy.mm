@@ -261,7 +261,9 @@ void RemoteLayerTreeDrawingAreaProxy::commitLayerTree(IPC::Connection& connectio
     for (auto& transaction : transactions) {
         // commitLayerTreeTransaction consumes the incoming buffers, so we need to grab them first.
         for (auto& [layerID, properties] : CheckedRef { transaction.first }->changedLayerProperties()) {
-            auto* backingStoreProperties = properties->backingStoreOrProperties.properties.get();
+            if (!std::holds_alternative<RemoteLayerBackingStoreOrProperties>(properties->backingStoreOrContents))
+                continue;
+            auto* backingStoreProperties = std::get<RemoteLayerBackingStoreOrProperties>(properties->backingStoreOrContents).properties.get();
             if (!backingStoreProperties)
                 continue;
             if (backingStoreProperties->bufferSetIdentifier()) {
@@ -424,9 +426,9 @@ void RemoteLayerTreeDrawingAreaProxy::commitLayerTreeTransaction(IPC::Connection
     }
 }
 
-void RemoteLayerTreeDrawingAreaProxy::asyncSetLayerContents(WebCore::PlatformLayerIdentifier layerID, RemoteLayerBackingStoreProperties&& properties)
+void RemoteLayerTreeDrawingAreaProxy::asyncSetLayerContents(WebCore::PlatformLayerIdentifier layerID, RemoteLayerContents&& contents)
 {
-    m_remoteLayerTreeHost->asyncSetLayerContents(layerID, WTFMove(properties));
+    m_remoteLayerTreeHost->asyncSetLayerContents(layerID, WTFMove(contents));
 }
 
 void RemoteLayerTreeDrawingAreaProxy::acceleratedAnimationDidStart(WebCore::PlatformLayerIdentifier layerID, const String& key, MonotonicTime startTime)

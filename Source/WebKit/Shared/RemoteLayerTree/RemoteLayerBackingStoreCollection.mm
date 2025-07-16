@@ -125,8 +125,12 @@ Vector<std::unique_ptr<ThreadSafeImageBufferSetFlusher>> RemoteLayerBackingStore
     for (auto& layer : transaction.changedLayers()) {
         if (layer->properties().changedProperties & LayerChange::BackingStoreChanged) {
             needToScheduleVolatilityTimer = true;
-            if (layer->properties().backingStoreOrProperties.store)
-                flushers.appendVector(layer->properties().backingStoreOrProperties.store->takePendingFlushers());
+            WTF::switchOn(layer->properties().backingStoreOrContents, [&](RemoteLayerBackingStoreOrProperties& backingStoreOrProperties) {
+                flushers.appendVector(backingStoreOrProperties.store->takePendingFlushers());
+            }, [&](std::unique_ptr<RemoteLayerContents>& contents) {
+                flushers.appendVector(contents->takePendingFlushers());
+            }, [&](std::monostate) {
+            });
         }
 
         layer->didCommit();

@@ -56,7 +56,7 @@ void RemoteLayerWithInProcessRenderingBackingStore::Buffer::discard()
 
 bool RemoteLayerWithInProcessRenderingBackingStore::hasFrontBuffer() const
 {
-    return m_contentsBufferHandle || !!m_bufferSet.m_frontBuffer;
+    return !!m_bufferSet.m_frontBuffer;
 }
 
 bool RemoteLayerWithInProcessRenderingBackingStore::frontBufferMayBeVolatile() const
@@ -106,7 +106,7 @@ void RemoteLayerWithInProcessRenderingBackingStore::createContextAndPaintContent
 {
     RefPtr frontBuffer = m_bufferSet.m_frontBuffer;
     if (!frontBuffer) {
-        ASSERT(m_layer->owner()->platformCALayerDelegatesDisplay(m_layer.ptr()));
+        ASSERT_NOT_REACHED();
         return;
     }
 
@@ -239,7 +239,6 @@ void RemoteLayerWithInProcessRenderingBackingStore::prepareToDisplay()
 
     LOG_WITH_STREAM(RemoteLayerBuffers, stream << "RemoteLayerBackingStore " << m_layer->layerID() << " prepareToDisplay()");
 
-    m_contentsBufferHandle = std::nullopt;
     auto displayRequirement = m_bufferSet.swapBuffersForDisplay(hasEmptyDirtyRegion(), supportsPartialRepaint());
     if (displayRequirement == SwapBuffersDisplayRequirement::NeedsNoDisplay)
         return;
@@ -251,20 +250,17 @@ void RemoteLayerWithInProcessRenderingBackingStore::prepareToDisplay()
     ensureFrontBuffer();
 }
 
-void RemoteLayerWithInProcessRenderingBackingStore::encodeBufferAndBackendInfos(IPC::Encoder& encoder) const
+std::tuple<std::optional<BufferAndBackendInfo>, std::optional<BufferAndBackendInfo>, std::optional<BufferAndBackendInfo>> RemoteLayerWithInProcessRenderingBackingStore::collectBufferAndBackendInfos() const
 {
-    auto encodeBuffer = [&](const RefPtr<WebCore::ImageBuffer>& buffer) {
+    auto bufferAndBackedInfoForBuffer = [&](const RefPtr<WebCore::ImageBuffer>& buffer) {
         if (buffer) {
-            encoder << std::optional { BufferAndBackendInfo::fromImageBuffer(*buffer) };
-            return;
+            return std::optional { BufferAndBackendInfo::fromImageBuffer(*buffer) };
         }
 
-        encoder << std::optional<BufferAndBackendInfo>();
+        return std::optional<BufferAndBackendInfo>();
     };
 
-    encodeBuffer(m_bufferSet.m_frontBuffer);
-    encodeBuffer(m_bufferSet.m_backBuffer);
-    encodeBuffer(m_bufferSet.m_secondaryBackBuffer);
+    return { bufferAndBackedInfoForBuffer(m_bufferSet.m_frontBuffer), bufferAndBackedInfoForBuffer(m_bufferSet.m_backBuffer), bufferAndBackedInfoForBuffer(m_bufferSet.m_secondaryBackBuffer) };
 }
 
 void RemoteLayerWithInProcessRenderingBackingStore::dump(WTF::TextStream& ts) const

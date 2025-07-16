@@ -196,10 +196,16 @@ static void dumpChangedLayers(TextStream& ts, const LayerPropertiesMap& changedL
             ts.dumpProperty("timeOffset"_s, layerProperties.timeOffset);
 
         if (layerProperties.changedProperties & LayerChange::BackingStoreChanged) {
-            if (auto* backingStoreProperties = layerProperties.backingStoreOrProperties.properties.get())
-                ts.dumpProperty("backingStore"_s, *backingStoreProperties);
-            else
-                ts.dumpProperty("backingStore"_s, "removed");
+            WTF::switchOn(layerProperties.backingStoreOrContents, [&](const RemoteLayerBackingStoreOrProperties& backingStoreOrProperties) {
+                if (auto* backingStoreProperties = backingStoreOrProperties.properties.get())
+                    ts.dumpProperty("backingStore"_s, *backingStoreProperties);
+                else
+                    ts.dumpProperty("backingStore"_s, "removed");
+            }, [&](const std::unique_ptr<RemoteLayerContents>& contents) {
+                ts.dumpProperty("contents", *contents);
+            }, [&](const std::monostate&) {
+                ts.dumpProperty("contents", "null");
+            });
         }
 
         if (layerProperties.changedProperties & LayerChange::BackingStoreAttachmentChanged)

@@ -174,7 +174,7 @@ private:
     void commitLayerTreeTransaction(IPC::Connection&, const RemoteLayerTreeTransaction&, const RemoteScrollingCoordinatorTransaction&);
     virtual void didCommitLayerTree(IPC::Connection&, const RemoteLayerTreeTransaction&, const RemoteScrollingCoordinatorTransaction&) { }
 
-    void asyncSetLayerContents(WebCore::PlatformLayerIdentifier, RemoteLayerBackingStoreProperties&&);
+    void asyncSetLayerContents(WebCore::PlatformLayerIdentifier, RemoteLayerContents&&);
 
     void sendUpdateGeometry();
 

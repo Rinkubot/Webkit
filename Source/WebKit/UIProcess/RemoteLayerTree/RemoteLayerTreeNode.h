@@ -112,7 +112,7 @@ public:
     void addToHostingNode(RemoteLayerTreeNode&);
     void removeFromHostingNode();
 
-    void applyBackingStore(RemoteLayerTreeHost*, RemoteLayerBackingStoreProperties&);
+    void applyContents(RemoteLayerContents&);
 
     // A cached CAIOSurface object to retain CA render resources.
     struct CachedContentsBuffer {

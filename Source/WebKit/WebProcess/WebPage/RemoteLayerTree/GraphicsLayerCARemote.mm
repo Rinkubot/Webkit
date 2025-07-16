@@ -172,12 +172,12 @@ public:
 #else
         bool hasExtendedDynamicRangeContent = false;
 #endif
-        RemoteLayerBackingStoreProperties properties(WTFMove(*backendHandle), clone->renderingResourceIdentifier(), opaque, hasExtendedDynamicRangeContent);
+        RemoteLayerContents contents(WTFMove(*backendHandle), clone->renderingResourceIdentifier(), opaque, hasExtendedDynamicRangeContent);
 #else
-        RemoteLayerBackingStoreProperties properties(WTFMove(*backendHandle), clone->renderingResourceIdentifier(), opaque);
+        RemoteLayerContents contents(WTFMove(*backendHandle), clone->renderingResourceIdentifier(), opaque);
 #endif
 
-        m_connection->send(Messages::RemoteLayerTreeDrawingAreaProxy::AsyncSetLayerContents(*m_layerID, WTFMove(properties)), m_drawingArea.toUInt64());
+        m_connection->send(Messages::RemoteLayerTreeDrawingAreaProxy::AsyncSetLayerContents(*m_layerID, WTFMove(contents)), m_drawingArea.toUInt64());
 
         return true;
     }

@@ -481,12 +481,28 @@ void RemoteLayerTreePropertyApplier::applyPropertiesToLayer(CALayer *layer, Remo
     if (properties.changedProperties & LayerChange::BackingStoreChanged
         || properties.changedProperties & LayerChange::BackingStoreAttachmentChanged)
     {
-        auto* backingStore = properties.backingStoreOrProperties.properties.get();
-        if (backingStore && properties.backingStoreAttached) {
-            RELEASE_ASSERT(layerTreeNode);
-            layerTreeNode->applyBackingStore(layerTreeHost, *backingStore);
-        } else
+        if (!properties.backingStoreAttached)
             [layer _web_clearContents];
+        else {
+            RELEASE_ASSERT(layerTreeNode);
+            WTF::switchOn(properties.backingStoreOrContents, [&](const RemoteLayerBackingStoreOrProperties& backingStoreOrProperties) {
+                auto* backingStore = backingStoreOrProperties.properties.get();
+                if (backingStore) {
+                    UIView* hostingView = nil;
+#if PLATFORM(IOS_FAMILY)
+                    hostingView = layerTreeNode->uiView();
+#endif
+
+                    backingStore->applyBackingStoreToNode(*layerTreeNode, layerTreeHost->replayDynamicContentScalingDisplayListsIntoBackingStore(), hostingView);
+
+                }
+            }, [&](const std::unique_ptr<RemoteLayerContents>& contents) {
+                if (contents)
+                    layerTreeNode->applyContents(*contents);
+            }, [&](std::monostate) {
+                [layer _web_clearContents];
+            });
+        }
     }
 
     if (properties.changedProperties & LayerChange::BackdropRootIsOpaqueChanged && layerTreeNode)

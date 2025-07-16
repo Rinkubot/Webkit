@@ -130,19 +130,14 @@ void RemoteLayerTreeNode::initializeLayer()
 #endif
 }
 
-void RemoteLayerTreeNode::applyBackingStore(RemoteLayerTreeHost* host, RemoteLayerBackingStoreProperties& properties)
+void RemoteLayerTreeNode::applyContents(RemoteLayerContents& contents)
 {
-    if (asyncContentsIdentifier() && properties.contentsRenderingResourceIdentifier() && *asyncContentsIdentifier() >= *properties.contentsRenderingResourceIdentifier())
+    if (asyncContentsIdentifier() && contents.renderingResourceIdentifier() && *asyncContentsIdentifier() >= *contents.renderingResourceIdentifier())
         return;
 
-    UIView* hostingView = nil;
-#if PLATFORM(IOS_FAMILY)
-    hostingView = uiView();
-#endif
+    contents.applyContentsToLayer(layer());
 
-    properties.applyBackingStoreToNode(*this, host->replayDynamicContentScalingDisplayListsIntoBackingStore(), hostingView);
-
-    if (auto identifier = properties.contentsRenderingResourceIdentifier())
+    if (auto identifier = contents.renderingResourceIdentifier())
         setAsyncContentsIdentifier(*identifier);
 }
 

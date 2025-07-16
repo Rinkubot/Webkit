@@ -290,6 +290,10 @@ protected:
 
     void updateClonedLayerProperties(PlatformCALayerRemote& clone, bool copyContents = true) const;
 
+    bool hasBackingStore() const;
+    RemoteLayerBackingStore& backingStore();
+    const RemoteLayerBackingStore& backingStore() const;
+
 private:
     Type type() const override { return Type::Remote; }
     void ensureBackingStore();

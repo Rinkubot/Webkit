@@ -53,7 +53,7 @@ public:
 #if ENABLE(RE_DYNAMIC_CONTENT_SCALING)
     std::optional<WebCore::DynamicContentScalingDisplayList> displayListHandle() const final;
 #endif
-    void encodeBufferAndBackendInfos(IPC::Encoder&) const final;
+    std::tuple<std::optional<BufferAndBackendInfo>, std::optional<BufferAndBackendInfo>, std::optional<BufferAndBackendInfo>> collectBufferAndBackendInfos() const final;
 
     void dump(WTF::TextStream&) const final;
 

@@ -32,6 +32,7 @@ namespace WebKit {
 
 class RemoteLayerBackingStore;
 class RemoteLayerBackingStoreProperties;
+class RemoteLayerContents;
 
 enum class LayerChangeIndex : size_t {
     EventRegionChanged = 40,
@@ -163,7 +164,7 @@ struct LayerProperties {
     WebCore::FloatPoint3D anchorPoint { 0.5, 0.5, 0 };
     WebCore::FloatRect bounds;
     WebCore::FloatRect contentsRect { 0, 0, 1, 1 };
-    RemoteLayerBackingStoreOrProperties backingStoreOrProperties;
+    Variant<std::monostate, RemoteLayerBackingStoreOrProperties, std::unique_ptr<RemoteLayerContents>> backingStoreOrContents;
     std::unique_ptr<WebCore::FilterOperations> filters;
     WebCore::Path shapePath;
     Markable<WebCore::PlatformLayerIdentifier> maskLayerID;

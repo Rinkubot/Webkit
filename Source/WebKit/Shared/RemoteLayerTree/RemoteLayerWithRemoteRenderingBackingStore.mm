@@ -61,7 +61,7 @@ RemoteLayerWithRemoteRenderingBackingStore::~RemoteLayerWithRemoteRenderingBacki
 
 bool RemoteLayerWithRemoteRenderingBackingStore::hasFrontBuffer() const
 {
-    return m_contentsBufferHandle || !m_cleared;
+    return !m_cleared;
 }
 
 bool RemoteLayerWithRemoteRenderingBackingStore::frontBufferMayBeVolatile() const
@@ -73,9 +73,6 @@ bool RemoteLayerWithRemoteRenderingBackingStore::frontBufferMayBeVolatile() cons
 
 void RemoteLayerWithRemoteRenderingBackingStore::prepareToDisplay()
 {
-    if (performDelegatedLayerDisplay())
-        return;
-
     RefPtr bufferSet = this->bufferSet();
     if (!bufferSet)
         return;
@@ -84,7 +81,6 @@ void RemoteLayerWithRemoteRenderingBackingStore::prepareToDisplay()
         setNeedsDisplay();
 
     bufferSet->prepareToDisplay(dirtyRegion(), supportsPartialRepaint(), hasEmptyDirtyRegion(), drawingRequiresClearedPixels());
-    m_contentsBufferHandle = std::nullopt;
 
     if (!hasFrontBuffer() || !supportsPartialRepaint())
         setNeedsDisplay();
@@ -143,20 +139,17 @@ void RemoteLayerWithRemoteRenderingBackingStore::ensureBackingStore(const Parame
     }
 }
 
-void RemoteLayerWithRemoteRenderingBackingStore::encodeBufferAndBackendInfos(IPC::Encoder& encoder) const
+std::tuple<std::optional<BufferAndBackendInfo>, std::optional<BufferAndBackendInfo>, std::optional<BufferAndBackendInfo>> RemoteLayerWithRemoteRenderingBackingStore::collectBufferAndBackendInfos() const
 {
-    auto encodeBuffer = [&](const  std::optional<WebCore::RenderingResourceIdentifier>& bufferIdentifier) {
+    auto bufferAndBackedInfoForIdentifier = [&](const  std::optional<WebCore::RenderingResourceIdentifier>& bufferIdentifier) {
         if (bufferIdentifier) {
-            encoder << std::optional { BufferAndBackendInfo { *bufferIdentifier, m_bufferSet->generation() } };
-            return;
+            return std::optional { BufferAndBackendInfo { *bufferIdentifier, m_bufferSet->generation() } };
         }
 
-        encoder << std::optional<BufferAndBackendInfo>();
+        return std::optional<BufferAndBackendInfo>();
     };
 
-    encodeBuffer(m_bufferCacheIdentifiers.front);
-    encodeBuffer(m_bufferCacheIdentifiers.back);
-    encodeBuffer(m_bufferCacheIdentifiers.secondaryBack);
+    return { bufferAndBackedInfoForIdentifier(m_bufferCacheIdentifiers.front), bufferAndBackedInfoForIdentifier(m_bufferCacheIdentifiers.back), bufferAndBackedInfoForIdentifier(m_bufferCacheIdentifiers.secondaryBack) };
 }
 
 std::optional<RemoteImageBufferSetIdentifier> RemoteLayerWithRemoteRenderingBackingStore::bufferSetIdentifier() const

@@ -46,6 +46,7 @@ OBJC_CLASS UIView;
 // FIXME: Make PlatformCALayerRemote.cpp Objective-C so we can include WebLayer.h here and share the typedef.
 namespace WebCore {
 class NativeImage;
+class PlatformCALayerDelegatedContentsFence;
 typedef Vector<WebCore::FloatRect, 5> RepaintRectList;
 struct PlatformCALayerDelegatedContents;
 struct PlatformCALayerDelegatedContentsFinishedEvent;
@@ -115,14 +116,10 @@ public:
     bool setNeedsDisplayIfEDRHeadroomExceeds(float);
 #endif
 
-    void setDelegatedContents(const PlatformCALayerRemoteDelegatedContents&);
-
     // Returns true if we need to encode the buffer.
     bool layerWillBeDisplayed();
     bool layerWillBeDisplayedWithRenderingSuppression();
     bool needsDisplay() const;
-
-    bool performDelegatedLayerDisplay();
 
     void paintContents();
     virtual void prepareToDisplay() = 0;
@@ -150,7 +147,7 @@ public:
     virtual bool hasFrontBuffer() const = 0;
     virtual bool frontBufferMayBeVolatile() const = 0;
 
-    virtual void encodeBufferAndBackendInfos(IPC::Encoder&) const = 0;
+    virtual std::tuple<std::optional<BufferAndBackendInfo>, std::optional<BufferAndBackendInfo>, std::optional<BufferAndBackendInfo>> collectBufferAndBackendInfos() const = 0;
 
     Vector<std::unique_ptr<ThreadSafeImageBufferSetFlusher>> takePendingFlushers();
 
@@ -196,11 +193,6 @@ protected:
 
     std::optional<WebCore::IntRect> m_previouslyPaintedRect;
 
-    // FIXME: This should be removed and m_bufferHandle should be used to ref the buffer once ShareableBitmap::Handle
-    // can be encoded multiple times. http://webkit.org/b/234169
-    std::optional<ImageBufferBackendHandle> m_contentsBufferHandle;
-    std::optional<WebCore::RenderingResourceIdentifier> m_contentsRenderingResourceIdentifier;
-
     Vector<std::unique_ptr<ThreadSafeImageBufferSetFlusher>> m_frontBufferFlushers;
 
     WebCore::RepaintRectList m_paintingRects;
@@ -221,24 +213,22 @@ class RemoteLayerBackingStoreProperties {
 public:
     RemoteLayerBackingStoreProperties() = default;
     RemoteLayerBackingStoreProperties(RemoteLayerBackingStoreProperties&&) = default;
-#if HAVE(SUPPORT_HDR_DISPLAY)
-    RemoteLayerBackingStoreProperties(ImageBufferBackendHandle&&, WebCore::RenderingResourceIdentifier, bool opaque, bool hasExtendedDynamicRangeContent);
-#else
-    RemoteLayerBackingStoreProperties(ImageBufferBackendHandle&&, WebCore::RenderingResourceIdentifier, bool opaque);
-#endif
 
     void applyBackingStoreToNode(RemoteLayerTreeNode&, bool replayDynamicContentScalingDisplayListsIntoBackingStore, UIView* hostingView);
 
     const std::optional<ImageBufferBackendHandle>& bufferHandle() const { return m_bufferHandle; };
 
-    static RetainPtr<id> layerContentsBufferFromBackendHandle(ImageBufferBackendHandle&&, bool isDelegatedDisplay);
+    bool isOpaque() const { return m_isOpaque; }
+
+    enum class ContentsBufferFromBackendHandleFlags {
+        HaveOverrideHeadroom = 1 << 0,
+    };
+    static RetainPtr<id> layerContentsBufferFromBackendHandle(ImageBufferBackendHandle&&, OptionSet<ContentsBufferFromBackendHandleFlags> = { });
 
     void dump(WTF::TextStream&) const;
 
-    std::optional<RemoteImageBufferSetIdentifier> bufferSetIdentifier() { return m_bufferSet; }
+    std::optional<RemoteImageBufferSetIdentifier> bufferSetIdentifier() const;
     void setBackendHandle(BufferSetBackendHandle&);
-
-    std::optional<WebCore::RenderingResourceIdentifier> contentsRenderingResourceIdentifier() const { return m_contentsRenderingResourceIdentifier; };
 
 private:
     friend struct IPC::ArgumentCoder<RemoteLayerBackingStoreProperties, void>;
@@ -246,14 +236,10 @@ private:
     RetainPtr<id> lookupCachedBuffer(RemoteLayerTreeNode&);
 
     std::optional<ImageBufferBackendHandle> m_bufferHandle;
-
     std::optional<RemoteImageBufferSetIdentifier> m_bufferSet;
-
     std::optional<BufferAndBackendInfo> m_frontBufferInfo;
     std::optional<BufferAndBackendInfo> m_backBufferInfo;
     std::optional<BufferAndBackendInfo> m_secondaryBackBufferInfo;
-    std::optional<WebCore::RenderingResourceIdentifier> m_contentsRenderingResourceIdentifier;
-
     std::optional<WebCore::IntRect> m_paintedRect;
 
 #if ENABLE(RE_DYNAMIC_CONTENT_SCALING)
@@ -261,15 +247,60 @@ private:
 #endif
 
     bool m_isOpaque { false };
-    RemoteLayerBackingStore::Type m_type;
 #if HAVE(SUPPORT_HDR_DISPLAY)
     bool m_hasExtendedDynamicRange { false };
     float m_maxRequestedEDRHeadroom { 1 };
 #endif
 };
 
+class RemoteLayerContents {
+    WTF_MAKE_TZONE_ALLOCATED(RemoteLayerContents);
+    WTF_MAKE_NONCOPYABLE(RemoteLayerContents);
+public:
+
+    RemoteLayerContents(RemoteLayerContents&&) = default;
+#if HAVE(SUPPORT_HDR_DISPLAY)
+    RemoteLayerContents(std::optional<ImageBufferBackendHandle>&& bufferHandle, const std::optional<WebCore::RenderingResourceIdentifier>& renderingResourceIdentifier, bool isOpaque, bool hasExtendedDynamicRangeContent)
+#else
+    RemoteLayerContents(std::optional<ImageBufferBackendHandle>&& bufferHandle, const std::optional<WebCore::RenderingResourceIdentifier>& renderingResourceIdentifier, bool isOpaque)
+#endif
+        : m_bufferHandle(WTFMove(bufferHandle))
+        , m_renderingResourceIdentifier(WTFMove(renderingResourceIdentifier))
+        , m_isOpaque(isOpaque)
+#if HAVE(SUPPORT_HDR_DISPLAY)
+        , m_hasExtendedDynamicRange(hasExtendedDynamicRangeContent)
+#endif
+    { }
+
+    // WebProcess
+    void addPendingFlusher(WebCore::PlatformCALayerDelegatedContentsFence&);
+    Vector<std::unique_ptr<ThreadSafeImageBufferSetFlusher>> takePendingFlushers();
+    std::optional<ImageBufferBackendHandle> cloneBufferHandle() const { return ImageBufferBackendHandle { *m_bufferHandle }; }
+
+    // UI-process
+    void applyContentsToLayer(CALayer*);
+
+    std::optional<WebCore::RenderingResourceIdentifier> renderingResourceIdentifier() const { return m_renderingResourceIdentifier; };
+
+    void dump(WTF::TextStream&) const;
+
+private:
+    friend struct IPC::ArgumentCoder<RemoteLayerContents, void>;
+
+    std::optional<ImageBufferBackendHandle> m_bufferHandle;
+    std::optional<WebCore::RenderingResourceIdentifier> m_renderingResourceIdentifier;
+    bool m_isOpaque;
+#if HAVE(SUPPORT_HDR_DISPLAY)
+    bool m_hasExtendedDynamicRange { false };
+#endif
+
+    // WebProcess only
+    Vector<std::unique_ptr<ThreadSafeImageBufferSetFlusher>> m_frontBufferFlushers;
+};
+
 WTF::TextStream& operator<<(WTF::TextStream&, BackingStoreNeedsDisplayReason);
 WTF::TextStream& operator<<(WTF::TextStream&, const RemoteLayerBackingStore&);
 WTF::TextStream& operator<<(WTF::TextStream&, const RemoteLayerBackingStoreProperties&);
+WTF::TextStream& operator<<(WTF::TextStream&, const RemoteLayerContents&);
 
 } // namespace WebKit

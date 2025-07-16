@@ -197,10 +197,31 @@ void PlatformCALayerRemote::updateClonedLayerProperties(PlatformCALayerRemote& c
     clone.updateCustomAppearance(customAppearance());
 }
 
+bool PlatformCALayerRemote::hasBackingStore() const
+{
+    if (std::holds_alternative<RemoteLayerBackingStoreOrProperties>(m_properties.backingStoreOrContents)) {
+        RELEASE_ASSERT(std::get<RemoteLayerBackingStoreOrProperties>(m_properties.backingStoreOrContents).store);
+        return true;
+    }
+    return false;
+}
+
+RemoteLayerBackingStore& PlatformCALayerRemote::backingStore()
+{
+    RELEASE_ASSERT(hasBackingStore());
+    return *std::get<RemoteLayerBackingStoreOrProperties>(m_properties.backingStoreOrContents).store;
+}
+
+const RemoteLayerBackingStore& PlatformCALayerRemote::backingStore() const
+{
+    RELEASE_ASSERT(hasBackingStore());
+    return *std::get<RemoteLayerBackingStoreOrProperties>(m_properties.backingStoreOrContents).store;
+}
+
 void PlatformCALayerRemote::recursiveMarkWillBeDisplayedWithRenderingSuppresion()
 {
-    if (m_properties.backingStoreOrProperties.store && m_properties.backingStoreAttached)
-        m_properties.backingStoreOrProperties.store->layerWillBeDisplayedWithRenderingSuppression();
+    if (hasBackingStore() && m_properties.backingStoreAttached)
+        backingStore().layerWillBeDisplayedWithRenderingSuppression();
 
     for (size_t i = 0; i < m_children.size(); ++i) {
         Ref child = downcast<PlatformCALayerRemote>(*m_children[i]);
@@ -211,7 +232,7 @@ void PlatformCALayerRemote::recursiveMarkWillBeDisplayedWithRenderingSuppresion(
 
 void PlatformCALayerRemote::recursiveBuildTransaction(RemoteLayerTreeContext& context, RemoteLayerTreeTransaction& transaction)
 {
-    ASSERT(!m_properties.backingStoreOrProperties.store || owner());
+    ASSERT(!hasBackingStore() || owner());
     RELEASE_ASSERT_WITH_SECURITY_IMPLICATION(&context == m_context);
 
     if (owner() && owner()->platformCALayerRenderingIsSuppressedIncludingDescendants()) {
@@ -223,12 +244,17 @@ void PlatformCALayerRemote::recursiveBuildTransaction(RemoteLayerTreeContext& co
     }
 
     bool usesBackingStore = owner() && (owner()->platformCALayerDrawsContent() || owner()->platformCALayerDelegatesDisplay(this));
-    if (m_properties.backingStoreOrProperties.store && !usesBackingStore) {
-        m_properties.backingStoreOrProperties.store = nullptr;
+    if (!std::holds_alternative<std::monostate>(m_properties.backingStoreOrContents) && !usesBackingStore) {
+        m_properties.backingStoreOrContents.emplace<std::monostate>();
         m_properties.notePropertiesChanged(LayerChange::BackingStoreChanged);
     }
 
-    if (m_properties.backingStoreOrProperties.store && m_properties.backingStoreAttached && m_properties.backingStoreOrProperties.store->layerWillBeDisplayed())
+    if (owner() && owner()->platformCALayerDelegatesDisplay(this)) {
+        owner()->platformCALayerLayerDisplay(this);
+        owner()->platformCALayerLayerDidDisplay(this);
+    }
+
+    if (hasBackingStore() && m_properties.backingStoreAttached && backingStore().layerWillBeDisplayed())
         m_properties.notePropertiesChanged(LayerChange::BackingStoreChanged);
 
     if (m_properties.changedProperties) {
@@ -276,18 +302,20 @@ void PlatformCALayerRemote::ensureBackingStore()
         if (!m_context)
             return false;
 
-        if (!m_properties.backingStoreOrProperties.store)
+        if (!hasBackingStore())
             return true;
 
         // A layer pulled out of a pool may have existing backing store which we mustn't reuse if it lives in the wrong process.
-        if (m_properties.backingStoreOrProperties.store->processModel() != RemoteLayerBackingStore::processModelForLayer(*this))
+        if (backingStore().processModel() != RemoteLayerBackingStore::processModelForLayer(*this))
             return true;
 
         return false;
     }();
 
-    if (needsNewBackingStore)
-        m_properties.backingStoreOrProperties.store = RemoteLayerBackingStore::createForLayer(*this);
+    if (needsNewBackingStore) {
+        m_properties.backingStoreOrContents.emplace<RemoteLayerBackingStoreOrProperties>();
+        std::get<RemoteLayerBackingStoreOrProperties>(m_properties.backingStoreOrContents).store = RemoteLayerBackingStore::createForLayer(*this);
+    }
 
     updateBackingStore();
 }
@@ -330,7 +358,7 @@ IncludeDynamicContentScalingDisplayList PlatformCALayerRemote::shouldIncludeDisp
 
 void PlatformCALayerRemote::updateBackingStore()
 {
-    if (!m_properties.backingStoreOrProperties.store)
+    if (!hasBackingStore())
         return;
 
     ASSERT(m_properties.backingStoreAttached);
@@ -348,7 +376,7 @@ void PlatformCALayerRemote::updateBackingStore()
     parameters.includeDisplayList = shouldIncludeDisplayListInBackingStore();
 #endif
 
-    m_properties.backingStoreOrProperties.store->ensureBackingStore(parameters);
+    backingStore().ensureBackingStore(parameters);
 }
 
 void PlatformCALayerRemote::setNeedsDisplayInRect(const FloatRect& rect)
@@ -359,7 +387,7 @@ void PlatformCALayerRemote::setNeedsDisplayInRect(const FloatRect& rect)
     ensureBackingStore();
 
     // FIXME: Need to map this through contentsRect/etc.
-    m_properties.backingStoreOrProperties.store->setNeedsDisplay(enclosingIntRect(rect));
+    backingStore().setNeedsDisplay(enclosingIntRect(rect));
 }
 
 void PlatformCALayerRemote::setNeedsDisplay()
@@ -369,15 +397,15 @@ void PlatformCALayerRemote::setNeedsDisplay()
 
     ensureBackingStore();
 
-    m_properties.backingStoreOrProperties.store->setNeedsDisplay();
+    backingStore().setNeedsDisplay();
 }
 
 bool PlatformCALayerRemote::needsDisplay() const
 {
-    if (!m_properties.backingStoreOrProperties.store)
+    if (!hasBackingStore())
         return false;
 
-    return m_properties.backingStoreOrProperties.store->needsDisplay();
+    return backingStore().needsDisplay();
 }
 
 void PlatformCALayerRemote::copyContentsFromLayer(PlatformCALayer* layer)
@@ -728,7 +756,7 @@ void PlatformCALayerRemote::setBackingStoreAttached(bool attached)
     if (attached)
         setNeedsDisplay();
     else
-        m_properties.backingStoreOrProperties.store = nullptr;
+        m_properties.backingStoreOrContents.emplace<std::monostate>();
 }
 
 bool PlatformCALayerRemote::backingStoreAttached() const
@@ -807,7 +835,7 @@ void PlatformCALayerRemote::setContentsFormat(ContentsFormat contentsFormat)
 
 bool PlatformCALayerRemote::hasContents() const
 {
-    return !!m_properties.backingStoreOrProperties.store;
+    return std::holds_alternative<std::unique_ptr<RemoteLayerContents>>(m_properties.backingStoreOrContents);
 }
 
 CFTypeRef PlatformCALayerRemote::contents() const
@@ -817,10 +845,7 @@ CFTypeRef PlatformCALayerRemote::contents() const
 
 void PlatformCALayerRemote::setContents(CFTypeRef value)
 {
-    if (!m_properties.backingStoreOrProperties.store)
-        return;
-    if (!value)
-        m_properties.backingStoreOrProperties.store->clearBackingStore();
+    m_properties.backingStoreOrContents.emplace<std::monostate>();
 }
 
 void PlatformCALayerRemote::setDelegatedContents(const PlatformCALayerDelegatedContents& contents)
@@ -831,8 +856,21 @@ void PlatformCALayerRemote::setDelegatedContents(const PlatformCALayerDelegatedC
 void PlatformCALayerRemote::setRemoteDelegatedContents(const PlatformCALayerRemoteDelegatedContents& contents)
 {
     ASSERT(m_acceleratesDrawing);
-    ensureBackingStore();
-    m_properties.backingStoreOrProperties.store->setDelegatedContents(contents);
+
+#if HAVE(SUPPORT_HDR_DISPLAY)
+#if ENABLE(PIXEL_FORMAT_RGBA16F)
+    bool hasExtendedDynamicRangeContent = contentsFormat() == ContentsFormat::RGBA16F;
+#else
+    bool hasExtendedDynamicRangeContent = false;
+#endif
+    m_properties.backingStoreOrContents.emplace<std::unique_ptr<RemoteLayerContents>>(makeUnique<RemoteLayerContents>(ImageBufferBackendHandle { contents.surface }, contents.surfaceIdentifier, isOpaque(), hasExtendedDynamicRangeContent));
+#else
+    m_properties.backingStoreOrContents.emplace<std::unique_ptr<RemoteLayerContents>>(makeUnique<RemoteLayerContents>(ImageBufferBackendHandle { contents.surface }, contents.surfaceIdentifier, isOpaque()));
+#endif
+
+    if (contents.finishedFence)
+        std::get<std::unique_ptr<RemoteLayerContents>>(m_properties.backingStoreOrContents)->addPendingFlusher(*contents.finishedFence);
+    m_properties.notePropertiesChanged(LayerChange::BackingStoreChanged);
 }
 
 void PlatformCALayerRemote::setContentsRect(const FloatRect& value)
@@ -1081,8 +1119,8 @@ void PlatformCALayerRemote::setScrollingNodeID(std::optional<ScrollingNodeID> no
 #if HAVE(SUPPORT_HDR_DISPLAY)
 bool PlatformCALayerRemote::setNeedsDisplayIfEDRHeadroomExceeds(float headroom)
 {
-    if (m_properties.backingStoreOrProperties.store)
-        return m_properties.backingStoreOrProperties.store->setNeedsDisplayIfEDRHeadroomExceeds(headroom);
+    if (hasBackingStore())
+        return backingStore().setNeedsDisplayIfEDRHeadroomExceeds(headroom);
     return false;
 }
 
@@ -1173,7 +1211,7 @@ Ref<PlatformCALayer> PlatformCALayerRemote::createCompatibleLayer(PlatformCALaye
 
 void PlatformCALayerRemote::enumerateRectsBeingDrawn(WebCore::GraphicsContext& context, void (^block)(WebCore::FloatRect))
 {
-    m_properties.backingStoreOrProperties.store->enumerateRectsBeingDrawn(context, block);
+    backingStore().enumerateRectsBeingDrawn(context, block);
 }
 
 uint32_t PlatformCALayerRemote::hostingContextID()
@@ -1184,10 +1222,10 @@ uint32_t PlatformCALayerRemote::hostingContextID()
 
 unsigned PlatformCALayerRemote::backingStoreBytesPerPixel() const
 {
-    if (!m_properties.backingStoreOrProperties.store)
+    if (!hasBackingStore())
         return 4;
 
-    return m_properties.backingStoreOrProperties.store->bytesPerPixel();
+    return backingStore().bytesPerPixel();
 }
 
 LayerPool* PlatformCALayerRemote::layerPool()
@@ -1215,20 +1253,20 @@ void PlatformCALayerRemote::setAcceleratedEffectsAndBaseValues(const Accelerated
 
 void PlatformCALayerRemote::purgeFrontBufferForTesting()
 {
-    if (m_properties.backingStoreOrProperties.store)
-        return m_properties.backingStoreOrProperties.store->purgeFrontBufferForTesting();
+    if (hasBackingStore())
+        backingStore().purgeFrontBufferForTesting();
 }
 
 void PlatformCALayerRemote::purgeBackBufferForTesting()
 {
-    if (m_properties.backingStoreOrProperties.store)
-        return m_properties.backingStoreOrProperties.store->purgeBackBufferForTesting();
+    if (hasBackingStore())
+        backingStore().purgeBackBufferForTesting();
 }
 
 void PlatformCALayerRemote::markFrontBufferVolatileForTesting()
 {
-    if (m_properties.backingStoreOrProperties.store)
-        m_properties.backingStoreOrProperties.store->markFrontBufferVolatileForTesting();
+    if (hasBackingStore())
+        backingStore().markFrontBufferVolatileForTesting();
 }
 
 } // namespace WebKit

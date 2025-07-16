@@ -91,19 +91,28 @@ enum class WebKit::SwapBuffersDisplayRequirement : uint8_t {
 header: "RemoteLayerBackingStore.h"
 [Nested] enum class WebKit::RemoteLayerBackingStore::Type : bool;
 
+[CustomHeader] class WebKit::RemoteLayerContents {
+    std::optional<WebKit::ImageBufferBackendHandle> cloneBufferHandle();
+    std::optional<WebCore::RenderingResourceIdentifier> m_renderingResourceIdentifier;
+    [NotSerialized] Vector<std::unique_ptr<WebKit::ThreadSafeImageBufferSetFlusher>> m_frontBufferFlushers;
+    bool m_isOpaque;
+#if HAVE(SUPPORT_HDR_DISPLAY)
+    bool m_hasExtendedDynamicRange;
+#endif
+};
+
 [RValue, CustomHeader, LegacyPopulateFromEmptyConstructor] class WebKit::RemoteLayerBackingStoreProperties {
     std::optional<WebKit::ImageBufferBackendHandle> m_bufferHandle;
     std::optional<WebKit::RemoteImageBufferSetIdentifier> m_bufferSet;
     std::optional<WebKit::BufferAndBackendInfo> m_frontBufferInfo;
     std::optional<WebKit::BufferAndBackendInfo> m_backBufferInfo;
     std::optional<WebKit::BufferAndBackendInfo> m_secondaryBackBufferInfo;
-    std::optional<WebCore::RenderingResourceIdentifier> m_contentsRenderingResourceIdentifier;
     std::optional<WebCore::IntRect> m_paintedRect;
 #if ENABLE(RE_DYNAMIC_CONTENT_SCALING)
     std::optional<WebCore::DynamicContentScalingDisplayList> m_displayListBufferHandle;
 #endif
+
     bool m_isOpaque;
-    WebKit::RemoteLayerBackingStore::Type m_type;
 #if HAVE(SUPPORT_HDR_DISPLAY)
     bool m_hasExtendedDynamicRange;
     float m_maxRequestedEDRHeadroom;
@@ -238,7 +247,7 @@ headers: "LayerProperties.h" "PlatformCALayerRemote.h"
     [OptionalTupleBit=WebKit::LayerChange::AnchorPointChanged] WebCore::FloatPoint3D anchorPoint;
     [OptionalTupleBit=WebKit::LayerChange::BoundsChanged] WebCore::FloatRect bounds;
     [OptionalTupleBit=WebKit::LayerChange::ContentsRectChanged] WebCore::FloatRect contentsRect;
-    [OptionalTupleBit=WebKit::LayerChange::BackingStoreChanged] WebKit::RemoteLayerBackingStoreOrProperties backingStoreOrProperties;
+    [OptionalTupleBit=WebKit::LayerChange::BackingStoreChanged] Variant<std::monostate, WebKit::RemoteLayerBackingStoreOrProperties, std::unique_ptr<WebKit::RemoteLayerContents>> backingStoreOrContents;
     [OptionalTupleBit=WebKit::LayerChange::FiltersChanged] std::unique_ptr<WebCore::FilterOperations> filters;
     [OptionalTupleBit=WebKit::LayerChange::ShapePathChanged] WebCore::Path shapePath;
     [OptionalTupleBit=WebKit::LayerChange::MaskLayerChanged] Markable<WebCore::PlatformLayerIdentifier> maskLayerID;
