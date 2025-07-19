@@ -134,6 +134,7 @@ void AXIsolatedTree::createEmptyContent(AccessibilityObject& axRoot)
         Locker locker { m_changeLogLock };
         setPendingRootNodeIDLocked(axRoot.objectID());
         m_pendingFocusedNodeID = axWebArea->objectID();
+        setPendingTreeStructure();
     }
     queueAppendsAndRemovals({ rootAppend, webAreaAppend }, { });
 }
@@ -190,6 +191,8 @@ void AXIsolatedTree::applyPendingRootNodeLocked()
         if (RefPtr root = objectForID(m_pendingRootNodeID)) {
             m_rootNode = WTFMove(root);
             m_pendingRootNodeID = std::nullopt;
+        } else {
+            WTFLogAlways("Could not apply pending root node\n");
         }
     }
 }
@@ -295,8 +298,10 @@ std::optional<AXIsolatedTree::NodeChange> AXIsolatedTree::nodeChangeForObject(Re
     m_nodeMap.set(axObject->objectID(), ParentChildrenIDs { parentID, data.childrenIDs });
     NodeChange nodeChange { WTFMove(data), axObject->wrapper() };
 
-    if (!parentID && axObject->isScrollView())
+    if (!parentID && axObject->isScrollView()) {
         setPendingRootNodeID(axObject->objectID());
+        setPendingTreeStructure();
+    }
     return nodeChange;
 }
 
@@ -349,6 +354,7 @@ void AXIsolatedTree::addUnconnectedNode(Ref<AccessibilityObject> axObject)
     Locker locker { m_changeLogLock };
     m_pendingAppends.append(WTFMove(nodeChange));
     m_unconnectedNodes.add(objectID);
+    setPendingTreeStructure();
 }
 
 void AXIsolatedTree::queueRemovals(Vector<AXID>&& subtreeRemovals)
@@ -357,6 +363,7 @@ void AXIsolatedTree::queueRemovals(Vector<AXID>&& subtreeRemovals)
 
     Locker locker { m_changeLogLock };
     queueRemovalsLocked(WTFMove(subtreeRemovals));
+    setPendingTreeStructure();
 }
 
 void AXIsolatedTree::queueRemovalsLocked(Vector<AXID>&& subtreeRemovals)
@@ -429,6 +436,7 @@ void AXIsolatedTree::queueAppendsAndRemovals(Vector<NodeChange>&& appends, Vecto
     }
 
     queueRemovalsLocked(WTFMove(subtreeRemovals));
+    setPendingTreeStructure();
 }
 
 void AXIsolatedTree::collectNodeChangesForSubtree(AccessibilityObject& axObject)
@@ -515,6 +523,7 @@ void AXIsolatedTree::updateNode(AccessibilityObject& axObject)
     if (auto change = nodeChangeForObject(axObject)) {
         Locker locker { m_changeLogLock };
         queueChange(WTFMove(*change));
+        setPendingTreeStructure();
         return;
     }
 
@@ -529,6 +538,7 @@ void AXIsolatedTree::updateNode(AccessibilityObject& axObject)
     if (auto change = nodeChangeForObject(downcast<AccessibilityObject>(*axParent))) {
         Locker locker { m_changeLogLock };
         queueChange(WTFMove(*change));
+        setPendingTreeStructure();
     }
 }
 
@@ -860,6 +870,7 @@ void AXIsolatedTree::updateNodeProperties(AccessibilityObject& axObject, const A
 
     Locker locker { m_changeLogLock };
     m_pendingPropertyChanges.append({ axObject.objectID(), WTFMove(properties) });
+    setPendingTreeStructure();
 }
 
 void AXIsolatedTree::overrideNodeProperties(AXID axID, AXPropertyVector&& properties)
@@ -871,6 +882,7 @@ void AXIsolatedTree::overrideNodeProperties(AXID axID, AXPropertyVector&& proper
 
     Locker locker { m_changeLogLock };
     m_pendingPropertyChanges.append({ axID, WTFMove(properties) });
+    setPendingTreeStructure();
 }
 
 void AXIsolatedTree::updateDependentProperties(AccessibilityObject& axObject)
@@ -1140,10 +1152,43 @@ RefPtr<AXIsolatedObject> AXIsolatedTree::rootWebArea()
     }) : nullptr;
 }
 
+static void buildTreeStructure(Vector<TreeStructureNode>& treeStructure, AXCoreObject* obj)
+{
+    TreeStructureNode structureNode(obj->objectID());
+    structureNode.role = obj->role();
+
+    auto children = obj->children();
+    for (auto& child : children) {
+        structureNode.children.append(child->objectID());
+    }
+    treeStructure.append(structureNode);
+
+    for (auto& child : children) {
+        buildTreeStructure(treeStructure, &child.get());
+    }
+}
+
+void AXIsolatedTree::setPendingTreeStructure()
+{
+    if (!isMainThread())
+    {
+        return;
+    }
+
+    if (!axObjectCache() || !axObjectCache()->rootWebArea() || !axObjectCache()->rootWebArea()->parentObject())
+    {
+        return;
+    }
+
+    m_pendingTreeStructure.clear();
+    buildTreeStructure(m_pendingTreeStructure, axObjectCache()->rootWebArea()->parentObject());
+}
+
 void AXIsolatedTree::setPendingRootNodeID(AXID axID)
 {
     Locker locker { m_changeLogLock };
     setPendingRootNodeIDLocked(axID);
+    setPendingTreeStructure();
 }
 
 void AXIsolatedTree::setPendingRootNodeIDLocked(AXID axID)
@@ -1163,6 +1208,7 @@ void AXIsolatedTree::setFocusedNodeID(std::optional<AXID> axID)
 
     Locker locker { m_changeLogLock };
     m_pendingFocusedNodeID = axID;
+    setPendingTreeStructure();
 }
 
 void AXIsolatedTree::updateRelations(HashMap<AXID, AXRelations>&& relations)
@@ -1173,6 +1219,7 @@ void AXIsolatedTree::updateRelations(HashMap<AXID, AXRelations>&& relations)
     m_relationsNeedUpdate = false;
     Locker locker { m_changeLogLock };
     m_pendingRelations = WTFMove(relations);
+    setPendingTreeStructure();
 }
 
 void AXIsolatedTree::setSelectedTextMarkerRange(AXTextMarkerRange&& range)
@@ -1182,6 +1229,7 @@ void AXIsolatedTree::setSelectedTextMarkerRange(AXTextMarkerRange&& range)
 
     Locker locker { m_changeLogLock };
     m_pendingSelectedTextMarkerRange = WTFMove(range);
+    setPendingTreeStructure();
 }
 
 void AXIsolatedTree::updateLoadingProgress(double newProgressValue)
@@ -1207,6 +1255,7 @@ void AXIsolatedTree::updateFrame(AXID axID, IntRect&& newFrame)
     properties.append({ AXProperty::InitialFrameRect, FloatRect() });
     Locker locker { m_changeLogLock };
     m_pendingPropertyChanges.append({ axID, WTFMove(properties) });
+    setPendingTreeStructure();
 }
 
 void AXIsolatedTree::updateRootScreenRelativePosition()
@@ -1287,6 +1336,7 @@ void AXIsolatedTree::applyPendingChanges()
 {
     Locker locker { m_changeLogLock };
     applyPendingChangesLocked();
+    setPendingTreeStructure();
 }
 
 void AXIsolatedTree::applyPendingChangesUnlessQueuedForDestruction()
@@ -1298,6 +1348,129 @@ void AXIsolatedTree::applyPendingChangesUnlessQueuedForDestruction()
     if (m_queuedForDestruction)
         return;
     applyPendingChangesLocked();
+    setPendingTreeStructure();
+}
+
+static void dumpStructureTree(HashMap<AXID, TreeStructureNode *>& idMap, Vector<TreeStructureNode>& treeStructure, int depth, AXID structureId)
+{
+    for (int i = 0; i < depth; i++)
+        fprintf(stderr, "  ");
+    TreeStructureNode *structureNode = idMap.get(structureId);
+    if (structureNode) {
+        WTFLogAlways("%d %s", (int)structureId.toRawValue(), accessibilityRoleToString(structureNode->role).utf8().data());
+        for (int i = 0; i < (int)structureNode->children.size(); i++) {
+            AXID childStructureId = structureNode->children[i];
+            dumpStructureTree(idMap, treeStructure, depth + 1, childStructureId);
+        }
+    } else {
+        WTFLogAlways("%d ERR", (int)structureId.toRawValue());
+    }
+}
+
+static void dumpIsolatedTree(int depth, AXCoreObject* node)
+{
+    for (int i = 0; i < depth; i++)
+        fprintf(stderr, "  ");
+    WTFLogAlways("%d %s", (int)node->objectID().toRawValue(), accessibilityRoleToString(node->role()).utf8().data());
+    auto nodeChildren = node->children();
+    for (int i = 0; i < (int)nodeChildren.size(); i++) {
+        auto& isolatedNode = nodeChildren[i];
+        dumpIsolatedTree(depth + 1, &isolatedNode.get());
+    }
+}
+
+static bool walkTreeStructure(HashMap<AXID, TreeStructureNode *>& idMap, Vector<TreeStructureNode>& treeStructure, bool output, int depth, AXID structureId, AXCoreObject* node)
+{
+    bool good = true;
+    if (output) {
+        for (int i = 0; i < depth; i++)
+            fprintf(stderr, "  ");
+        TreeStructureNode *structureNode = idMap.get(structureId);
+        if (!structureNode) {
+            WTFLogAlways("%d ERR structure node missing", (int)structureId.toRawValue());
+            good = false;
+        }
+        else {
+            if (structureId != node->objectID()) {
+                WTFLogAlways("%d %s (structure id) : %d %s (isolated tree) childCount %d : %d - ERR ids do not match",
+                             (int)structureId.toRawValue(),
+                             accessibilityRoleToString(structureNode->role).utf8().data(),
+                             (int)node->objectID().toRawValue(),
+                             accessibilityRoleToString(node->role()).utf8().data(),
+                             (int)structureNode->children.size(), (int)node->children().size());
+                good = false;
+            } else if ((int)structureNode->children.size() != (int)node->children().size()) {
+                WTFLogAlways("%d child counts %d (structure) : %d (isolated tree) - ERR child counts do not match",
+                             (int)structureId.toRawValue(),
+                             (int)structureNode->children.size(), (int)node->children().size());
+                good = false;
+            }
+            else {
+                WTFLogAlways("%d %s", (int)structureId.toRawValue(), accessibilityRoleToString(structureNode->role).utf8().data());
+                auto nodeChildren = node->children();
+                for (int i = 0; i < (int)structureNode->children.size(); i++) {
+                    if (i >= (int)nodeChildren.size()) {
+                        WTFLogAlways("walkTreeStructure: ERR child index %d out of bounds (size: %d)", i, (int)nodeChildren.size());
+                        good = false;
+                        break;
+                    }
+                    
+                    AXID childStructureId = structureNode->children[i];
+                    auto& isolatedNode = nodeChildren[i];
+                    if (isolatedNode->parentObject() != node) {
+                        WTFLogAlways("ERR bad parent\n");
+                        good = false;
+                        break;
+                    }
+
+                    bool result = walkTreeStructure(idMap, treeStructure, output, depth + 1, childStructureId, &isolatedNode.get());
+                    if (!result) {
+                        good = false;
+                    }
+                }
+            }
+        }
+    }
+    return good;
+}
+
+static void walkTreeStructure(Vector<TreeStructureNode>& treeStructure, RefPtr<AXIsolatedObject> rootNode)
+{
+    // Early return if no tree structure or no root node
+    if (treeStructure.size() == 0 || !rootNode) {
+        WTFLogAlways("walkTreeStructure: empty structure or null root node");
+        return;
+    }
+
+    HashMap<AXID, TreeStructureNode *> idMap;
+    TreeStructureNode* root = nullptr;
+
+    // Build the ID map and find the root
+    for (auto& structureNode : treeStructure) {
+        idMap.set(structureNode.axid, &structureNode);
+        if (!root) {
+            root = &structureNode;
+        }
+    }
+
+    if (!root) {
+        WTFLogAlways("walkTreeStructure: no valid root found");
+        return;
+    }
+
+    AXID rootId = root->axid;
+
+    bool okay = walkTreeStructure(idMap, treeStructure, false, 0, rootId, rootNode.get());
+    if (okay) {
+        WTFLogAlways("walkTreeStructure: %d nodes okay", (int)treeStructure.size());
+    } else {
+        walkTreeStructure(idMap, treeStructure, true, 0, rootId, rootNode.get());
+
+        WTFLogAlways("*** structure tree ***");
+        dumpStructureTree(idMap, treeStructure, 0, rootId);
+        WTFLogAlways("*** isolated tree ***");
+        dumpIsolatedTree(0, rootNode.get());
+    }
 }
 
 void AXIsolatedTree::applyPendingChangesLocked()
@@ -1416,6 +1589,8 @@ void AXIsolatedTree::applyPendingChangesLocked()
     // Do this at the end because it requires looking up the root node by ID, so doing it at the end
     // ensures all additions to m_readerThreadNodeMap have been made by now.
     applyPendingRootNodeLocked();
+
+    walkTreeStructure(m_pendingTreeStructure, m_rootNode);
 }
 
 void AXIsolatedTree::sortedLiveRegionsDidChange(Vector<AXID> liveRegionIDs)
@@ -1424,6 +1599,7 @@ void AXIsolatedTree::sortedLiveRegionsDidChange(Vector<AXID> liveRegionIDs)
 
     Locker locker { m_changeLogLock };
     m_pendingSortedLiveRegionIDs = WTFMove(liveRegionIDs);
+    setPendingTreeStructure();
 }
 
 void AXIsolatedTree::sortedNonRootWebAreasDidChange(Vector<AXID> webAreaIDs)
@@ -1435,6 +1611,7 @@ void AXIsolatedTree::sortedNonRootWebAreasDidChange(Vector<AXID> webAreaIDs)
     // not ad-hoc whenever the main-thread changes them. Otherwise we could sync IDs to the accessibility thread that don't have isolated objects
     // until the next actual tree-update cycle.
     m_pendingSortedNonRootWebAreaIDs = WTFMove(webAreaIDs);
+    setPendingTreeStructure();
 }
 
 AXTreePtr findAXTree(Function<bool(AXTreePtr)>&& match)
@@ -1554,6 +1731,7 @@ void AXIsolatedTree::processQueuedNodeUpdates()
         Locker lock { m_changeLogLock };
         m_pendingMostRecentlyPaintedText = cache->mostRecentlyPaintedText();
         m_mostRecentlyPaintedTextIsDirty = false;
+        setPendingTreeStructure();
     }
 
     queueRemovalsAndUnresolvedChanges();

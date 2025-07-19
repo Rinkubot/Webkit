@@ -391,6 +391,14 @@ struct IsolatedObjectData {
     }
 };
 
+struct TreeStructureNode {
+    TreeStructureNode(AXID axid_) : axid(axid_) { }
+
+    AXID axid;
+    Vector<AXID> children;
+    AccessibilityRole role;
+};
+
 DECLARE_ALLOCATOR_WITH_HEAP_IDENTIFIER(AXIsolatedTree);
 class AXIsolatedTree : public ThreadSafeRefCountedAndCanMakeThreadSafeWeakPtr<AXIsolatedTree>
     , public AXTreeStore<AXIsolatedTree> {
@@ -501,6 +509,7 @@ public:
     // Both setPendingRootNodeLocked and setFocusedNodeID are called during the generation
     // of the IsolatedTree.
     // Focused node updates in AXObjectCache use setFocusNodeID.
+    void setPendingTreeStructure();
     void setPendingRootNodeID(AXID);
     void setPendingRootNodeIDLocked(AXID) WTF_REQUIRES_LOCK(m_changeLogLock);
     void setFocusedNodeID(std::optional<AXID>);
@@ -637,6 +646,7 @@ private:
     RefPtr<AXIsolatedObject> m_rootNode;
 
     // Written to by main thread under lock, accessed and applied by AX thread.
+    Vector<TreeStructureNode> m_pendingTreeStructure;
     Markable<AXID> m_pendingRootNodeID WTF_GUARDED_BY_LOCK(m_changeLogLock);
     Vector<NodeChange> m_pendingAppends WTF_GUARDED_BY_LOCK(m_changeLogLock); // Nodes to be added to the tree and platform-wrapped.
     Vector<AXPropertyChange> m_pendingPropertyChanges WTF_GUARDED_BY_LOCK(m_changeLogLock);
