@@ -47,6 +47,8 @@ JSC_DEFINE_HOST_FUNCTION(constructJSWebAssemblyGlobal, (JSGlobalObject* globalOb
     VM& vm = globalObject->vm();
     auto throwScope = DECLARE_THROW_SCOPE(vm);
 
+    vm.willCallNativeConstructor("Global"_s);
+
     JSObject* newTarget = asObject(callFrame->newTarget());
     Structure* webAssemblyGlobalStructure = JSC_GET_DERIVED_STRUCTURE(vm, webAssemblyGlobalStructure, newTarget, callFrame->jsCallee());
     RETURN_IF_EXCEPTION(throwScope, { });

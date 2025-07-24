@@ -42,6 +42,7 @@
 #include "FormData.h"
 #include "HitTestResult.h"
 #include "InspectorInstrumentationPublic.h"
+#include "JSDOMGlobalObject.h"
 #include "LocalFrame.h"
 #include "LocalFrameView.h"
 #include "Page.h"
@@ -169,6 +170,8 @@ public:
 
     static void willCallFunction(ScriptExecutionContext*, const String& scriptName, int scriptLine, int scriptColumn);
     static void didCallFunction(ScriptExecutionContext*);
+    static void willCallNativeConstructor(JSC::JSGlobalObject*, const String& className);
+
     static void didAddEventListener(EventTarget&, const AtomString& eventType, EventListener&, bool capture);
     static void willRemoveEventListener(EventTarget&, const AtomString& eventType, EventListener&, bool capture);
     static bool isEventListenerDisabled(EventTarget&, const AtomString& eventType, EventListener&, bool capture);
@@ -401,6 +404,8 @@ private:
 
     static void willCallFunctionImpl(InstrumentingAgents&, const String& scriptName, int scriptLine, int scriptColumn);
     static void didCallFunctionImpl(InstrumentingAgents&);
+    static void willCallNativeConstructorImpl(InstrumentingAgents&, const String& className);
+
     static void didAddEventListenerImpl(InstrumentingAgents&, EventTarget&, const AtomString& eventType, EventListener&, bool capture);
     static void willRemoveEventListenerImpl(InstrumentingAgents&, EventTarget&, const AtomString& eventType, EventListener&, bool capture);
     static bool isEventListenerDisabledImpl(InstrumentingAgents&, EventTarget&, const AtomString& eventType, EventListener&, bool capture);
@@ -915,6 +920,14 @@ inline void InspectorInstrumentation::didCallFunction(ScriptExecutionContext* co
     FAST_RETURN_IF_NO_FRONTENDS(void());
     if (auto* agents = instrumentingAgents(context))
         didCallFunctionImpl(*agents);
+}
+
+inline void InspectorInstrumentation::willCallNativeConstructor(JSC::JSGlobalObject* lexicalGlobalObject, const String& className)
+{
+    FAST_RETURN_IF_NO_FRONTENDS(void());
+    auto* globalObject = JSC::jsDynamicCast<JSDOMGlobalObject*>(lexicalGlobalObject);
+    if (auto* agents = instrumentingAgents(globalObject ? globalObject->scriptExecutionContext() : nullptr))
+        willCallNativeConstructorImpl(*agents, className);
 }
 
 inline void InspectorInstrumentation::willDispatchEvent(ScriptExecutionContext& context, const Event& event)

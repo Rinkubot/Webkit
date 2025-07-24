@@ -98,12 +98,16 @@ static inline JSArray* constructArrayWithSizeQuirk(JSGlobalObject* globalObject,
 
 JSC_DEFINE_HOST_FUNCTION(constructWithArrayConstructor, (JSGlobalObject* globalObject, CallFrame* callFrame))
 {
+    globalObject->vm().willCallNativeConstructor("Array"_s);
+
     ArgList args(callFrame);
     return JSValue::encode(constructArrayWithSizeQuirk(globalObject, args, callFrame->newTarget()));
 }
 
 JSC_DEFINE_HOST_FUNCTION(callArrayConstructor, (JSGlobalObject* globalObject, CallFrame* callFrame))
 {
+    globalObject->vm().willCallNativeConstructor("Array"_s);
+
     ArgList args(callFrame);
     return JSValue::encode(constructArrayWithSizeQuirk(globalObject, args, JSValue()));
 }

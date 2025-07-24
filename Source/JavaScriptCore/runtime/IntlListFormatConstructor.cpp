@@ -83,6 +83,8 @@ JSC_DEFINE_HOST_FUNCTION(constructIntlListFormat, (JSGlobalObject* globalObject,
     VM& vm = globalObject->vm();
     auto scope = DECLARE_THROW_SCOPE(vm);
 
+    vm.willCallNativeConstructor("ListFormat"_s);
+
     JSObject* newTarget = asObject(callFrame->newTarget());
     Structure* structure = JSC_GET_DERIVED_STRUCTURE(vm, listFormatStructure, newTarget, callFrame->jsCallee());
     RETURN_IF_EXCEPTION(scope, { });

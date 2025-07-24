@@ -59,6 +59,9 @@ void SuppressedErrorConstructor::finishCreation(VM& vm, SuppressedErrorPrototype
 JSC_DEFINE_HOST_FUNCTION(callSuppressedErrorConstructor, (JSGlobalObject* globalObject, CallFrame* callFrame))
 {
     VM& vm = globalObject->vm();
+
+    vm.willCallNativeConstructor("SuppressedError"_s);
+
     JSValue error = callFrame->argument(0);
     JSValue suppressed = callFrame->argument(1);
     JSValue message = callFrame->argument(2);
@@ -70,6 +73,9 @@ JSC_DEFINE_HOST_FUNCTION(constructSuppressedErrorConstructor, (JSGlobalObject* g
 {
     VM& vm = globalObject->vm();
     auto scope = DECLARE_THROW_SCOPE(vm);
+
+    vm.willCallNativeConstructor("SuppressedError"_s);
+
     JSValue error = callFrame->argument(0);
     JSValue suppressed = callFrame->argument(1);
     JSValue message = callFrame->argument(2);

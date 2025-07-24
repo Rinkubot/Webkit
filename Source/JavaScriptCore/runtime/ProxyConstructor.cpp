@@ -82,6 +82,8 @@ void ProxyConstructor::finishCreation(VM& vm, JSGlobalObject* globalObject)
 
 JSC_DEFINE_HOST_FUNCTION(constructProxyObject, (JSGlobalObject* globalObject, CallFrame* callFrame))
 {
+    globalObject->vm().willCallNativeConstructor("Proxy"_s);
+
     JSValue target = callFrame->argument(0);
     JSValue handler = callFrame->argument(1);
     return JSValue::encode(ProxyObject::create(globalObject, target, handler));

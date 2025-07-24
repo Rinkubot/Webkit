@@ -1775,6 +1775,18 @@ void VM::invalidateStructureChainIntegrity(StructureChainIntegrityEvent)
         megamorphicCache->bumpEpoch();
 }
 
+void VM::didCreateNativeExecutableForDebuggers(NativeExecutable* nativeExecutable)
+{
+    for (auto* debugger = m_debuggers.head(); debugger; debugger = debugger->next())
+        debugger->didCreateNativeExecutable(nativeExecutable);
+}
+
+void VM::willCallNativeConstructorForDebuggers(const String& className)
+{
+    for (auto* debugger = m_debuggers.head(); debugger; debugger = debugger->next())
+        debugger->willCallNativeConstructor(className);
+}
+
 VM::DrainMicrotaskDelayScope::DrainMicrotaskDelayScope(VM& vm)
     : m_vm(&vm)
 {

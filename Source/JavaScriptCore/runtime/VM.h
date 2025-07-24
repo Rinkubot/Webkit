@@ -131,6 +131,7 @@ class FuzzerAgent;
 class HasOwnPropertyCache;
 class HeapAnalyzer;
 class HeapProfiler;
+class InternalFunction;
 class IntlCache;
 class JSDestructibleObjectHeapCellType;
 class JSGlobalObject;
@@ -961,8 +962,17 @@ public:
 
     void addDebugger(Debugger&);
     void removeDebugger(Debugger&);
-    template<typename Func>
-    void forEachDebugger(const Func&);
+
+    ALWAYS_INLINE void didCreateNativeExecutable(NativeExecutable* nativeExecutable)
+    {
+        if (!m_debuggers.isEmpty()) [[unlikely]]
+            didCreateNativeExecutableForDebuggers(nativeExecutable);
+    }
+    ALWAYS_INLINE void willCallNativeConstructor(const String& className)
+    {
+        if (!m_debuggers.isEmpty()) [[unlikely]]
+            willCallNativeConstructorForDebuggers(className);
+    }
 
     void changeNumberOfActiveJITPlans(int64_t value)
     {
@@ -1032,6 +1042,9 @@ private:
 
     void callPromiseRejectionCallback(Strong<JSPromise>&);
     void didExhaustMicrotaskQueue();
+
+    void didCreateNativeExecutableForDebuggers(NativeExecutable*);
+    JS_EXPORT_PRIVATE void willCallNativeConstructorForDebuggers(const String& className);
 
 #if ENABLE(GC_VALIDATION)
     const ClassInfo* m_initializingObjectClass { nullptr };

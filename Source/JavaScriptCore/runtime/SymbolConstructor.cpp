@@ -82,6 +82,8 @@ JSC_DEFINE_HOST_FUNCTION(callSymbol, (JSGlobalObject* globalObject, CallFrame* c
     VM& vm = globalObject->vm();
     auto scope = DECLARE_THROW_SCOPE(vm);
 
+    vm.willCallNativeConstructor("Symbol"_s);
+
     JSValue description = callFrame->argument(0);
     if (description.isUndefined())
         return JSValue::encode(Symbol::create(vm));
@@ -95,6 +97,9 @@ JSC_DEFINE_HOST_FUNCTION(constructSymbol, (JSGlobalObject* globalObject, CallFra
 {
     VM& vm = globalObject->vm();
     auto scope = DECLARE_THROW_SCOPE(vm);
+
+    vm.willCallNativeConstructor("Symbol"_s);
+
     return throwVMError(globalObject, scope, createNotAConstructorError(globalObject, callFrame->jsCallee()));
 }
 

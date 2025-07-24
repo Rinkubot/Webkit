@@ -36,6 +36,8 @@ static JSC_DECLARE_HOST_FUNCTION(constructWithBooleanConstructor);
 // ECMA 15.6.1
 JSC_DEFINE_HOST_FUNCTION(callBooleanConstructor, (JSGlobalObject* globalObject, CallFrame* callFrame))
 {
+    globalObject->vm().willCallNativeConstructor("Boolean"_s);
+
     return JSValue::encode(jsBoolean(callFrame->argument(0).toBoolean(globalObject)));
 }
 
@@ -44,6 +46,9 @@ JSC_DEFINE_HOST_FUNCTION(constructWithBooleanConstructor, (JSGlobalObject* globa
 {
     VM& vm = globalObject->vm();
     auto scope = DECLARE_THROW_SCOPE(vm);
+
+    vm.willCallNativeConstructor("Boolean"_s);
+
     JSValue boolean = jsBoolean(callFrame->argument(0).toBoolean(globalObject));
 
     JSObject* newTarget = asObject(callFrame->newTarget());

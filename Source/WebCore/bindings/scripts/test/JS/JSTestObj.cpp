@@ -34,6 +34,7 @@
 #include "ExtendedDOMIsoSubspaces.h"
 #include "HTMLNames.h"
 #include "IDLTypes.h"
+#include "InspectorInstrumentation.h"
 #include "JSBlob.h"
 #include "JSDOMAttribute.h"
 #include "JSDOMBinding.h"
@@ -2279,6 +2280,7 @@ static_assert(TestObj::readonly == 0, "readonly in TestObj does not match value 
 
 template<> EncodedJSValue JSC_HOST_CALL_ATTRIBUTES JSTestObjDOMConstructor::construct(JSGlobalObject* lexicalGlobalObject, CallFrame* callFrame)
 {
+    InspectorInstrumentation::willCallNativeConstructor(lexicalGlobalObject, "TestObject"_s);
     SUPPRESS_UNCOUNTED_LOCAL auto& vm = lexicalGlobalObject->vm();
     auto throwScope = DECLARE_THROW_SCOPE(vm);
     auto* castedThis = jsCast<JSTestObjDOMConstructor*>(callFrame->jsCallee());

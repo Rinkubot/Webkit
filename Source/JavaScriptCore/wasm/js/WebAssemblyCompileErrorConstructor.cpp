@@ -43,6 +43,9 @@ JSC_DEFINE_HOST_FUNCTION(constructJSWebAssemblyCompileError, (JSGlobalObject* gl
 {
     auto& vm = globalObject->vm();
     auto scope = DECLARE_THROW_SCOPE(vm);
+
+    vm.willCallNativeConstructor("CompileError"_s);
+
     JSValue message = callFrame->argument(0);
     JSValue options = callFrame->argument(1);
 
@@ -55,6 +58,8 @@ JSC_DEFINE_HOST_FUNCTION(constructJSWebAssemblyCompileError, (JSGlobalObject* gl
 
 JSC_DEFINE_HOST_FUNCTION(callJSWebAssemblyCompileError, (JSGlobalObject* globalObject, CallFrame* callFrame))
 {
+    globalObject->vm().willCallNativeConstructor("CompileError"_s);
+
     JSValue message = callFrame->argument(0);
     JSValue options = callFrame->argument(1);
     Structure* errorStructure = globalObject->webAssemblyCompileErrorStructure();

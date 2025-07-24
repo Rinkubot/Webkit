@@ -41,12 +41,16 @@ static JSC_DECLARE_HOST_FUNCTION(constructGeneratorFunctionConstructor);
 
 JSC_DEFINE_HOST_FUNCTION(callGeneratorFunctionConstructor, (JSGlobalObject* globalObject, CallFrame* callFrame))
 {
+    globalObject->vm().willCallNativeConstructor("GeneratorFunction"_s);
+
     ArgList args(callFrame);
     return JSValue::encode(constructFunction(globalObject, callFrame, args, FunctionConstructionMode::Generator));
 }
 
 JSC_DEFINE_HOST_FUNCTION(constructGeneratorFunctionConstructor, (JSGlobalObject* globalObject, CallFrame* callFrame))
 {
+    globalObject->vm().willCallNativeConstructor("GeneratorFunction"_s);
+
     ArgList args(callFrame);
     return JSValue::encode(constructFunction(globalObject, callFrame, args, FunctionConstructionMode::Generator, callFrame->newTarget()));
 }

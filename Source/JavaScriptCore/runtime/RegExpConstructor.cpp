@@ -397,12 +397,16 @@ JSC_DEFINE_HOST_FUNCTION(esSpecIsRegExp, (JSGlobalObject* globalObject, CallFram
 
 JSC_DEFINE_HOST_FUNCTION(constructWithRegExpConstructor, (JSGlobalObject* globalObject, CallFrame* callFrame))
 {
+    globalObject->vm().willCallNativeConstructor("RegExp"_s);
+
     ArgList args(callFrame);
     return JSValue::encode(constructRegExp(globalObject, args, callFrame->jsCallee(), callFrame->newTarget()));
 }
 
 JSC_DEFINE_HOST_FUNCTION(callRegExpConstructor, (JSGlobalObject* globalObject, CallFrame* callFrame))
 {
+    globalObject->vm().willCallNativeConstructor("RegExp"_s);
+
     ArgList args(callFrame);
     return JSValue::encode(constructRegExp(globalObject, args, callFrame->jsCallee()));
 }

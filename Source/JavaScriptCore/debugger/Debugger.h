@@ -161,8 +161,9 @@ public:
     void registerCodeBlock(CodeBlock*);
     void forEachRegisteredCodeBlock(NOESCAPE const Function<void(CodeBlock*)>&);
 
-    void didCreateNativeExecutable(NativeExecutable&);
+    void didCreateNativeExecutable(NativeExecutable*);
     void willCallNativeExecutable(CallFrame*);
+    void willCallNativeConstructor(const String& className);
 
     class Client {
     public:
@@ -199,8 +200,9 @@ public:
         virtual void didParseSource(SourceID, const Debugger::Script&) { }
         virtual void failedToParseSource(const String& /* url */, const String& /* data */, int /* firstLine */, int /* errorLine */, const String& /* errorMessage */) { }
 
-        virtual void didCreateNativeExecutable(NativeExecutable&) { }
+        virtual void didCreateNativeExecutable(NativeExecutable*) { }
         virtual void willCallNativeExecutable(CallFrame*) { }
+        virtual void willCallNativeConstructor(const String& /* className */) { }
 
         virtual void willEnter(CallFrame*) { }
 

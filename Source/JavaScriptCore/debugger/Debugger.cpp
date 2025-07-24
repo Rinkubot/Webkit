@@ -276,7 +276,7 @@ void Debugger::forEachRegisteredCodeBlock(NOESCAPE const Function<void(CodeBlock
     });
 }
 
-void Debugger::didCreateNativeExecutable(NativeExecutable& nativeExecutable)
+void Debugger::didCreateNativeExecutable(NativeExecutable* nativeExecutable)
 {
     dispatchFunctionToObservers([&] (Observer& observer) {
         observer.didCreateNativeExecutable(nativeExecutable);
@@ -287,6 +287,13 @@ void Debugger::willCallNativeExecutable(CallFrame* callFrame)
 {
     dispatchFunctionToObservers([&] (Observer& observer) {
         observer.willCallNativeExecutable(callFrame);
+    });
+}
+
+void Debugger::willCallNativeConstructor(const String& className)
+{
+    dispatchFunctionToObservers([&] (Observer& observer) {
+        observer.willCallNativeConstructor(className);
     });
 }
 
