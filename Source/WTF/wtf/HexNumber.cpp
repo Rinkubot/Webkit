@@ -31,6 +31,13 @@ namespace WTF {
 
 namespace Internal {
 
+static const std::array<LChar, 16>& hexDigitsForMode(HexConversionMode mode)
+{
+    static constinit std::array<LChar, 16> lowercaseHexDigits { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' };
+    static constinit std::array<LChar, 16> uppercaseHexDigits { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F' };
+    return mode == Lowercase ? lowercaseHexDigits : uppercaseHexDigits;
+}
+
 std::span<LChar> appendHex(std::span<LChar> buffer, std::uintmax_t number, unsigned minimumDigits, HexConversionMode mode)
 {
     size_t startIndex = buffer.size();

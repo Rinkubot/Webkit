@@ -69,9 +69,8 @@ static std::optional<Vector<Ref<SharedBuffer>>> extractKeyIDsKeyids(const Shared
     // https://w3c.github.io/encrypted-media/format-registry/initdata/keyids.html#format
     if (buffer.size() > std::numeric_limits<unsigned>::max())
         return std::nullopt;
-    String json { buffer.span() };
 
-    auto value = JSON::Value::parseJSON(json);
+    auto value = JSON::Value::parseJSON(byteCast<LChar>(buffer.span()));
     if (!value)
         return std::nullopt;
 

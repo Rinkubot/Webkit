@@ -22,13 +22,12 @@
 
 #pragma once
 
-#include <wtf/Compiler.h>
-
 #include <limits.h>
 #include <unicode/ustring.h>
 #include <wtf/ASCIICType.h>
 #include <wtf/CheckedArithmetic.h>
 #include <wtf/CompactPtr.h>
+#include <wtf/Compiler.h>
 #include <wtf/DebugHeap.h>
 #include <wtf/Expected.h>
 #include <wtf/MathExtras.h>
@@ -252,8 +251,11 @@ public:
 
     WTF_EXPORT_PRIVATE static Ref<StringImpl> create(std::span<const char16_t>);
     WTF_EXPORT_PRIVATE static Ref<StringImpl> create(std::span<const LChar>);
-    ALWAYS_INLINE static Ref<StringImpl> create(std::span<const char> characters) { return create(byteCast<LChar>(characters)); }
+    enum class ReplaceInvalidSequences : bool { No, Yes };
+    WTF_EXPORT_PRIVATE static RefPtr<StringImpl> create(std::span<const char8_t>, ReplaceInvalidSequences);
     WTF_EXPORT_PRIVATE static Ref<StringImpl> create8BitIfPossible(std::span<const char16_t>);
+
+    ALWAYS_INLINE static Ref<StringImpl> create(std::span<const char> characters) { return create(byteCast<LChar>(characters)); }
 
     // Not using create() naming to encourage developers to call create(ASCIILiteral) when they have a string literal.
     ALWAYS_INLINE static Ref<StringImpl> createFromCString(const char* characters) { return create(unsafeSpan8(characters)); }
@@ -269,7 +271,7 @@ public:
     WTF_EXPORT_PRIVATE static Ref<StringImpl> createUninitialized(size_t length, std::span<LChar>&);
     WTF_EXPORT_PRIVATE static Ref<StringImpl> createUninitialized(size_t length, std::span<char16_t>&);
 
-    template<typename CharacterType> static RefPtr<StringImpl> tryCreateUninitialized(size_t length, std::span<CharacterType>&);
+    template<IsStringStorageCharacter CharacterType> static RefPtr<StringImpl> tryCreateUninitialized(size_t length, std::span<CharacterType>&);
 
     static Ref<StringImpl> createByReplacingInCharacters(std::span<const LChar>, char16_t target, char16_t replacement, size_t indexOfFirstTargetCharacter);
     static Ref<StringImpl> createByReplacingInCharacters(std::span<const char16_t>, char16_t target, char16_t replacement, size_t indexOfFirstTargetCharacter);
@@ -297,7 +299,7 @@ public:
     static constexpr unsigned maskStringKind() { return s_hashMaskStringKind; }
     static constexpr unsigned dataOffset() { return OBJECT_OFFSETOF(StringImpl, m_data8); }
 
-    template<typename CharacterType, size_t inlineCapacity, typename OverflowHandler, size_t minCapacity, typename Malloc>
+    template<IsStringStorageCharacter CharacterType, size_t inlineCapacity, typename OverflowHandler, size_t minCapacity, typename Malloc>
     static Ref<StringImpl> adopt(Vector<CharacterType, inlineCapacity, OverflowHandler, minCapacity, Malloc>&&);
 
     WTF_EXPORT_PRIVATE static Ref<StringImpl> adopt(StringBuffer<char16_t>&&);
@@ -311,7 +313,7 @@ public:
     ALWAYS_INLINE std::span<const LChar> span8() const LIFETIME_BOUND { ASSERT(is8Bit()); return unsafeMakeSpan(m_data8, length()); }
     ALWAYS_INLINE std::span<const char16_t> span16() const LIFETIME_BOUND { ASSERT(!is8Bit() || isEmpty()); return unsafeMakeSpan(m_data16, length()); }
 
-    template<typename CharacterType> std::span<const CharacterType> span() const LIFETIME_BOUND;
+    template<IsStringStorageCharacter CharacterType> std::span<const CharacterType> span() const LIFETIME_BOUND;
 
     size_t cost() const;
     size_t costDuringGC();
@@ -417,7 +419,7 @@ public:
     {
         static_assert(sizeof(char16_t) == sizeof(uint16_t));
         static_assert(sizeof(LChar) == sizeof(uint8_t));
-        return copyElements(spanReinterpretCast<uint16_t>(destination), source);
+        return copyElements(spanReinterpretCast<uint16_t>(destination), spanReinterpretCast<const uint8_t>(source));
     }
 
     ALWAYS_INLINE static void copyCharacters(std::span<LChar> destination, std::span<const char16_t> source)
@@ -428,7 +430,7 @@ public:
         for (auto character : source)
             ASSERT(isLatin1(character));
 #endif
-        return copyElements(destination, spanReinterpretCast<const uint16_t>(source));
+        return copyElements(spanReinterpretCast<uint8_t>(destination), spanReinterpretCast<const uint16_t>(source));
     }
 
     // Some string features, like reference counting and the atomicity flag, are not
@@ -1034,7 +1036,7 @@ ALWAYS_INLINE Ref<StringImpl> StringImpl::createSubstringSharingImpl(StringImpl&
     return adoptRef(*new (NotNull, stringImpl) StringImpl(rep.span16().subspan(offset, length), *ownerRep));
 }
 
-template<typename CharacterType> ALWAYS_INLINE RefPtr<StringImpl> StringImpl::tryCreateUninitialized(size_t length, std::span<CharacterType>& output)
+template<IsStringStorageCharacter CharacterType> ALWAYS_INLINE RefPtr<StringImpl> StringImpl::tryCreateUninitialized(size_t length, std::span<CharacterType>& output)
 {
     if (!length) {
         output = { };
@@ -1055,7 +1057,7 @@ template<typename CharacterType> ALWAYS_INLINE RefPtr<StringImpl> StringImpl::tr
     return constructInternal<CharacterType>(*result, length);
 }
 
-template<typename CharacterType, size_t inlineCapacity, typename OverflowHandler, size_t minCapacity, typename Malloc>
+template<IsStringStorageCharacter CharacterType, size_t inlineCapacity, typename OverflowHandler, size_t minCapacity, typename Malloc>
 inline Ref<StringImpl> StringImpl::adopt(Vector<CharacterType, inlineCapacity, OverflowHandler, minCapacity, Malloc>&& vector)
 {
     if constexpr (std::is_same_v<Malloc, StringImplMalloc>) {
@@ -1159,7 +1161,7 @@ inline void StringImpl::deref()
 
 inline char16_t StringImpl::at(unsigned i) const
 {
-    return is8Bit() ? span8()[i] : span16()[i];
+    return is8Bit() ? char16_t { span8()[i] } : span16()[i];
 }
 
 inline StringImpl::StringImpl(CreateSymbolTag, std::span<const LChar> characters)
@@ -1353,7 +1355,7 @@ inline Ref<StringImpl> StringImpl::createByReplacingInCharacters(std::span<const
     auto newImpl = createUninitializedInternalNonEmpty(characters.size(), data);
     size_t i = 0;
     for (auto character : characters)
-        data[i++] = character == target ? replacement : character;
+        data[i++] = character == target ? replacement : char16_t { character };
     return newImpl;
 }
 

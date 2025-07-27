@@ -89,8 +89,8 @@ static constexpr size_t maxInputSampleSize = 128;
 static String trimInputSample(std::span<const uint8_t> input)
 {
     if (input.size() <= maxInputSampleSize)
-        return input;
-    return makeString(input.first(maxInputSampleSize), horizontalEllipsis);
+        return byteCast<LChar>(input);
+    return makeString(byteCast<LChar>(input.first(maxInputSampleSize)), horizontalEllipsis);
 }
 
 static String generateSecWebSocketKey()
@@ -413,13 +413,13 @@ int WebSocketHandshake::readStatusLine(std::span<const uint8_t> header, int& sta
         return lineLength;
     }
 
-    StringView httpStatusLine(header.first(*firstSpaceIndex));
+    StringView httpStatusLine(byteCast<LChar>(header.first(*firstSpaceIndex)));
     if (!headerHasValidHTTPVersion(httpStatusLine)) {
         m_failureReason = makeString("Invalid HTTP version string: "_s, httpStatusLine);
         return lineLength;
     }
 
-    StringView statusCodeString(header.subspan(*firstSpaceIndex + 1, *secondSpaceIndex - *firstSpaceIndex - 1));
+    StringView statusCodeString(byteCast<LChar>(header.subspan(*firstSpaceIndex + 1, *secondSpaceIndex - *firstSpaceIndex - 1)));
     if (statusCodeString.length() != 3) // Status code must consist of three digits.
         return lineLength;
     for (int i = 0; i < 3; ++i) {
@@ -430,7 +430,7 @@ int WebSocketHandshake::readStatusLine(std::span<const uint8_t> header, int& sta
     }
 
     statusCode = parseInteger<int>(statusCodeString).value();
-    statusText = String(header.subspan(*secondSpaceIndex + 1, index - *secondSpaceIndex - 3)); // Exclude "\r\n".
+    statusText = String(byteCast<LChar>(header.subspan(*secondSpaceIndex + 1, index - *secondSpaceIndex - 3))); // Exclude "\r\n".
     return lineLength;
 }
 

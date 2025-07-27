@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 Apple Inc. All rights reserved.
+ * Copyright (C) 2014-2025 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -26,7 +26,90 @@
 
 #pragma once
 
-// A type to hold a single Latin-1 character.
-// This type complements the char16_t type that we get from C++.
-// To parallel that type, we put this one in the global namespace.
-typedef unsigned char LChar;
+#include <wtf/StdLibExtras.h>
+
+namespace WTF {
+
+// Single Latin-1 character. Complements char8_t for UTF-8, char16_t for UTF-16, char32_t for UTF-32.
+struct LChar {
+    uint8_t value;
+
+    LChar() = default;
+    constexpr LChar(std::integral auto value) : value { static_cast<uint8_t>(value) } { }
+    constexpr operator std::integral auto() const { return value; }
+    constexpr bool operator !() const { return !value; }
+    constexpr bool operator ==(const LChar&) const = default;
+    constexpr auto operator <=>(const LChar&) const = default;
+};
+
+constexpr bool operator == (LChar a, std::integral auto b)
+{
+    return a.value == b;
+}
+
+constexpr auto operator <=> (LChar a, std::integral auto b)
+{
+    return a.value <=> b;
+}
+
+constexpr LChar operator + (LChar a, std::integral auto b)
+{
+    return a.value + b;
+}
+
+constexpr LChar operator - (LChar a, std::integral auto b)
+{
+    return a.value - b;
+}
+
+constexpr LChar operator & (LChar a, std::integral auto b)
+{
+    return a.value & b;
+}
+
+constexpr LChar operator | (LChar a, std::integral auto b)
+{
+    return a.value | b;
+}
+
+constexpr LChar operator % (LChar a, std::integral auto b)
+{
+    return a.value % b;
+}
+
+constexpr LChar& operator += (LChar& a, std::integral auto b)
+{
+    a.value += b;
+    return a;
+}
+
+constexpr LChar& operator -= (LChar& a, std::integral auto b)
+{
+    a.value -= b;
+    return a;
+}
+
+constexpr LChar& operator &= (LChar& a, std::integral auto b)
+{
+    a.value &= b;
+    return a;
+}
+
+constexpr LChar& operator |= (LChar& a, std::integral auto b)
+{
+    a.value |= b;
+    return a;
+}
+
+constexpr LChar& operator %= (LChar& a, std::integral auto b)
+{
+    a.value %= b;
+    return a;
+}
+
+template<typename CharacterType>
+concept IsStringStorageCharacter = std::same_as<CharacterType, LChar> || std::same_as<CharacterType, char16_t>;
+
+}
+
+using WTF::LChar;

@@ -623,7 +623,7 @@ ALWAYS_INLINE T Lexer<T>::peek(int offset) const
 {
     ASSERT(offset > 0 && offset < 5);
     const T* code = m_code + offset;
-    return (code < m_codeEnd) ? *code : 0;
+    return (code < m_codeEnd) ? *code : T { };
 }
 
 struct ParsedUnicodeEscapeValue {
@@ -1398,7 +1398,6 @@ template <bool shouldBuildStrings> auto Lexer<T>::parseStringSlowCase(JSTokenDat
         }
         // Fast check for characters that require special handling.
         // Catches 0, \n, and \r as efficiently as possible, and lets through all common ASCII characters.
-        static_assert(std::is_unsigned<T>::value, "Lexer expects an unsigned character type");
         if (m_current < 0xE) [[unlikely]] {
             // New-line or end of input is not allowed
             if (atEnd() || m_current == '\r' || m_current == '\n') {

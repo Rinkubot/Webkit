@@ -322,7 +322,7 @@ NSData *originalURLData(NSURL *URL)
 
 NSString *userVisibleString(NSURL *URL)
 {
-    return URLHelpers::userVisibleURL(span(originalURLData(URL))).createNSString().autorelease();
+    return URLHelpers::userVisibleURL(byteCast<LChar>(span(originalURLData(URL)))).createNSString().autorelease();
 }
 
 BOOL isUserVisibleURL(NSString *string)
