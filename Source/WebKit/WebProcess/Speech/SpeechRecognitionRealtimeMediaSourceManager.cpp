@@ -203,13 +203,13 @@ void SpeechRecognitionRealtimeMediaSourceManager::deleteSource(RealtimeMediaSour
 
 void SpeechRecognitionRealtimeMediaSourceManager::start(RealtimeMediaSourceIdentifier identifier)
 {
-    if (auto source = m_sources.get(identifier))
+    if (RefPtr source = m_sources.get(identifier))
         source->start();
 }
 
 void SpeechRecognitionRealtimeMediaSourceManager::stop(RealtimeMediaSourceIdentifier identifier)
 {
-    if (auto source = m_sources.get(identifier))
+    if (RefPtr source = m_sources.get(identifier))
         source->stop();
 }
 

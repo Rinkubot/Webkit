@@ -456,7 +456,7 @@ void WebSWClientConnection::focusServiceWorkerClient(ScriptExecutionContextIdent
                 }
 
                 page->focusController().setFocusedFrame(frame.get());
-                callback(ServiceWorkerClientData::from(*document));
+                callback(ServiceWorkerClientData::from(Ref { *document }));
             });
         };
 
