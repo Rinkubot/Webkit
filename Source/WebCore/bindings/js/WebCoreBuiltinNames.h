@@ -191,6 +191,7 @@ namespace WebCore {
     macro(DeprecationReportBody) \
     macro(DigitalCredential) \
     macro(DocumentTimeline) \
+    macro(DOMException) \
     macro(DynamicsCompressorNode) \
     macro(ElementInternals) \
     macro(EncodedAudioChunk) \
