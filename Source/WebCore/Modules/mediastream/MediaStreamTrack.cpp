@@ -682,7 +682,7 @@ ScriptExecutionContext* MediaStreamTrack::scriptExecutionContext() const
 #if !RELEASE_LOG_DISABLED
 WTFLogChannel& MediaStreamTrack::logChannel() const
 {
-    return LogWebRTC;
+    return LogMedia;
 }
 #endif
 
