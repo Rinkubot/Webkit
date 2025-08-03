@@ -1160,7 +1160,7 @@ void NetworkResourceLoader::didFinishLoading(const NetworkLoadMetrics& networkLo
             contentFilter->stopFilteringMainResource();
         }
 #endif
-        send(Messages::WebResourceLoader::DidFinishResourceLoad(networkLoadMetrics));
+        sendDidFinishResourceLoad(networkLoadMetrics);
     }
 
 #if ENABLE(CONTENT_EXTENSIONS)
@@ -1174,6 +1174,19 @@ void NetworkResourceLoader::didFinishLoading(const NetworkLoadMetrics& networkLo
         protectedConnectionToWebProcess()->networkProcess().protectedParentProcessConnection()->send(Messages::NetworkProcessProxy::ResourceLoadDidCompleteWithError(webPageProxyID(), resourceLoadInfo(), m_response, { }), 0);
 
     cleanup(LoadResult::Success);
+}
+
+void NetworkResourceLoader::sendDidFinishResourceLoad(const NetworkLoadMetrics& networkLoadMetrics)
+{
+    if (m_didChangeOfNetworkLoad && m_parameters.options.mode != FetchOptions::Mode::Navigate && !networkLoadMetrics.failsTAOCheck) {
+        auto updatedNetworkLoadMetrics = networkLoadMetrics;
+        updatedNetworkLoadMetrics.redirectCount = m_redirectCount;
+        if (m_networkLoadChecker && !m_networkLoadChecker->isSameOriginRequest())
+            updatedNetworkLoadMetrics.hasCrossOriginRedirect = true;
+        send(Messages::WebResourceLoader::DidFinishResourceLoad(updatedNetworkLoadMetrics));
+        return;
+    }
+    send(Messages::WebResourceLoader::DidFinishResourceLoad(networkLoadMetrics));
 }
 
 void NetworkResourceLoader::didFailLoading(const ResourceError& error)
@@ -1444,6 +1457,7 @@ void NetworkResourceLoader::restartNetworkLoad(WebCore::ResourceRequest&& newReq
         networkLoad->cancel();
         networkLoad->clearClient();
         m_networkLoad = nullptr;
+        m_didChangeOfNetworkLoad = true;
     }
 
     completionHandler({ });

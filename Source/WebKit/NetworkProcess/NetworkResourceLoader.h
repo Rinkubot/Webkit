@@ -147,6 +147,8 @@ public:
     void didReceiveChallenge(const WebCore::AuthenticationChallenge&) final;
     bool shouldCaptureExtraNetworkLoadMetrics() const final;
 
+    void sendDidFinishResourceLoad(const WebCore::NetworkLoadMetrics&);
+
     // CrossOriginAccessControlCheckDisabler
     bool crossOriginAccessControlCheckEnabled() const override;
         
@@ -335,6 +337,7 @@ private:
     std::unique_ptr<NetworkCache::Entry> m_cacheEntryWaitingForContinueDidReceiveResponse;
     RefPtr<NetworkLoadChecker> m_networkLoadChecker;
     bool m_shouldRestartLoad { false };
+    bool m_didChangeOfNetworkLoad { false };
     ResponseCompletionHandler m_responseCompletionHandler;
     bool m_shouldCaptureExtraNetworkLoadMetrics { false };
     bool m_isKeptAlive { false };
