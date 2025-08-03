@@ -1107,7 +1107,7 @@ bool SourceBufferPrivate::processMediaSample(SourceBufferPrivateClient& client, 
 
                 MediaTime highestBufferedTime = trackBuffer.maximumBufferedTime();
                 MediaTime eraseBeginTime = trackBuffer.highestPresentationTimestamp();
-                MediaTime eraseEndTime = frameEndTimestamp - contiguousFrameTolerance;
+                MediaTime eraseEndTime = frameEndTimestamp;
 
                 if (eraseEndTime <= eraseBeginTime)
                     break;
@@ -1119,6 +1119,17 @@ bool SourceBufferPrivate::processMediaSample(SourceBufferPrivateClient& client, 
                 } else {
                     // In any other case, perform a binary search (O(log(n)).
                     range = trackBuffer.samples().presentationOrder().findSamplesBetweenPresentationTimes(eraseBeginTime, eraseEndTime);
+                }
+
+                if (range.second != trackBuffer.samples().presentationOrder().end() && !sample->isSync()) {
+                    auto eraseEndTimeMinusTolerance = frameEndTimestamp - contiguousFrameTolerance;
+                    while (range.first != range.second) {
+                        auto& oldSample = *((range.second)->second);
+                        if (oldSample.isSync() || eraseEndTimeMinusTolerance > oldSample.presentationTime()
+                            || sample->duration() != oldSample.duration())
+                            break;
+                        --range.second;
+                    }
                 }
 
                 if (range.first != trackBuffer.samples().presentationOrder().end())
