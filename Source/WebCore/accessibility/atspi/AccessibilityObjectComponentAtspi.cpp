@@ -148,8 +148,9 @@ bool AccessibilityObjectAtspi::focus() const
         return false;
 
     m_coreObject->setFocused(true);
-    m_coreObject->updateBackingStore();
-    return m_coreObject->isFocused();
+    if (m_coreObject)
+        m_coreObject->updateBackingStore();
+    return m_coreObject && m_coreObject->isFocused();
 }
 
 float AccessibilityObjectAtspi::opacity() const
