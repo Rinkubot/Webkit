@@ -1873,6 +1873,7 @@ float RenderText::width(unsigned from, unsigned len, float xPos, bool firstLine,
 
 float RenderText::width(unsigned from, unsigned length, const FontCascade& fontCascade, float xPos, SingleThreadWeakHashSet<const Font>* fallbackFonts, GlyphOverflow* glyphOverflow) const
 {
+    ASSERT(!fallbackFonts);
     ASSERT(from + length <= text().length());
     if (!text().length() || !length)
         return 0.f;
