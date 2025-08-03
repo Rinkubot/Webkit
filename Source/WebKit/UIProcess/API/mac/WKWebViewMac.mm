@@ -1486,6 +1486,11 @@ ALLOW_DEPRECATED_DECLARATIONS_END
 
 - (NSView *)_safeBrowsingWarning
 {
+    return self._browsingWarning;
+}
+
+- (NSView *)_browsingWarning
+{
     return _impl->warningView();
 }
 
