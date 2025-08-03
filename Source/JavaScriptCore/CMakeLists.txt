@@ -1485,6 +1485,10 @@ if (NOT WIN32)
 endif ()
 
 if (COMPILER_IS_GCC_OR_CLANG)
+    # We assume signed integer overflow is wrapping, tell the compiler not
+    # to treat it as undefined behavior.
+    WEBKIT_ADD_TARGET_CXX_FLAGS(JavaScriptCore -fwrapv)
+
     # Avoid using fused multiply-add instructions since this could give different results
     # for e.g. parseInt depending on the platform and compilation flags.
     if (WTF_CPU_LOONGARCH64)
