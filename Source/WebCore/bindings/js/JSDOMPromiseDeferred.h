@@ -215,7 +215,7 @@ private:
     {
     }
 
-    bool shouldIgnoreRequestToFulfill() const { return isEmpty(); }
+    bool shouldIgnoreRequestToFulfill() const { return isEmpty() || activeDOMObjectAreStopped(); }
 
     JSC::JSPromise* deferred() const { return guarded(); }
 
