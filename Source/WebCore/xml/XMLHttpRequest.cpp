@@ -663,8 +663,8 @@ ExceptionOr<void> XMLHttpRequest::createRequest()
         if (loader)
             m_loadingActivity = LoadingActivity { Ref { *this }, loader.releaseNonNull() };
 
-        // Either loader is null or some error was synchronously sent to us.
-        ASSERT(m_loadingActivity || !m_sendFlag);
+        // Either loader is null or some error was synchronously sent to us which made us stop the timer.
+        ASSERT(m_loadingActivity || !m_timeoutTimer.isActive());
     } else {
         if (RefPtr document = dynamicDowncast<Document>(context)) {
             if (!PermissionsPolicy::isFeatureEnabled(PermissionsPolicy::Feature::SyncXHR, *document))
@@ -686,7 +686,7 @@ ExceptionOr<void> XMLHttpRequest::createRequest()
 
 void XMLHttpRequest::abort()
 {
-    Ref<XMLHttpRequest> protectedThis(*this);
+    Ref protectedThis { *this };
 
     if (!internalAbort())
         return;
@@ -768,6 +768,9 @@ void XMLHttpRequest::genericError()
 
 void XMLHttpRequest::networkError()
 {
+    if (!m_sendFlag)
+        return;
+
     genericError();
     dispatchErrorEvents(eventNames().errorEvent);
     internalAbort();
@@ -775,6 +778,9 @@ void XMLHttpRequest::networkError()
 
 void XMLHttpRequest::abortError()
 {
+    if (!m_sendFlag)
+        return;
+
     genericError();
     dispatchErrorEvents(eventNames().abortEvent);
 }
@@ -922,7 +928,6 @@ void XMLHttpRequest::didFail(std::optional<ScriptExecutionContextIdentifier>, co
 
     // In case didFail is called synchronously on an asynchronous XHR call, let's dispatch network error asynchronously
     if (m_async && m_sendFlag && !m_loadingActivity) {
-        m_sendFlag = false;
         m_timeoutTimer.stop();
         queueTaskKeepingObjectAlive(*this, TaskSource::Networking, [](auto& xhr) {
             xhr.networkError();
@@ -1147,7 +1152,7 @@ void XMLHttpRequest::notifyIsDone(bool isDone)
 
 void XMLHttpRequest::didReachTimeout()
 {
-    Ref<XMLHttpRequest> protectedThis(*this);
+    Ref protectedThis { *this };
     if (!internalAbort())
         return;
 
