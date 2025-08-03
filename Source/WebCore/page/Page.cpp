@@ -2163,7 +2163,7 @@ void Page::updateRendering()
 
     bool isSVGImagePage = chrome().client().isSVGImageChromeClient();
     if (!isSVGImagePage)
-        tracePoint(RenderingUpdateStart);
+        WTFBeginSignpost(this, "RenderingUpdate");
 
     layoutIfNeeded();
 
@@ -2304,7 +2304,7 @@ void Page::updateRendering()
     doAfterUpdateRendering();
 
     if (!isSVGImagePage)
-        tracePoint(RenderingUpdateEnd);
+        WTFEndSignpost(this, "RenderingUpdate");
 }
 
 void Page::isolatedUpdateRendering()
