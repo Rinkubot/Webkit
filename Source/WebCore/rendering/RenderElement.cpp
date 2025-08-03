@@ -1627,9 +1627,17 @@ bool RenderElement::isVisibleInDocumentRect(const IntRect& documentRect) const
 
 bool RenderElement::isInsideEntirelyHiddenLayer() const
 {
-    if (isSVGLayerAwareRenderer() && document().settings().layerBasedSVGEngineEnabled() && enclosingLayer()->enclosingSVGHiddenOrResourceContainer())
+    CheckedPtr layer = enclosingLayer();
+    if (!layer)
         return true;
-    return style().usedVisibility() != Visibility::Visible && !enclosingLayer()->hasVisibleContent();
+
+    if (isSVGLayerAwareRenderer() && document().settings().layerBasedSVGEngineEnabled() && layer->enclosingSVGHiddenOrResourceContainer())
+        return true;
+
+    if (style().usedVisibility() != Visibility::Visible)
+        return true;
+
+    return !layer->hasVisibleContent();
 }
 
 void RenderElement::registerForVisibleInViewportCallback()
@@ -2487,7 +2495,8 @@ void RenderElement::repaintOldAndNewPositionsForSVGRenderer() const
         return;
     }
 
-    repaint();
+    if (isDescendantOf(&view()))
+        repaint();
 }
 
 #if ENABLE(TEXT_AUTOSIZING)
