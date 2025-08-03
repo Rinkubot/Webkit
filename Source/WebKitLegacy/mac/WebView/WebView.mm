@@ -212,6 +212,7 @@
 #import <WebCore/ProcessSyncClient.h>
 #import <WebCore/ProgressTracker.h>
 #import <WebCore/Range.h>
+#import <WebCore/RemoteCommandListener.h>
 #import <WebCore/RemoteFrameClient.h>
 #import <WebCore/RemoteFrameGeometryTransformer.h>
 #import <WebCore/RemoteUserInputEventData.h>
@@ -1472,6 +1473,7 @@ static WebCore::ApplicationCacheStorage& webApplicationCacheStorage()
 #if USE(AUDIO_SESSION)
         WebCore::AudioSession::enableMediaPlayback();
 #endif
+        WebCore::RemoteCommandListener::enableMediaPlayback();
 
 #if ENABLE(VIDEO)
         WebCore::HTMLMediaElement::setMediaCacheDirectory(FileSystem::pathByAppendingComponent(String(NSTemporaryDirectory()), "MediaCache/"_s));
