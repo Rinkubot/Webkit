@@ -782,7 +782,11 @@ T UnifiedPDFPlugin::convertDown(CoordinateSpace sourceSpace, CoordinateSpace des
             return mappedValue;
 
         ASSERT(pageIndex);
-        ASSERT(*pageIndex < m_documentLayout.pageCount());
+        static auto pageIndexIsValid = [](auto pageIndex, auto pageCount, bool isLocked) {
+            return isLocked && !pageCount ?: *pageIndex < pageCount;
+        };
+        ASSERT_UNUSED(pageIndexIsValid, pageIndexIsValid(pageIndex, m_documentLayout.pageCount(), isLocked()));
+
         mappedValue = m_documentLayout.documentToPDFPage(mappedValue, *pageIndex);
         [[fallthrough]];
 
@@ -807,7 +811,11 @@ T UnifiedPDFPlugin::convertUp(CoordinateSpace sourceSpace, CoordinateSpace desti
             return mappedValue;
 
         ASSERT(pageIndex);
-        ASSERT(*pageIndex < m_documentLayout.pageCount());
+        static auto pageIndexIsValid = [](auto pageIndex, auto pageCount, bool isLocked) {
+            return isLocked && !pageCount ?: *pageIndex < pageCount;
+        };
+        ASSERT_UNUSED(pageIndexIsValid, pageIndexIsValid(pageIndex, m_documentLayout.pageCount(), isLocked()));
+
         mappedValue = m_documentLayout.pdfPageToDocument(mappedValue, *pageIndex);
         [[fallthrough]];
 
