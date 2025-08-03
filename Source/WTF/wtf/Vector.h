@@ -357,7 +357,6 @@ public:
     }
 
     ALWAYS_INLINE void allocateBuffer(size_t newCapacity) { allocateBuffer<FailureAction::Crash>(newCapacity); }
-    ALWAYS_INLINE bool tryAllocateBuffer(size_t newCapacity) { return allocateBuffer<FailureAction::Report>(newCapacity); }
 
     bool shouldReallocateBuffer(size_t newCapacity) const
     {
@@ -467,7 +466,6 @@ public:
 #endif
 
     using Base::allocateBuffer;
-    using Base::tryAllocateBuffer;
     using Base::shouldReallocateBuffer;
     using Base::reallocateBuffer;
     using Base::deallocateBuffer;
@@ -538,7 +536,6 @@ public:
     }
 
     ALWAYS_INLINE void allocateBuffer(size_t newCapacity) { allocateBuffer<FailureAction::Crash>(newCapacity); }
-    ALWAYS_INLINE bool tryAllocateBuffer(size_t newCapacity) { return allocateBuffer<FailureAction::Report>(newCapacity); }
 
     void deallocateBuffer(T* bufferToDeallocate)
     {
@@ -1044,7 +1041,6 @@ private:
     using Base::swap;
     using Base::allocateBuffer;
     using Base::deallocateBuffer;
-    using Base::tryAllocateBuffer;
     using Base::shouldReallocateBuffer;
     using Base::reallocateBuffer;
     using Base::restoreInlineBufferIfNeeded;
