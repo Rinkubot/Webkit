@@ -3946,7 +3946,7 @@ private:
     {
         LValue value = lowInt32(m_node->child1());
 
-        if (doesOverflow(m_node->arithMode())) {
+        if (m_node->hasInt52Result()) {
             setStrictInt52(m_out.zeroExtPtr(value));
             return;
         }
