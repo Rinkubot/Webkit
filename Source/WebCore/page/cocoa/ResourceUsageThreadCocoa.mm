@@ -160,8 +160,9 @@ void ResourceUsageThread::platformCollectCPUData(JSC::VM*, ResourceUsageData& da
         return;
     }
 
-    // Main thread is always first.
-    ASSERT(threads[0].dispatchQueueName == "com.apple.main-thread"_s);
+    // Main thread should be always first. If not, just give up for collection.
+    if (threads[0].dispatchQueueName != "com.apple.main-thread"_s)
+        return;
 
     mach_port_t resourceUsageMachThread = mach_thread_self();
     mach_port_t mainThreadMachThread = threads[0].sendRight.sendRight();
