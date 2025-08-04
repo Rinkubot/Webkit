@@ -25,6 +25,7 @@
 #import "config.h"
 #import <wtf/cocoa/TypeCastsCocoa.h>
 
+#import "WTFTestUtilities.h"
 #import <wtf/StdLibExtras.h>
 
 #if __has_feature(objc_arc) && !defined(TypeCastsCocoa)
@@ -137,8 +138,10 @@ TEST(TypeCastsCocoa, bridge_id_cast)
 
 TEST(TypeCastsCocoa, checked_objc_cast)
 {
+    // Null cast.
     EXPECT_EQ(nil, checked_objc_cast<NSString>(nil));
 
+    // Same cast / up cast from id.
     @autoreleasepool {
         RetainPtr<id> objectNS;
         uintptr_t objectNSPtr;
@@ -151,6 +154,7 @@ TEST(TypeCastsCocoa, checked_objc_cast)
         EXPECT_EQ(1L, CFGetRetainCount((CFTypeRef)objectNSPtr));
     }
 
+    // Down cast.
     @autoreleasepool {
         RetainPtr<NSObject *> objectNS;
         uintptr_t objectNSPtr;
@@ -162,14 +166,45 @@ TEST(TypeCastsCocoa, checked_objc_cast)
         EXPECT_EQ(1L, CFGetRetainCount((CFTypeRef)objectNSPtr));
     }
 
+    // Invalid down cast.
+    @autoreleasepool {
+        RetainPtr<NSObject> objectNS;
+        uintptr_t objectNSPtr;
+        AUTORELEASEPOOL_FOR_ARC_DEBUG {
+            objectNS = adoptNS([[NSObject alloc] init]);
+            objectNSPtr = reinterpret_cast<uintptr_t>(objectNS.get());
+            expectReleaseAssert(^{
+                auto string = checked_objc_cast<NSString>(objectNS.get());
+                UNUSED_VARIABLE(string);
+            });
+        }
+        EXPECT_EQ(1L, CFGetRetainCount((CFTypeRef)objectNSPtr));
+    }
+
+    // Up cast.
     @autoreleasepool {
         RetainPtr<NSString> objectNS;
         uintptr_t objectNSPtr;
         AUTORELEASEPOOL_FOR_ARC_DEBUG {
             objectNS = adoptNS([[NSString alloc] initWithFormat:@"%s", helloWorldCString]);
             objectNSPtr = reinterpret_cast<uintptr_t>(objectNS.get());
-            NSObject* objPtr = objectNS.get();
+            NSObject* objPtr = objectNS.get(); // FIXME: Use upcast to NSObject.
             EXPECT_EQ(objectNS.get(), objPtr);
+        }
+        EXPECT_EQ(1L, CFGetRetainCount((CFTypeRef)objectNSPtr));
+    }
+
+    // Invalid cast from id.
+    @autoreleasepool {
+        RetainPtr<id> objectNS;
+        uintptr_t objectNSPtr;
+        AUTORELEASEPOOL_FOR_ARC_DEBUG {
+            objectNS = adoptNS<id>([[NSString alloc] initWithFormat:@"%s", helloWorldCString]);
+            objectNSPtr = reinterpret_cast<uintptr_t>(objectNS.get());
+            expectReleaseAssert(^{
+                auto array = checked_objc_cast<NSArray>(objectNS.get());
+                UNUSED_VARIABLE(array);
+            });
         }
         EXPECT_EQ(1L, CFGetRetainCount((CFTypeRef)objectNSPtr));
     }
@@ -177,9 +212,11 @@ TEST(TypeCastsCocoa, checked_objc_cast)
 
 TEST(TypeCastsCocoa, dynamic_objc_cast)
 {
+    // Null cast.
     NSObject *obj = nil;
     EXPECT_EQ(nil, dynamic_objc_cast<NSString>(obj));
 
+    // Same cast / up cast from id.
     @autoreleasepool {
         auto objectNS = adoptNS<id>([[NSString alloc] initWithFormat:@"%s", helloWorldCString]);
         uintptr_t objectNSPtr;
@@ -192,6 +229,7 @@ TEST(TypeCastsCocoa, dynamic_objc_cast)
         EXPECT_EQ(1L, CFGetRetainCount((CFTypeRef)objectNSPtr));
     }
 
+    // Down cast / invalid cast.
     @autoreleasepool {
         auto objectNS = adoptNS<NSObject *>([[NSString alloc] initWithFormat:@"%s", helloWorldCString]);
         uintptr_t objectNSPtr;
@@ -203,6 +241,7 @@ TEST(TypeCastsCocoa, dynamic_objc_cast)
         EXPECT_EQ(1L, CFGetRetainCount((CFTypeRef)objectNSPtr));
     }
 
+    // Up cast / invalid cast.
     @autoreleasepool {
         auto objectNS = adoptNS([[NSString alloc] initWithFormat:@"%s", helloWorldCString]);
         uintptr_t objectNSPtr;
@@ -214,6 +253,7 @@ TEST(TypeCastsCocoa, dynamic_objc_cast)
         EXPECT_EQ(1L, CFGetRetainCount((CFTypeRef)objectNSPtr));
     }
 
+    // Same cast / invalid cast from id.
     @autoreleasepool {
         auto objectID = adoptNS<id>([[NSObject alloc] init]);
         uintptr_t objectIDPtr;
@@ -225,6 +265,7 @@ TEST(TypeCastsCocoa, dynamic_objc_cast)
         EXPECT_EQ(1L, CFGetRetainCount((CFTypeRef)objectIDPtr));
     }
 
+    // Invalid down cast.
     @autoreleasepool {
         auto objectNS = adoptNS([[NSObject alloc] init]);
         uintptr_t objectNSPtr;
@@ -238,6 +279,7 @@ TEST(TypeCastsCocoa, dynamic_objc_cast)
 
 TEST(TypeCastsCocoa, dynamic_objc_cast_RetainPtr)
 {
+    // Null cast.
     @autoreleasepool {
         RetainPtr<NSObject> object;
         auto objectCast = dynamic_objc_cast<NSString>(WTFMove(object));
@@ -245,6 +287,7 @@ TEST(TypeCastsCocoa, dynamic_objc_cast_RetainPtr)
         EXPECT_EQ(nil, objectCast.get());
     }
 
+    // Same cast / up cast / bad cast from id.
     @autoreleasepool {
         auto object = adoptNS<id>([[NSString alloc] initWithFormat:@"%s", helloWorldCString]);
         uintptr_t objectPtr;
@@ -296,6 +339,7 @@ TEST(TypeCastsCocoa, dynamic_objc_cast_RetainPtr)
         EXPECT_EQ(1L, CFGetRetainCount((CFTypeRef)objectPtr2));
     }
 
+    // Up cast.
     @autoreleasepool {
         auto object = adoptNS([[NSString alloc] initWithFormat:@"%s", helloWorldCString]);
         uintptr_t objectPtr;
@@ -304,7 +348,7 @@ TEST(TypeCastsCocoa, dynamic_objc_cast_RetainPtr)
         }
         EXPECT_EQ(1L, CFGetRetainCount((CFTypeRef)objectPtr));
 
-        RetainPtr<NSObject> objectCast = WTFMove(object);
+        RetainPtr<NSObject> objectCast = WTFMove(object); // FIXME: Use upcast to NSObject.
         uintptr_t objectCastPtr;
         AUTORELEASEPOOL_FOR_ARC_DEBUG {
             objectCastPtr = reinterpret_cast<uintptr_t>(objectCast.get());
@@ -314,6 +358,7 @@ TEST(TypeCastsCocoa, dynamic_objc_cast_RetainPtr)
         EXPECT_EQ(1L, CFGetRetainCount((CFTypeRef)objectCastPtr));
     }
 
+    // Same cast / bad cast from NSObject.
     @autoreleasepool {
         RetainPtr<id> object;
         uintptr_t objectPtr;
@@ -339,12 +384,14 @@ TEST(TypeCastsCocoa, dynamic_objc_cast_RetainPtr)
         }
         EXPECT_EQ(1L, CFGetRetainCount((CFTypeRef)objectPtr));
 
-        RetainPtr<MyObjectSubtype> objectCastBad;
+        RetainPtr<NSArray> objectCastBad;
+        uintptr_t objectPtr2;
         AUTORELEASEPOOL_FOR_ARC_DEBUG {
-            objectCastBad = dynamic_objc_cast<MyObjectSubtype>(WTFMove(object));
+            objectCastBad = dynamic_objc_cast<NSArray>(WTFMove(object));
+            objectPtr2 = reinterpret_cast<uintptr_t>(object.get());
         }
         EXPECT_EQ(nil, objectCastBad.get());
-        EXPECT_EQ(1L, CFGetRetainCount((CFTypeRef)objectPtr));
+        EXPECT_EQ(1L, CFGetRetainCount((CFTypeRef)objectPtr2));
     }
 }
 

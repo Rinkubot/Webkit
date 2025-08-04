@@ -190,6 +190,7 @@
 		4433A396208044140091ED57 /* SynchronousTimeoutTests.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4433A395208044130091ED57 /* SynchronousTimeoutTests.mm */; };
 		44449DC12718B4B700E821B5 /* OSObjectPtrCocoaARC.mm in Sources */ = {isa = PBXBuildFile; fileRef = 44449DBF2718B4B600E821B5 /* OSObjectPtrCocoaARC.mm */; settings = {COMPILER_FLAGS = "-fobjc-arc"; }; };
 		44449DC22718B4B700E821B5 /* OSObjectPtrCocoa.mm in Sources */ = {isa = PBXBuildFile; fileRef = 44449DC02718B4B700E821B5 /* OSObjectPtrCocoa.mm */; };
+		44599CE72D99E60E00EFD714 /* WTFTestUtilitiesDarwin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 44599CE62D99E60E00EFD714 /* WTFTestUtilitiesDarwin.cpp */; };
 		44652CB726FCD405005EC272 /* TypeCastsCocoaARC.mm in Sources */ = {isa = PBXBuildFile; fileRef = 44652CB626FCD405005EC272 /* TypeCastsCocoaARC.mm */; settings = {COMPILER_FLAGS = "-fobjc-arc"; }; };
 		448110C2253F40300097FC33 /* WebPreferencesTest.mm in Sources */ = {isa = PBXBuildFile; fileRef = 448110C1253F40240097FC33 /* WebPreferencesTest.mm */; };
 		448D7E471EA6C55500ECC756 /* EnvironmentUtilitiesTest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 448D7E451EA6C55500ECC756 /* EnvironmentUtilitiesTest.cpp */; };
@@ -2803,6 +2804,7 @@
 		4433A395208044130091ED57 /* SynchronousTimeoutTests.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = SynchronousTimeoutTests.mm; sourceTree = "<group>"; };
 		44449DBF2718B4B600E821B5 /* OSObjectPtrCocoaARC.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = OSObjectPtrCocoaARC.mm; sourceTree = "<group>"; };
 		44449DC02718B4B700E821B5 /* OSObjectPtrCocoa.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = OSObjectPtrCocoa.mm; sourceTree = "<group>"; };
+		44599CE62D99E60E00EFD714 /* WTFTestUtilitiesDarwin.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = WTFTestUtilitiesDarwin.cpp; sourceTree = "<group>"; };
 		44652CB626FCD405005EC272 /* TypeCastsCocoaARC.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = TypeCastsCocoaARC.mm; sourceTree = "<group>"; };
 		448110C1253F40240097FC33 /* WebPreferencesTest.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = WebPreferencesTest.mm; sourceTree = "<group>"; };
 		44817A2E1F0486BF00003810 /* WKRequestActivatedElementInfo.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = WKRequestActivatedElementInfo.mm; sourceTree = "<group>"; };
@@ -4472,6 +4474,7 @@
 			isa = PBXGroup;
 			children = (
 				0F139E711A423A1D00F590F5 /* cocoa */,
+				44599CE52D99E5D400EFD714 /* darwin */,
 				BC575944126E733C006F0F12 /* InjectedBundle */,
 				2E9660DC16C07D7B00371B42 /* ios */,
 				BCA61C3A11700B9400460D1E /* mac */,
@@ -5214,6 +5217,14 @@
 				5C581D3127C8A01C006B3BC4 /* YouTubePluginReplacement.cpp */,
 			);
 			path = WebCore;
+			sourceTree = "<group>";
+		};
+		44599CE52D99E5D400EFD714 /* darwin */ = {
+			isa = PBXGroup;
+			children = (
+				44599CE62D99E60E00EFD714 /* WTFTestUtilitiesDarwin.cpp */,
+			);
+			path = darwin;
 			sourceTree = "<group>";
 		};
 		448110BF253F3F8D0097FC33 /* cocoa */ = {
@@ -7539,6 +7550,7 @@
 				45F3A6002D8222CD002B4550 /* WorkerPool.cpp in Sources */,
 				46BBEA1B25F9835700D4987A /* WorkQueue.cpp in Sources */,
 				7C83DF631D0A590C00FEBCF3 /* WTFString.cpp in Sources */,
+				44599CE72D99E60E00EFD714 /* WTFTestUtilitiesDarwin.cpp in Sources */,
 				FF41AC702A79CAA000AC0FA5 /* WYHash.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

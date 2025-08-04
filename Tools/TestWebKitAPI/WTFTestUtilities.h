@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2011 Google Inc. All rights reserved.
+ * Copyright (C) 2012-2025 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -30,11 +31,16 @@
 
 #pragma once
 
+#include <wtf/Function.h>
 #include <wtf/text/CString.h>
 #include <wtf/text/StringBuilder.h>
 #include <wtf/text/WTFString.h>
 
 namespace TestWebKitAPI {
+
+#if OS(DARWIN)
+void expectReleaseAssert(NOESCAPE const WTF::Function<void()>&);
+#endif
 
 template<size_t length>
 String utf16String(const char16_t (&url)[length])
@@ -46,4 +52,4 @@ String utf16String(const char16_t (&url)[length])
     return builder.toString();
 }
 
-}
+} // namespace TestWebKitAPI
