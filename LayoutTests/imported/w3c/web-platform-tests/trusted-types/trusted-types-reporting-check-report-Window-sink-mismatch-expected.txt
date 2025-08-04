@@ -1,0 +1,13 @@
+CONSOLE MESSAGE: [Report Only] This requires a TrustedScript value else it violates the following Content Security Policy directive: "require-trusted-types-for 'script'"
+CONSOLE MESSAGE: Refused to execute a script because 'unsafe-eval' and 'trusted-types-eval' does not appear in the script-src directive of the Content Security Policy.
+CONSOLE MESSAGE: [Report Only] This requires a TrustedScript value else it violates the following Content Security Policy directive: "require-trusted-types-for 'script'"
+CONSOLE MESSAGE: Refused to execute a script because 'unsafe-eval' and 'trusted-types-eval' does not appear in the script-src directive of the Content Security Policy.
+CONSOLE MESSAGE: Refused to execute a script because 'unsafe-eval' and 'trusted-types-eval' does not appear in the script-src directive of the Content Security Policy.
+CONSOLE MESSAGE: [Report Only] This requires a TrustedScript value else it violates the following Content Security Policy directive: "require-trusted-types-for 'script'"
+
+PASS Passing a plain string to setTimeout works since it's report-only.
+PASS Passing a TrustedScript to setTimeout works.
+PASS Passing a plain string to eval throws.
+PASS Test report-uri works with require-trusted-types-for violation.
+PASS Test number of sent reports.
+

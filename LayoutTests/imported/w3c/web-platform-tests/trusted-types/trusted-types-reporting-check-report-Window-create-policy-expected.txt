@@ -1,0 +1,8 @@
+CONSOLE MESSAGE: [Report Only] Refused to create a TrustedTypePolicy named 'three' because it violates the following Content Security Policy directive: "trusted-types one two"
+CONSOLE MESSAGE: [Report Only] Refused to create a TrustedTypePolicy named 'four' because it violates the following Content Security Policy directive: "trusted-types one two"
+
+PASS Creating policy works for policy in the allowlist.
+PASS Creating policy works for policy in the blocklist, since it's report-only.
+PASS Test report-uri works with trusted-types violation.
+PASS Test number of sent reports.
+

@@ -1,0 +1,6 @@
+CONSOLE MESSAGE: Refused to create a TrustedTypePolicy named 'ForbiddenPolicyName' because it violates the following Content Security Policy directive: "trusted-types AllowedPolicyName default"
+CONSOLE MESSAGE: This requires a TrustedHTML value else it violates the following Content Security Policy directive: "require-trusted-types-for 'script'"
+
+PASS window.trustedTypes.createPolicy() in a sandboxed page with allow-scripts.
+PASS Default Trusted Types policy in a sandboxed page with allow-scripts.
+

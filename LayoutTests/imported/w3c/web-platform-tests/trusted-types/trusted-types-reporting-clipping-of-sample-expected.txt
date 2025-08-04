@@ -1,0 +1,38 @@
+CONSOLE MESSAGE: Refused to create a TrustedTypePolicy named 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA' because it violates the following Content Security Policy directive: "trusted-types 'none'"
+CONSOLE MESSAGE: Refused to connect to ws://common/blank.html because it does not appear in the connect-src directive of the Content Security Policy.
+CONSOLE MESSAGE: This requires a TrustedHTML value else it violates the following Content Security Policy directive: "require-trusted-types-for 'script'"
+CONSOLE MESSAGE: Refused to connect to ws://common/blank.html because it does not appear in the connect-src directive of the Content Security Policy.
+CONSOLE MESSAGE: Refused to create a TrustedTypePolicy named 'BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB' because it violates the following Content Security Policy directive: "trusted-types 'none'"
+CONSOLE MESSAGE: Refused to connect to ws://common/blank.html because it does not appear in the connect-src directive of the Content Security Policy.
+CONSOLE MESSAGE: This requires a TrustedHTML value else it violates the following Content Security Policy directive: "require-trusted-types-for 'script'"
+CONSOLE MESSAGE: Refused to connect to ws://common/blank.html because it does not appear in the connect-src directive of the Content Security Policy.
+CONSOLE MESSAGE: Refused to create a TrustedTypePolicy named 'CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC' because it violates the following Content Security Policy directive: "trusted-types 'none'"
+CONSOLE MESSAGE: Refused to connect to ws://common/blank.html because it does not appear in the connect-src directive of the Content Security Policy.
+CONSOLE MESSAGE: This requires a TrustedHTML value else it violates the following Content Security Policy directive: "require-trusted-types-for 'script'"
+CONSOLE MESSAGE: Refused to connect to ws://common/blank.html because it does not appear in the connect-src directive of the Content Security Policy.
+CONSOLE MESSAGE: Refused to create a TrustedTypePolicy named 'ÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐ' because it violates the following Content Security Policy directive: "trusted-types 'none'"
+CONSOLE MESSAGE: Refused to connect to ws://common/blank.html because it does not appear in the connect-src directive of the Content Security Policy.
+CONSOLE MESSAGE: This requires a TrustedHTML value else it violates the following Content Security Policy directive: "require-trusted-types-for 'script'"
+CONSOLE MESSAGE: Refused to connect to ws://common/blank.html because it does not appear in the connect-src directive of the Content Security Policy.
+CONSOLE MESSAGE: Refused to create a TrustedTypePolicy named 'ÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉ' because it violates the following Content Security Policy directive: "trusted-types 'none'"
+CONSOLE MESSAGE: Refused to connect to ws://common/blank.html because it does not appear in the connect-src directive of the Content Security Policy.
+CONSOLE MESSAGE: This requires a TrustedHTML value else it violates the following Content Security Policy directive: "require-trusted-types-for 'script'"
+CONSOLE MESSAGE: Refused to connect to ws://common/blank.html because it does not appear in the connect-src directive of the Content Security Policy.
+CONSOLE MESSAGE: Refused to create a TrustedTypePolicy named '℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉' because it violates the following Content Security Policy directive: "trusted-types 'none'"
+CONSOLE MESSAGE: Refused to connect to ws://common/blank.html because it does not appear in the connect-src directive of the Content Security Policy.
+CONSOLE MESSAGE: This requires a TrustedHTML value else it violates the following Content Security Policy directive: "require-trusted-types-for 'script'"
+CONSOLE MESSAGE: Refused to connect to ws://common/blank.html because it does not appear in the connect-src directive of the Content Security Policy.
+
+PASS Clipping of violation sample for createPolicy(AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA)
+PASS Clipping of violation sample for Element.innerHTML = "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+PASS Clipping of violation sample for createPolicy(BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB)
+PASS Clipping of violation sample for Element.innerHTML = "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB"
+PASS Clipping of violation sample for createPolicy(CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC)
+PASS Clipping of violation sample for Element.innerHTML = "CCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCCC"
+PASS Clipping of violation sample for createPolicy(ÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐ)
+PASS Clipping of violation sample for Element.innerHTML = "ÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐÐ"
+PASS Clipping of violation sample for createPolicy(ÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉ)
+PASS Clipping of violation sample for Element.innerHTML = "ÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉÉ"
+PASS Clipping of violation sample for createPolicy(℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉)
+PASS Clipping of violation sample for Element.innerHTML = "℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉℉"
+
