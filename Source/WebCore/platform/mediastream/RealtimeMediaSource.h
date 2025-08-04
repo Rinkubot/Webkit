@@ -366,6 +366,9 @@ protected:
 
     bool hasSeveralVideoFrameObserversWithAdaptors() const { return m_videoFrameObserversWithAdaptors > 1; }
 
+    void initializeFrameRate(double);
+    void initializeFacingMode(VideoFacingMode);
+
     OwnerCallback m_registerOwnerCallback;
 
 private:
