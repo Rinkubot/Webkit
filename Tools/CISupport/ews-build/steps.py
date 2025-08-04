@@ -754,7 +754,7 @@ class CheckOutSource(git.Git):
         super().__init__(
             repourl=repourl,
             retry=self.CHECKOUT_DELAY_AND_MAX_RETRIES_PAIR,
-            timeout=2 * 60 * 60,
+            timeout=3 * 60 * 60,
             alwaysUseLatest=True,
             logEnviron=False,
             method='clean',
