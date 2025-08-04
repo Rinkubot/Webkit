@@ -479,7 +479,7 @@ static uint32_t convertSystemLayoutDirection(NSUserInterfaceLayoutDirection dire
     if (viewIsInWindow) {
         BOOL previouslyInstalledScreenTimeWebpageController = !!_screenTimeWebpageController;
         [self _installScreenTimeWebpageControllerIfNeeded];
-        if (!previouslyInstalledScreenTimeWebpageController && _screenTimeWebpageController)
+        if (_screenTimeWebpageController && (!previouslyInstalledScreenTimeWebpageController || [_screenTimeWebpageController URL] != [self _mainFrameURL]))
             [_screenTimeWebpageController setURL:[self _mainFrameURL]];
 
         if (!showsSystemScreenTimeBlockingView && _screenTimeBlurredSnapshot) {
