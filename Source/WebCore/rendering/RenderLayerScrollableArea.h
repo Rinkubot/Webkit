@@ -261,7 +261,7 @@ public:
     bool isVisibleToHitTesting() const final;
     void animatedScrollDidEnd() final;
     LayoutRect scrollRectToVisible(const LayoutRect& absoluteRect, const ScrollRectToVisibleOptions&);
-    std::optional<LayoutRect> updateScrollPositionForScrollIntoView(const ScrollPositionChangeOptions&, const LayoutRect& revealRect, const LayoutRect& localExposeRect);
+    std::optional<LayoutRect> updateScrollPositionForScrollIntoView(const ScrollPositionChangeOptions&, const LayoutSize& revealOffset, const LayoutRect& localExposeRect);
     void updateScrollAnchoringElement() final;
     void updateScrollPositionForScrollAnchoringController() final;
     void invalidateScrollAnchoringElement() final;

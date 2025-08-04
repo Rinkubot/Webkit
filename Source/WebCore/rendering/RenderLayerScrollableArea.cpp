@@ -1893,54 +1893,58 @@ void RenderLayerScrollableArea::panScrollFromPoint(const IntPoint& sourcePoint)
     scrollByRecursively(adjustedScrollDelta(delta));
 }
 
-static LayoutRect getLocalExposeRect(const LayoutRect& absoluteRect, RenderBox* box, int verticalScrollbarWidth, const LayoutRect& layerBounds)
+static LayoutRect computeLocalExposeRect(const LayoutRect& absoluteRect, RenderBox* box)
 {
-    LayoutRect localExposeRect(box->absoluteToLocalQuad(FloatQuad(FloatRect(absoluteRect))).boundingBox());
-
-    // localExposedRect is now the absolute rect in local coordinates, but relative to the
-    // border edge. Make the rectangle relative to the scrollable area.
-    localExposeRect.moveBy(-LayoutPoint(box->borderLeft(), box->borderTop()));
-
-    if (box->shouldPlaceVerticalScrollbarOnLeft()) {
-        // For `direction: rtl; writing-mode: horizontal-{tb,bt}` and `writing-mode: vertical-rl`
-        // boxes, the scroll bar is on the left side. The visible rect starts from the right side
-        // of the scroll bar. So the x of localExposeRect should start from the same position too.
-        localExposeRect.moveBy(LayoutPoint(-verticalScrollbarWidth, 0));
-    }
-
-    // scroll-padding applies to the scroll container, but expand the rectangle that we want to expose in order
-    // simulate padding the scroll container. This rectangle is passed up the tree of scrolling elements to
-    // ensure that the padding on this scroll container is maintained.
-    localExposeRect.expand(box->scrollPaddingForViewportRect(layerBounds));
-    return localExposeRect;
+    return LayoutRect { box->absoluteToLocalQuad(FloatQuad(FloatRect(absoluteRect))).boundingBox() };
 }
 
 LayoutRect RenderLayerScrollableArea::scrollRectToVisible(const LayoutRect& absoluteRect, const ScrollRectToVisibleOptions& options)
 {
     RenderBox* box = layer().renderBox();
     ASSERT(box);
-    
-    LayoutRect layerBounds(0_lu, 0_lu, box->clientWidth(), box->clientHeight());
 
-    LayoutRect localExposeRect = getLocalExposeRect(absoluteRect, box, verticalScrollbarWidth(), layerBounds);
+    auto scrollingViewport = box->paddingBoxRect();
+
+    auto scrollPadding = box->scrollPaddingForViewportRect(scrollingViewport);
+    if ((scrollPadding.left() + scrollPadding.right()) > scrollingViewport.width()) {
+        auto shrinkFactor = static_cast<float>(scrollingViewport.width()) / (scrollPadding.left() + scrollPadding.right());
+        scrollPadding.left() *= shrinkFactor;
+        scrollPadding.right() *= shrinkFactor;
+    }
+
+    if ((scrollPadding.top() + scrollPadding.bottom()) > scrollingViewport.height()) {
+        auto shrinkFactor = static_cast<float>(scrollingViewport.height()) / (scrollPadding.top() + scrollPadding.bottom());
+        scrollPadding.top() *= shrinkFactor;
+        scrollPadding.bottom() *= shrinkFactor;
+    }
+
+    auto scrollingViewportWithPadding = scrollingViewport;
+    scrollingViewportWithPadding.contract(scrollPadding);
+
+    auto localExposeRect = computeLocalExposeRect(absoluteRect, box);
     std::optional<LayoutRect> localVisiblityRect;
     if (options.visibilityCheckRect)
-        localVisiblityRect = getLocalExposeRect(*options.visibilityCheckRect, box, verticalScrollbarWidth(), layerBounds);
+        localVisiblityRect = computeLocalExposeRect(*options.visibilityCheckRect, box);
 
-    auto revealRect = getRectToExposeForScrollIntoView(layerBounds, localExposeRect, options.alignX, options.alignY, localVisiblityRect);
+    auto revealRect = getRectToExposeForScrollIntoView(scrollingViewportWithPadding, localExposeRect, options.alignX, options.alignY, localVisiblityRect);
+    revealRect.move(-scrollingViewportWithPadding.x(), -scrollingViewportWithPadding.y());
+
     auto scrollPositionOptions = ScrollPositionChangeOptions::createProgrammatic();
     if (!box->frame().eventHandler().autoscrollInProgress() && box->element() && useSmoothScrolling(options.behavior, box->protectedElement().get()))
         scrollPositionOptions.animated = ScrollIsAnimated::Yes;
-    if (auto result = updateScrollPositionForScrollIntoView(scrollPositionOptions, revealRect, localExposeRect))
+
+    if (auto result = updateScrollPositionForScrollIntoView(scrollPositionOptions, toLayoutSize(revealRect.location()), localExposeRect))
         return result.value();
+
     return absoluteRect;
 }
-std::optional<LayoutRect> RenderLayerScrollableArea::updateScrollPositionForScrollIntoView(const ScrollPositionChangeOptions& options, const LayoutRect& revealRect, const LayoutRect& localExposeRect)
+
+std::optional<LayoutRect> RenderLayerScrollableArea::updateScrollPositionForScrollIntoView(const ScrollPositionChangeOptions& options, const LayoutSize& revealOffset, const LayoutRect& localExposeRect)
 {
     RenderBox* box = m_layer.renderBox();
     ASSERT(box);
 
-    ScrollOffset clampedScrollOffset = clampScrollOffset(scrollOffset() + toIntSize(roundedIntRect(revealRect).location()));
+    ScrollOffset clampedScrollOffset = clampScrollOffset(scrollOffset() + roundedIntSize(revealOffset));
     if (clampedScrollOffset == scrollOffset() && scrollAnimationStatus() == ScrollAnimationStatus::NotAnimating)
         return std::nullopt;
 
