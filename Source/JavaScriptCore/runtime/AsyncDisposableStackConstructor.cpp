@@ -86,6 +86,8 @@ JSC_DEFINE_HOST_FUNCTION(constructAsyncDisposableStack, (JSGlobalObject* globalO
     VM& vm = globalObject->vm();
     auto scope = DECLARE_THROW_SCOPE(vm);
 
+    vm.willCallNativeConstructor("AsyncDisposableStack"_s);
+
     JSObject* newTarget = asObject(callFrame->newTarget());
     Structure* asyncDisposableStackStructure = JSC_GET_DERIVED_STRUCTURE(vm, asyncDisposableStackStructure, newTarget, callFrame->jsCallee());
     RETURN_IF_EXCEPTION(scope, { });

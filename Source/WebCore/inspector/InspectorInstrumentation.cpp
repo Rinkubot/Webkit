@@ -437,6 +437,12 @@ void InspectorInstrumentation::didCallFunctionImpl(InstrumentingAgents& instrume
         timelineAgent->didCallFunction();
 }
 
+void InspectorInstrumentation::willCallNativeConstructorImpl(InstrumentingAgents& instrumentingAgents, const String& className)
+{
+    if (auto* webDebuggerAgent = instrumentingAgents.enabledWebDebuggerAgent())
+        webDebuggerAgent->willCallNativeConstructor(className);
+}
+
 void InspectorInstrumentation::willDispatchEventImpl(InstrumentingAgents& instrumentingAgents, const Event& event)
 {
     if (auto* timelineAgent = instrumentingAgents.trackingTimelineAgent())

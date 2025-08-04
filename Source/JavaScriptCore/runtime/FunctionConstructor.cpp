@@ -45,6 +45,8 @@ static JSC_DECLARE_HOST_FUNCTION(callFunctionConstructor);
 
 JSC_DEFINE_HOST_FUNCTION(constructWithFunctionConstructor, (JSGlobalObject* globalObject, CallFrame* callFrame))
 {
+    globalObject->vm().willCallNativeConstructor("Function"_s);
+
     ArgList args(callFrame);
     return JSValue::encode(constructFunction(globalObject, callFrame, args, FunctionConstructionMode::Function, callFrame->newTarget()));
 }
@@ -52,6 +54,8 @@ JSC_DEFINE_HOST_FUNCTION(constructWithFunctionConstructor, (JSGlobalObject* glob
 // ECMA 15.3.1 The Function Constructor Called as a Function
 JSC_DEFINE_HOST_FUNCTION(callFunctionConstructor, (JSGlobalObject* globalObject, CallFrame* callFrame))
 {
+    globalObject->vm().willCallNativeConstructor("Function"_s);
+
     ArgList args(callFrame);
     return JSValue::encode(constructFunction(globalObject, callFrame, args));
 }

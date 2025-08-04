@@ -84,6 +84,9 @@ JSC_DEFINE_HOST_FUNCTION(constructIntlCollator, (JSGlobalObject* globalObject, C
 {
     VM& vm = globalObject->vm();
     auto scope = DECLARE_THROW_SCOPE(vm);
+
+    vm.willCallNativeConstructor("Collator"_s);
+
     // 10.1.2 Intl.Collator ([locales [, options]]) (ECMA-402 2.0)
     // 1. If NewTarget is undefined, let newTarget be the active function object, else let newTarget be NewTarget.
     // 2. Let collator be OrdinaryCreateFromConstructor(newTarget, %CollatorPrototype%).
@@ -108,6 +111,9 @@ JSC_DEFINE_HOST_FUNCTION(callIntlCollator, (JSGlobalObject* globalObject, CallFr
     // NewTarget is always undefined when called as a function.
 
     VM& vm = globalObject->vm();
+
+    vm.willCallNativeConstructor("Collator"_s);
+
     // Collator does not require the workaround for ECMA-402 1.0 compatibility.
     // https://bugs.webkit.org/show_bug.cgi?id=153679
 

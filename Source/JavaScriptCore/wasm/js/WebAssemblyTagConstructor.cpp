@@ -45,6 +45,8 @@ JSC_DEFINE_HOST_FUNCTION(constructJSWebAssemblyTag, (JSGlobalObject* globalObjec
 {
     VM& vm = globalObject->vm();
     auto scope = DECLARE_THROW_SCOPE(vm);
+
+    vm.willCallNativeConstructor("Tag"_s);
     
     if (callFrame->argumentCount() < 1)
         return throwVMTypeError(globalObject, scope, "WebAssembly.Tag constructor expects the tag type as the first argument."_s);

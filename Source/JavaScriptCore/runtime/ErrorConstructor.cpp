@@ -59,6 +59,9 @@ JSC_DEFINE_HOST_FUNCTION(constructErrorConstructor, (JSGlobalObject* globalObjec
 {
     VM& vm = globalObject->vm();
     auto scope = DECLARE_THROW_SCOPE(vm);
+
+    vm.willCallNativeConstructor("Error"_s);
+
     JSValue message = callFrame->argument(0);
     JSValue options = callFrame->argument(1);
 
@@ -71,6 +74,8 @@ JSC_DEFINE_HOST_FUNCTION(constructErrorConstructor, (JSGlobalObject* globalObjec
 
 JSC_DEFINE_HOST_FUNCTION(callErrorConstructor, (JSGlobalObject* globalObject, CallFrame* callFrame))
 {
+    globalObject->vm().willCallNativeConstructor("Error"_s);
+
     JSValue message = callFrame->argument(0);
     JSValue options = callFrame->argument(1);
     Structure* errorStructure = globalObject->errorStructure();

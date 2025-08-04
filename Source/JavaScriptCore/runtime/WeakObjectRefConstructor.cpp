@@ -61,6 +61,8 @@ JSC_DEFINE_HOST_FUNCTION(constructWeakRef, (JSGlobalObject* globalObject, CallFr
     VM& vm = globalObject->vm();
     auto scope = DECLARE_THROW_SCOPE(vm);
 
+    vm.willCallNativeConstructor("WeakRef"_s);
+
     JSValue target = callFrame->argument(0);
     if (!canBeHeldWeakly(target)) [[unlikely]]
         return throwVMTypeError(globalObject, scope, "First argument to WeakRef should be an object or a non-registered symbol"_s);

@@ -182,6 +182,8 @@ JSObject* constructDate(JSGlobalObject* globalObject, JSValue newTarget, const A
     
 JSC_DEFINE_HOST_FUNCTION(constructWithDateConstructor, (JSGlobalObject* globalObject, CallFrame* callFrame))
 {
+    globalObject->vm().willCallNativeConstructor("Date"_s);
+
     ArgList args(callFrame);
     return JSValue::encode(constructDate(globalObject, callFrame->newTarget(), args));
 }
@@ -190,6 +192,9 @@ JSC_DEFINE_HOST_FUNCTION(constructWithDateConstructor, (JSGlobalObject* globalOb
 JSC_DEFINE_HOST_FUNCTION(callDate, (JSGlobalObject* globalObject, CallFrame*))
 {
     VM& vm = globalObject->vm();
+
+    vm.willCallNativeConstructor("Date"_s);
+
     GregorianDateTime ts;
     vm.dateCache.msToGregorianDateTime(WallTime::now().secondsSinceEpoch().milliseconds(), TimeType::LocalTime, ts);
     return JSValue::encode(jsNontrivialString(vm, formatDateTime(ts, DateTimeFormatDateAndTime, false, vm.dateCache)));

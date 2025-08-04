@@ -62,6 +62,8 @@ JSC_DEFINE_HOST_FUNCTION(constructWeakSet, (JSGlobalObject* globalObject, CallFr
     VM& vm = globalObject->vm();
     auto scope = DECLARE_THROW_SCOPE(vm);
 
+    vm.willCallNativeConstructor("WeakSet"_s);
+
     JSObject* newTarget = asObject(callFrame->newTarget());
     Structure* weakSetStructure = JSC_GET_DERIVED_STRUCTURE(vm, weakSetStructure, newTarget, callFrame->jsCallee());
     RETURN_IF_EXCEPTION(scope, { });

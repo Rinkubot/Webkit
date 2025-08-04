@@ -99,6 +99,9 @@ JSC_DEFINE_HOST_FUNCTION(constructNumberConstructor, (JSGlobalObject* globalObje
 {
     VM& vm = globalObject->vm();
     auto scope = DECLARE_THROW_SCOPE(vm);
+
+    vm.willCallNativeConstructor("Number"_s);
+
     double n = 0;
     if (callFrame->argumentCount()) {
         JSValue numeric = callFrame->uncheckedArgument(0).toNumeric(globalObject);
@@ -127,6 +130,9 @@ JSC_DEFINE_HOST_FUNCTION(callNumberConstructor, (JSGlobalObject* globalObject, C
 {
     VM& vm = globalObject->vm();
     auto scope = DECLARE_THROW_SCOPE(vm);
+
+    vm.willCallNativeConstructor("Number"_s);
+
     if (!callFrame->argumentCount())
         return JSValue::encode(jsNumber(0));
     JSValue numeric = callFrame->uncheckedArgument(0).toNumeric(globalObject);

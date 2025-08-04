@@ -61,6 +61,8 @@ JSC_DEFINE_HOST_FUNCTION(constructWeakMap, (JSGlobalObject* globalObject, CallFr
     VM& vm = globalObject->vm();
     auto scope = DECLARE_THROW_SCOPE(vm);
 
+    vm.willCallNativeConstructor("WeakMap"_s);
+
     JSObject* newTarget = asObject(callFrame->newTarget());
     Structure* weakMapStructure = JSC_GET_DERIVED_STRUCTURE(vm, weakMapStructure, newTarget, callFrame->jsCallee());
     RETURN_IF_EXCEPTION(scope, { });

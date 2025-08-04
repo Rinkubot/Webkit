@@ -83,6 +83,8 @@ JSC_DEFINE_HOST_FUNCTION(constructIntlDisplayNames, (JSGlobalObject* globalObjec
     VM& vm = globalObject->vm();
     auto scope = DECLARE_THROW_SCOPE(vm);
 
+    vm.willCallNativeConstructor("DisplayNames"_s);
+
     JSObject* newTarget = asObject(callFrame->newTarget());
     Structure* structure = JSC_GET_DERIVED_STRUCTURE(vm, displayNamesStructure, newTarget, callFrame->jsCallee());
     RETURN_IF_EXCEPTION(scope, { });

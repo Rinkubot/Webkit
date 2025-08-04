@@ -8214,10 +8214,13 @@ sub GenerateConstructorDefinitions
                 GenerateConstructorDefinition($outputArray, $className, $protoClassName, $visibleInterfaceName, $interface, $generatingLegacyFactoryFunction, $constructor);
             }
 
+            AddToImplIncludes("InspectorInstrumentation.h");
+
             my $overloadFunctionPrefix = "construct${className}";
 
             push(@implContent, "template<> EncodedJSValue JSC_HOST_CALL_ATTRIBUTES ${className}DOMConstructor::construct(JSGlobalObject* lexicalGlobalObject, CallFrame* callFrame)\n");
             push(@implContent, "{\n");
+            push(@implContent, "    InspectorInstrumentation::willCallNativeConstructor(lexicalGlobalObject, \"${visibleInterfaceName}\"_s);\n");
             push(@implContent, "    SUPPRESS_UNCOUNTED_LOCAL auto& vm = lexicalGlobalObject->vm();\n");
             push(@implContent, "    auto throwScope = DECLARE_THROW_SCOPE(vm);\n");
             push(@implContent, "    UNUSED_PARAM(throwScope);\n");
@@ -8247,8 +8250,11 @@ sub GenerateConstructorDefinition
 
     if (IsConstructable($interface)) {
         if (HasCustomConstructor($interface)) {
+            AddToImplIncludes("InspectorInstrumentation.h");
+
             push(@$outputArray, "template<> JSC::EncodedJSValue JSC_HOST_CALL_ATTRIBUTES ${constructorClassName}::construct(JSC::JSGlobalObject* lexicalGlobalObject, JSC::CallFrame* callFrame)\n");
             push(@$outputArray, "{\n");
+            push(@$outputArray, "    InspectorInstrumentation::willCallNativeConstructor(lexicalGlobalObject, \"${visibleInterfaceName}\"_s);\n");
             push(@$outputArray, "    ASSERT(callFrame);\n");
             push(@$outputArray, "    return construct${className}(lexicalGlobalObject, *callFrame);\n");
             push(@$outputArray, "}\n");
@@ -8257,11 +8263,15 @@ sub GenerateConstructorDefinition
             my $isOverloaded = $operation->{overloads} && @{$operation->{overloads}} > 1;
             if ($isOverloaded) {
                 push(@$outputArray, "static inline EncodedJSValue construct${className}$operation->{overloadIndex}(JSGlobalObject* lexicalGlobalObject, CallFrame* callFrame)\n");
+                push(@$outputArray, "{\n");
             } else {
+                AddToImplIncludes("InspectorInstrumentation.h");
+
                 push(@$outputArray, "template<> EncodedJSValue JSC_HOST_CALL_ATTRIBUTES ${constructorClassName}::construct(JSGlobalObject* lexicalGlobalObject, CallFrame* callFrame)\n");
+                push(@$outputArray, "{\n");
+                push(@$outputArray, "    InspectorInstrumentation::willCallNativeConstructor(lexicalGlobalObject, \"${visibleInterfaceName}\"_s);\n");
             }
 
-            push(@$outputArray, "{\n");
             push(@$outputArray, "    SUPPRESS_UNCOUNTED_LOCAL auto& vm = lexicalGlobalObject->vm();\n");
             push(@$outputArray, "    auto throwScope = DECLARE_THROW_SCOPE(vm);\n");
             push(@$outputArray, "    auto* castedThis = jsCast<${constructorClassName}*>(callFrame->jsCallee());\n");

@@ -82,6 +82,8 @@ JSC_DEFINE_HOST_FUNCTION(constructTemporalTimeZone, (JSGlobalObject* globalObjec
     VM& vm = globalObject->vm();
     auto scope = DECLARE_THROW_SCOPE(vm);
 
+    vm.willCallNativeConstructor("TimeZone"_s);
+
     JSObject* newTarget = asObject(callFrame->newTarget());
     Structure* structure = JSC_GET_DERIVED_STRUCTURE(vm, timeZoneStructure, newTarget, callFrame->jsCallee());
     RETURN_IF_EXCEPTION(scope, { });

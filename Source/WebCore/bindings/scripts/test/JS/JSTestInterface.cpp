@@ -31,6 +31,7 @@
 #include "ExtendedDOMClientIsoSubspaces.h"
 #include "ExtendedDOMIsoSubspaces.h"
 #include "HTMLNames.h"
+#include "InspectorInstrumentation.h"
 #include "JSDOMAttribute.h"
 #include "JSDOMBinding.h"
 #include "JSDOMConstructor.h"
@@ -268,6 +269,7 @@ static_assert(TestSupplemental::CONST_IMPL == 2, "CONST_IMPL in TestSupplemental
 
 template<> EncodedJSValue JSC_HOST_CALL_ATTRIBUTES JSTestInterfaceDOMConstructor::construct(JSGlobalObject* lexicalGlobalObject, CallFrame* callFrame)
 {
+    InspectorInstrumentation::willCallNativeConstructor(lexicalGlobalObject, "TestInterface"_s);
     SUPPRESS_UNCOUNTED_LOCAL auto& vm = lexicalGlobalObject->vm();
     auto throwScope = DECLARE_THROW_SCOPE(vm);
     auto* castedThis = jsCast<JSTestInterfaceDOMConstructor*>(callFrame->jsCallee());

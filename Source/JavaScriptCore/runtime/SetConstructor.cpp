@@ -65,6 +65,8 @@ JSC_DEFINE_HOST_FUNCTION(constructSet, (JSGlobalObject* globalObject, CallFrame*
     VM& vm = globalObject->vm();
     auto scope = DECLARE_THROW_SCOPE(vm);
 
+    vm.willCallNativeConstructor("Set"_s);
+
     JSObject* newTarget = asObject(callFrame->newTarget());
     Structure* setStructure = JSC_GET_DERIVED_STRUCTURE(vm, setStructure, newTarget, callFrame->jsCallee());
     RETURN_IF_EXCEPTION(scope, { });

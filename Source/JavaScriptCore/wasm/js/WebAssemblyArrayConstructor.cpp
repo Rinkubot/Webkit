@@ -44,6 +44,8 @@ JSC_DEFINE_HOST_FUNCTION(constructJSWebAssemblyArray, (JSGlobalObject* globalObj
     auto& vm = globalObject->vm();
     auto scope = DECLARE_THROW_SCOPE(vm);
 
+    vm.willCallNativeConstructor("Array"_s);
+
     return throwVMTypeError(globalObject, scope, "WebAssembly.Array constructor should not be exposed currently"_s);
 }
 

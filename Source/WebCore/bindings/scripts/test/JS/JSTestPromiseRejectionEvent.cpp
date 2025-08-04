@@ -26,6 +26,7 @@
 #include "DOMPromiseProxy.h"
 #include "ExtendedDOMClientIsoSubspaces.h"
 #include "ExtendedDOMIsoSubspaces.h"
+#include "InspectorInstrumentation.h"
 #include "JSDOMAttribute.h"
 #include "JSDOMBinding.h"
 #include "JSDOMConstructor.h"
@@ -169,6 +170,7 @@ using JSTestPromiseRejectionEventDOMConstructor = JSDOMConstructor<JSTestPromise
 
 template<> EncodedJSValue JSC_HOST_CALL_ATTRIBUTES JSTestPromiseRejectionEventDOMConstructor::construct(JSGlobalObject* lexicalGlobalObject, CallFrame* callFrame)
 {
+    InspectorInstrumentation::willCallNativeConstructor(lexicalGlobalObject, "TestPromiseRejectionEvent"_s);
     SUPPRESS_UNCOUNTED_LOCAL auto& vm = lexicalGlobalObject->vm();
     auto throwScope = DECLARE_THROW_SCOPE(vm);
     auto* castedThis = jsCast<JSTestPromiseRejectionEventDOMConstructor*>(callFrame->jsCallee());

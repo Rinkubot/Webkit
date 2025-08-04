@@ -69,55 +69,79 @@ inline EncodedJSValue NativeErrorConstructor<errorType>::callImpl(JSGlobalObject
 
 JSC_DEFINE_HOST_FUNCTION(callEvalError, (JSGlobalObject* globalObject, CallFrame* callFrame))
 {
+    globalObject->vm().willCallNativeConstructor("EvalError"_s);
+
     return NativeErrorConstructor<ErrorType::EvalError>::callImpl(globalObject, callFrame);
 }
 JSC_DEFINE_HOST_FUNCTION(constructEvalError, (JSGlobalObject* globalObject, CallFrame* callFrame))
 {
+    globalObject->vm().willCallNativeConstructor("EvalError"_s);
+
     return NativeErrorConstructor<ErrorType::EvalError>::constructImpl(globalObject, callFrame);
 }
 
 JSC_DEFINE_HOST_FUNCTION(callRangeError, (JSGlobalObject* globalObject, CallFrame* callFrame))
 {
+    globalObject->vm().willCallNativeConstructor("RangeError"_s);
+
     return NativeErrorConstructor<ErrorType::RangeError>::callImpl(globalObject, callFrame);
 }
 JSC_DEFINE_HOST_FUNCTION(constructRangeError, (JSGlobalObject* globalObject, CallFrame* callFrame))
 {
+    globalObject->vm().willCallNativeConstructor("RangeError"_s);
+
     return NativeErrorConstructor<ErrorType::RangeError>::constructImpl(globalObject, callFrame);
 }
 
 JSC_DEFINE_HOST_FUNCTION(callReferenceError, (JSGlobalObject* globalObject, CallFrame* callFrame))
 {
+    globalObject->vm().willCallNativeConstructor("ReferenceError"_s);
+
     return NativeErrorConstructor<ErrorType::ReferenceError>::callImpl(globalObject, callFrame);
 }
 JSC_DEFINE_HOST_FUNCTION(constructReferenceError, (JSGlobalObject* globalObject, CallFrame* callFrame))
 {
+    globalObject->vm().willCallNativeConstructor("ReferenceError"_s);
+
     return NativeErrorConstructor<ErrorType::ReferenceError>::constructImpl(globalObject, callFrame);
 }
 
 JSC_DEFINE_HOST_FUNCTION(callSyntaxError, (JSGlobalObject* globalObject, CallFrame* callFrame))
 {
+    globalObject->vm().willCallNativeConstructor("SyntaxError"_s);
+
     return NativeErrorConstructor<ErrorType::SyntaxError>::callImpl(globalObject, callFrame);
 }
 JSC_DEFINE_HOST_FUNCTION(constructSyntaxError, (JSGlobalObject* globalObject, CallFrame* callFrame))
 {
+    globalObject->vm().willCallNativeConstructor("SyntaxError"_s);
+
     return NativeErrorConstructor<ErrorType::SyntaxError>::constructImpl(globalObject, callFrame);
 }
 
 JSC_DEFINE_HOST_FUNCTION(callTypeError, (JSGlobalObject* globalObject, CallFrame* callFrame))
 {
+    globalObject->vm().willCallNativeConstructor("TypeError"_s);
+
     return NativeErrorConstructor<ErrorType::TypeError>::callImpl(globalObject, callFrame);
 }
 JSC_DEFINE_HOST_FUNCTION(constructTypeError, (JSGlobalObject* globalObject, CallFrame* callFrame))
 {
+    globalObject->vm().willCallNativeConstructor("TypeError"_s);
+
     return NativeErrorConstructor<ErrorType::TypeError>::constructImpl(globalObject, callFrame);
 }
 
 JSC_DEFINE_HOST_FUNCTION(callURIError, (JSGlobalObject* globalObject, CallFrame* callFrame))
 {
+    globalObject->vm().willCallNativeConstructor("URIError"_s);
+
     return NativeErrorConstructor<ErrorType::URIError>::callImpl(globalObject, callFrame);
 }
 JSC_DEFINE_HOST_FUNCTION(constructURIError, (JSGlobalObject* globalObject, CallFrame* callFrame))
 {
+    globalObject->vm().willCallNativeConstructor("URIError"_s);
+
     return NativeErrorConstructor<ErrorType::URIError>::constructImpl(globalObject, callFrame);
 }
 

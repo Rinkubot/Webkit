@@ -25,6 +25,7 @@
 #include "ContextDestructionObserverInlines.h"
 #include "ExtendedDOMClientIsoSubspaces.h"
 #include "ExtendedDOMIsoSubspaces.h"
+#include "InspectorInstrumentation.h"
 #include "JSDOMBinding.h"
 #include "JSDOMConstructor.h"
 #include "JSDOMConvertInterface.h"
@@ -136,6 +137,7 @@ static inline EncodedJSValue constructJSTestOverloadedConstructorsWithSequence2(
 
 template<> EncodedJSValue JSC_HOST_CALL_ATTRIBUTES JSTestOverloadedConstructorsWithSequenceDOMConstructor::construct(JSGlobalObject* lexicalGlobalObject, CallFrame* callFrame)
 {
+    InspectorInstrumentation::willCallNativeConstructor(lexicalGlobalObject, "TestOverloadedConstructorsWithSequence"_s);
     SUPPRESS_UNCOUNTED_LOCAL auto& vm = lexicalGlobalObject->vm();
     auto throwScope = DECLARE_THROW_SCOPE(vm);
     UNUSED_PARAM(throwScope);

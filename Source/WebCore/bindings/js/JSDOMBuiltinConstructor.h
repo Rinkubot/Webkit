@@ -93,6 +93,10 @@ template<typename JSClass> inline JSC::Structure* JSDOMBuiltinConstructor<JSClas
 
 template<typename JSClass> inline JSC::EncodedJSValue JSC_HOST_CALL_ATTRIBUTES JSDOMBuiltinConstructor<JSClass>::construct(JSC::JSGlobalObject* lexicalGlobalObject, JSC::CallFrame* callFrame)
 {
+    auto& vm = JSC::getVM(lexicalGlobalObject);
+
+    vm.willCallNativeConstructor(JSClass::info()->className);
+
     ASSERT(callFrame);
     auto* castedThis = JSC::jsCast<JSDOMBuiltinConstructor*>(callFrame->jsCallee());
     auto* structure = castedThis->getDOMStructureForJSObject(lexicalGlobalObject, asObject(callFrame->newTarget()));

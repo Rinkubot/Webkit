@@ -25,6 +25,7 @@
 #include "ContextDestructionObserverInlines.h"
 #include "ExtendedDOMClientIsoSubspaces.h"
 #include "ExtendedDOMIsoSubspaces.h"
+#include "InspectorInstrumentation.h"
 #include "JSDOMBinding.h"
 #include "JSDOMConstructor.h"
 #include "JSDOMConvertInterface.h"
@@ -137,6 +138,7 @@ using JSExposedToWorkerAndWindowDOMConstructor = JSDOMConstructor<JSExposedToWor
 
 template<> EncodedJSValue JSC_HOST_CALL_ATTRIBUTES JSExposedToWorkerAndWindowDOMConstructor::construct(JSGlobalObject* lexicalGlobalObject, CallFrame* callFrame)
 {
+    InspectorInstrumentation::willCallNativeConstructor(lexicalGlobalObject, "ExposedToWorkerAndWindow"_s);
     SUPPRESS_UNCOUNTED_LOCAL auto& vm = lexicalGlobalObject->vm();
     auto throwScope = DECLARE_THROW_SCOPE(vm);
     auto* castedThis = jsCast<JSExposedToWorkerAndWindowDOMConstructor*>(callFrame->jsCallee());

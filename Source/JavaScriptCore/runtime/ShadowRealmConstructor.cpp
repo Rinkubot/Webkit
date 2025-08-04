@@ -52,6 +52,9 @@ void ShadowRealmConstructor::finishCreation(VM& vm, ShadowRealmPrototype* shadow
 JSC_DEFINE_HOST_FUNCTION(constructWithShadowRealmConstructor, (JSGlobalObject* globalObject, CallFrame*))
 {
     VM& vm = globalObject->vm();
+
+    vm.willCallNativeConstructor("ShadowRealm"_s);
+
     Structure* shadowRealmStructure = ShadowRealmObject::createStructure(vm, globalObject, globalObject->shadowRealmPrototype());
     JSObject* shadowRealmObject = ShadowRealmObject::create(vm, shadowRealmStructure, globalObject);
     return JSValue::encode(shadowRealmObject);

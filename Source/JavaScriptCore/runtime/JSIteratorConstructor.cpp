@@ -92,6 +92,8 @@ JSC_DEFINE_HOST_FUNCTION(constructIterator, (JSGlobalObject* globalObject, CallF
     VM& vm = globalObject->vm();
     auto scope = DECLARE_THROW_SCOPE(vm);
 
+    vm.willCallNativeConstructor("Iterator"_s);
+
     JSObject* newTarget = asObject(callFrame->newTarget());
     JSIteratorConstructor* iteratorConstructor = jsCast<JSIteratorConstructor*>(callFrame->jsCallee());
     if (newTarget == iteratorConstructor)

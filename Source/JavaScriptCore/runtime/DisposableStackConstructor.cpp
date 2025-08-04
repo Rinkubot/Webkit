@@ -86,6 +86,8 @@ JSC_DEFINE_HOST_FUNCTION(constructDisposableStack, (JSGlobalObject* globalObject
     VM& vm = globalObject->vm();
     auto scope = DECLARE_THROW_SCOPE(vm);
 
+    vm.willCallNativeConstructor("DisposableStack"_s);
+
     JSObject* newTarget = asObject(callFrame->newTarget());
     Structure* disposableStackStructure = JSC_GET_DERIVED_STRUCTURE(vm, disposableStackStructure, newTarget, callFrame->jsCallee());
     RETURN_IF_EXCEPTION(scope, { });

@@ -47,6 +47,9 @@ JSC_DEFINE_HOST_FUNCTION(constructJSWebAssemblyException, (JSGlobalObject* globa
 {
     auto& vm = globalObject->vm();
     auto scope = DECLARE_THROW_SCOPE(vm);
+
+    vm.willCallNativeConstructor("Exception"_s);
+
     JSValue tagValue = callFrame->argument(0);
     JSValue tagParameters = callFrame->argument(1);
 

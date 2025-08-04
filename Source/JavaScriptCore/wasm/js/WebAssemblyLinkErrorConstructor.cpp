@@ -43,6 +43,9 @@ JSC_DEFINE_HOST_FUNCTION(constructJSWebAssemblyLinkError, (JSGlobalObject* globa
 {
     auto& vm = globalObject->vm();
     auto scope = DECLARE_THROW_SCOPE(vm);
+
+    vm.willCallNativeConstructor("LinkError"_s);
+
     JSValue message = callFrame->argument(0);
     JSValue options = callFrame->argument(1);
 
@@ -55,6 +58,8 @@ JSC_DEFINE_HOST_FUNCTION(constructJSWebAssemblyLinkError, (JSGlobalObject* globa
 
 JSC_DEFINE_HOST_FUNCTION(callJSWebAssemblyLinkError, (JSGlobalObject* globalObject, CallFrame* callFrame))
 {
+    globalObject->vm().willCallNativeConstructor("LinkError"_s);
+
     JSValue message = callFrame->argument(0);
     JSValue options = callFrame->argument(1);
     Structure* errorStructure = globalObject->webAssemblyLinkErrorStructure();

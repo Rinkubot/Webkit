@@ -658,20 +658,20 @@ Protocol::ErrorStringOr<void> InspectorDebuggerAgent::removeBreakpoint(const Pro
     return { };
 }
 
-static String functionName(JSC::NativeExecutable& nativeExecutable)
+static String functionName(JSC::NativeExecutable* nativeExecutable)
 {
-    return nativeExecutable.name();
+    return nativeExecutable->name();
 }
 
-static String functionName(JSC::FunctionExecutable& functionExecutable)
+static String functionName(JSC::FunctionExecutable* functionExecutable)
 {
-    return functionExecutable.ecmaName().string();
+    return functionExecutable->ecmaName().string();
 }
 
-static String functionName(JSC::CodeBlock& codeBlock)
+static String functionName(JSC::CodeBlock* codeBlock)
 {
-    if (auto* functionExecutable = JSC::jsDynamicCast<JSC::FunctionExecutable*>(codeBlock.ownerExecutable()))
-        return functionName(*functionExecutable);
+    if (auto* functionExecutable = JSC::jsDynamicCast<JSC::FunctionExecutable*>(codeBlock->ownerExecutable()))
+        return functionName(functionExecutable);
 
     return nullString();
 }
@@ -682,11 +682,11 @@ static String functionName(JSC::CallFrame* callFrame)
         return nullString();
 
     if (auto* codeBlock = callFrame->codeBlock())
-        return functionName(*codeBlock);
+        return functionName(codeBlock);
 
     if (auto* jsFunction = JSC::jsDynamicCast<JSC::JSFunction*>(callFrame->jsCallee())) {
         if (auto* nativeExecutable = JSC::jsDynamicCast<JSC::NativeExecutable*>(jsFunction->executable()))
-            return functionName(*nativeExecutable);
+            return functionName(nativeExecutable);
     }
 
     return nullString();
@@ -787,7 +787,7 @@ Protocol::ErrorStringOr<void> InspectorDebuggerAgent::addSymbolicBreakpoint(cons
         JSC::JSLockHolder locker(m_debugger.vm());
 
         m_debugger.forEachRegisteredCodeBlock([&] (JSC::CodeBlock* codeBlock) {
-            if (symbolicBreakpoint.matches(functionName(*codeBlock)))
+            if (symbolicBreakpoint.matches(functionName(codeBlock)))
                 codeBlock->addBreakpoint(1);
         });
     }
@@ -817,7 +817,7 @@ Protocol::ErrorStringOr<void> InspectorDebuggerAgent::addSymbolicBreakpoint(cons
             });
         }
         for (auto* nativeExecutable : WTFMove(newNativeExecutables))
-            didCreateNativeExecutable(*nativeExecutable);
+            didCreateNativeExecutable(nativeExecutable);
     }
 #endif
 
@@ -843,7 +843,7 @@ Protocol::ErrorStringOr<void> InspectorDebuggerAgent::removeSymbolicBreakpoint(c
         JSC::JSLockHolder locker(m_debugger.vm());
 
         m_debugger.forEachRegisteredCodeBlock([&] (JSC::CodeBlock* codeBlock) {
-            if (symbolicBreakpoint.matches(functionName(*codeBlock)))
+            if (symbolicBreakpoint.matches(functionName(codeBlock)))
                 codeBlock->removeBreakpoint(1);
         });
     }
@@ -853,13 +853,14 @@ Protocol::ErrorStringOr<void> InspectorDebuggerAgent::removeSymbolicBreakpoint(c
         Locker locker { s_replacedThunksLock };
 
         replacedThunks().removeAllMatching([&] (auto& replacedThunk) {
-            if (!replacedThunk->nativeExecutable)
+            auto nativeExecutable = replacedThunk->nativeExecutable.get();
+            if (!nativeExecutable)
                 return true;
 
-            if (&replacedThunk->nativeExecutable->vm() != &m_debugger.vm())
+            if (&nativeExecutable->vm() != &m_debugger.vm())
                 return false;
 
-            if (symbolicBreakpoint.matches(functionName(*replacedThunk->nativeExecutable))) {
+            if (symbolicBreakpoint.matches(functionName(nativeExecutable))) {
                 ASSERT(replacedThunk->matchCount);
                 if (!--replacedThunk->matchCount)
                     return true;
@@ -1453,11 +1454,11 @@ Protocol::ErrorStringOr<void> InspectorDebuggerAgent::setPauseForInternalScripts
     return { };
 }
 
-void InspectorDebuggerAgent::didCreateNativeExecutable(JSC::NativeExecutable& nativeExecutable)
+void InspectorDebuggerAgent::didCreateNativeExecutable(JSC::NativeExecutable* nativeExecutable)
 {
 #if ENABLE(JIT)
     auto& vm = m_debugger.vm();
-    ASSERT(&nativeExecutable.vm() == &vm);
+    ASSERT(&nativeExecutable->vm() == &vm);
 
     if (!JSC::Options::useJIT())
         return;
@@ -1480,14 +1481,14 @@ void InspectorDebuggerAgent::didCreateNativeExecutable(JSC::NativeExecutable& na
 
     Locker locker { s_replacedThunksLock };
 
-    auto existingIndex = replacedThunks().find(&nativeExecutable);
+    auto existingIndex = replacedThunks().find(nativeExecutable);
     if (existingIndex != notFound) {
         replacedThunks()[existingIndex]->matchCount += matchCount;
         return;
     }
 
     auto replacedThunk = Box<ReplacedThunk>::create();
-    replacedThunk->nativeExecutable = &nativeExecutable;
+    replacedThunk->nativeExecutable = nativeExecutable;
     replacedThunk->matchCount = matchCount;
 
     auto createJITCodeRef = [&] (CodePtr<JSC::JITThunkPtrTag> thunk) {
@@ -1495,9 +1496,9 @@ void InspectorDebuggerAgent::didCreateNativeExecutable(JSC::NativeExecutable& na
     };
 
     auto replaceThunks = [&] (JSC::CodeSpecializationKind kind) {
-        RELEASE_ASSERT(nativeExecutable.hasJITCodeFor(kind));
+        RELEASE_ASSERT(nativeExecutable->hasJITCodeFor(kind));
 
-        auto jitCode = nativeExecutable.generatedJITCodeFor(kind);
+        auto jitCode = nativeExecutable->generatedJITCodeFor(kind);
         if (!jitCode->canSwapCodeRefForDebugger())
             return false;
 
@@ -1512,10 +1513,10 @@ void InspectorDebuggerAgent::didCreateNativeExecutable(JSC::NativeExecutable& na
             break;
         }
 
-        RELEASE_ASSERT(nativeExecutable.generatedJITCodeWithArityCheckFor(kind) == jitCode->addressForCall(JSC::ArityCheckMode::MustCheckArity));
+        RELEASE_ASSERT(nativeExecutable->generatedJITCodeWithArityCheckFor(kind) == jitCode->addressForCall(JSC::ArityCheckMode::MustCheckArity));
 
         auto oldJITCodeRef = jitCode->swapCodeRefForDebugger(createJITCodeRef(thunk));
-        auto oldArityJITCodeRef = nativeExecutable.swapGeneratedJITCodeWithArityCheckForDebugger(kind, jitCode->addressForCall(JSC::ArityCheckMode::MustCheckArity));
+        auto oldArityJITCodeRef = nativeExecutable->swapGeneratedJITCodeWithArityCheckForDebugger(kind, jitCode->addressForCall(JSC::ArityCheckMode::MustCheckArity));
 
         switch (kind) {
         case JSC::CodeSpecializationKind::CodeForCall:
@@ -1577,6 +1578,31 @@ void InspectorDebuggerAgent::willCallNativeExecutable(JSC::CallFrame* callFrame)
     pauseData->setString("name"_s, symbol);
 
     breakProgram(DebuggerFrontendDispatcher::Reason::FunctionCall, WTFMove(pauseData), m_symbolicBreakpoints[index].specialBreakpoint.copyRef());
+}
+
+void InspectorDebuggerAgent::willCallNativeConstructor(const String& className)
+{
+    if (!breakpointsActive())
+        return;
+
+    if (m_symbolicBreakpoints.isEmpty())
+        return;
+
+    RefPtr<JSC::Breakpoint> specialBreakpoint;
+    for (auto& symbolicBreakpoint : m_symbolicBreakpoints) {
+        if (symbolicBreakpoint.matches(className)) {
+            specialBreakpoint = symbolicBreakpoint.specialBreakpoint;
+            ASSERT(specialBreakpoint);
+            break;
+        }
+    }
+    if (!specialBreakpoint)
+        return;
+
+    auto pauseData = JSON::Object::create();
+    pauseData->setString("name"_s, className);
+
+    breakProgram(DebuggerFrontendDispatcher::Reason::FunctionCall, WTFMove(pauseData), specialBreakpoint.copyRef());
 }
 
 bool InspectorDebuggerAgent::isInspectorDebuggerAgent() const
@@ -1792,7 +1818,7 @@ void InspectorDebuggerAgent::applyBreakpoints(JSC::CodeBlock* codeBlock)
     if (m_symbolicBreakpoints.isEmpty())
         return;
 
-    auto symbol = functionName(*codeBlock);
+    auto symbol = functionName(codeBlock);
     if (symbol.isEmpty())
         return;
 
@@ -1873,14 +1899,15 @@ void InspectorDebuggerAgent::clearInspectorBreakpointState()
         Locker locker { s_replacedThunksLock };
 
         replacedThunks().removeAllMatching([&] (auto& replacedThunk) {
-            if (!replacedThunk->nativeExecutable)
+            auto nativeExecutable = replacedThunk->nativeExecutable.get();
+            if (!nativeExecutable)
                 return true;
 
-            if (&replacedThunk->nativeExecutable->vm() != &m_debugger.vm())
+            if (&nativeExecutable->vm() != &m_debugger.vm())
                 return false;
 
             for (auto& symbolicBreakpoint : m_symbolicBreakpoints) {
-                if (symbolicBreakpoint.matches(functionName(*replacedThunk->nativeExecutable))) {
+                if (symbolicBreakpoint.matches(functionName(nativeExecutable))) {
                     ASSERT(replacedThunk->matchCount);
                     if (!--replacedThunk->matchCount)
                         return true;

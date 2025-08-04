@@ -41,12 +41,16 @@ static JSC_DECLARE_HOST_FUNCTION(constructAsyncFunctionConstructor);
 
 JSC_DEFINE_HOST_FUNCTION(callAsyncFunctionConstructor, (JSGlobalObject* globalObject, CallFrame* callFrame))
 {
+    globalObject->vm().willCallNativeConstructor("AsyncFunction"_s);
+
     ArgList args(callFrame);
     return JSValue::encode(constructFunction(globalObject, callFrame, args, FunctionConstructionMode::Async));
 }
 
 JSC_DEFINE_HOST_FUNCTION(constructAsyncFunctionConstructor, (JSGlobalObject* globalObject, CallFrame* callFrame))
 {
+    globalObject->vm().willCallNativeConstructor("AsyncFunction"_s);
+
     ArgList args(callFrame);
     return JSValue::encode(constructFunction(globalObject, callFrame, args, FunctionConstructionMode::Async, callFrame->newTarget()));
 }

@@ -38,6 +38,7 @@ namespace JSC {
         return callGenericTypedArrayViewImpl<JS##Class>(globalObject, callFrame); \
     } \
     JSC_DEFINE_HOST_FUNCTION(construct##Class, (JSGlobalObject* globalObject, CallFrame* callFrame)) { \
+        globalObject->vm().willCallNativeConstructor(#Class ""_s); \
         return constructGenericTypedArrayViewImpl<JS##Class>(globalObject, callFrame); \
     }
 

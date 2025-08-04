@@ -59,6 +59,9 @@ void AggregateErrorConstructor::finishCreation(VM& vm, AggregateErrorPrototype* 
 JSC_DEFINE_HOST_FUNCTION(callAggregateErrorConstructor, (JSGlobalObject* globalObject, CallFrame* callFrame))
 {
     VM& vm = globalObject->vm();
+
+    vm.willCallNativeConstructor("AggregateError"_s);
+
     JSValue errors = callFrame->argument(0);
     JSValue message = callFrame->argument(1);
     JSValue options = callFrame->argument(2);
@@ -70,6 +73,9 @@ JSC_DEFINE_HOST_FUNCTION(constructAggregateErrorConstructor, (JSGlobalObject* gl
 {
     VM& vm = globalObject->vm();
     auto scope = DECLARE_THROW_SCOPE(vm);
+
+    vm.willCallNativeConstructor("AggregateError"_s);
+
     JSValue errors = callFrame->argument(0);
     JSValue message = callFrame->argument(1);
     JSValue options = callFrame->argument(2);
