@@ -197,7 +197,7 @@ void HTMLFrameElementBase::setLocation(const String& str)
 
 void HTMLFrameElementBase::setLocation(JSC::JSGlobalObject& state, const String& newLocation)
 {
-    if (WTF::protocolIsJavaScript(newLocation)) {
+    if (WTF::isJavaScriptURL(newLocation)) {
         if (!BindingSecurity::shouldAllowAccessToNode(state, contentDocument()))
             return;
     }

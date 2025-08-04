@@ -382,7 +382,7 @@ bool isDefaultPortForProtocol(uint16_t port, StringView protocol)
 
 bool URL::protocolIsJavaScript() const
 {
-    return WTF::protocolIsJavaScript(string());
+    return protocolIs("javascript"_s);
 }
 
 bool URL::protocolIs(StringView protocol) const
@@ -955,9 +955,10 @@ String URL::strippedForUseAsReport() const
     return makeString(StringView(m_string).left(m_userStart), StringView(m_string).substring(end, m_pathEnd - end));
 }
 
-bool protocolIsJavaScript(StringView string)
+bool isJavaScriptURL(StringView string)
 {
-    return protocolIsInternal(string, "javascript"_s);
+    URL url(string.toString());
+    return url.protocolIsJavaScript();
 }
 
 bool protocolIsInHTTPFamily(StringView url)
