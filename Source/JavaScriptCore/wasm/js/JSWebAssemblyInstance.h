@@ -70,6 +70,7 @@ class JSWebAssemblyInstance final : public JSNonFinalObject {
 public:
     using Base = JSNonFinalObject;
     static constexpr DestructionMode needsDestruction = NeedsDestruction;
+    static constexpr uintptr_t MaxSoftStackLimit = uintptr_t(-1);
     static void destroy(JSCell*);
 
     template<typename CellType, SubspaceAccess mode>

@@ -529,6 +529,7 @@ public:
     {
         return m_parser->offset() - m_parser->currentOpcodeStartingOffset();
     }
+    FunctionCodeIndex functionIndex() const { return m_functionIndex; }
     void addCallCommonData(const FunctionSignature&, const CallInformation&);
     void addTailCallCommonData(const FunctionSignature&);
     void didFinishParsingLocals()
@@ -538,10 +539,20 @@ public:
     void didPopValueFromStack(ExpressionType, ASCIILiteral) { }
     void willParseOpcode() { }
     void willParseExtendedOpcode() { }
+    uint32_t previousMC = 0;
     void didParseOpcode()
     {
         if (!m_parser->unreachableBlocks())
             assertAboutStackSize(m_parser->getStackHeightInValues() == m_stackSize.value());
+
+        if (Options::enableWasmDebugger()) {
+            size_t functionStart = m_info.functions[m_functionIndex].start;
+            uint32_t currentOpcodeBaseOffset = functionStart + m_parser->currentOpcodeStartingOffset();
+            uint32_t currentMC = curMC();
+            uint32_t metadataSize = currentMC - previousMC;
+            m_info.addMetaDebugInfo(currentOpcodeBaseOffset, ModuleInformation::MetadataDebugInfo(m_functionIndex, previousMC, metadataSize));
+            previousMC = currentMC;
+        }
     }
     void dump(const ControlStack&, const Stack*);
 
