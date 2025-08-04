@@ -295,9 +295,7 @@ struct SecurityPolicyViolationEventInit;
 struct StartViewTransitionOptions;
 struct ViewTransitionParams;
 
-#if ENABLE(TOUCH_EVENTS)
 struct EventTrackingRegions;
-#endif
 
 #if USE(SYSTEM_PREVIEW)
 struct SystemPreviewInfo;
@@ -1371,6 +1369,7 @@ public:
 
     void updateAccessibilityObjectRegions();
     void updateEventRegions();
+    Vector<EventTrackingRegions> touchEventRegionsForTesting() const;
 
     void invalidateRenderingDependentRegions();
     void invalidateEventRegionsForFrame(HTMLFrameOwnerElement&);
