@@ -642,7 +642,6 @@ public:
     RenderLayer* enclosingFilterLayer(IncludeSelfOrNot = IncludeSelf) const;
     RenderLayer* enclosingFilterRepaintLayer() const;
     void setFilterBackendNeedsRepaintingInRect(const LayoutRect&);
-    bool hasAncestorWithFilterOutsets() const;
 
     inline bool canUseOffsetFromAncestor() const;
     bool canUseOffsetFromAncestor(const RenderLayer& ancestor) const;
@@ -827,7 +826,9 @@ public:
 
     inline bool hasFilter() const;
     bool hasFilterOutsets() const { return !filterOutsets().isZero(); }
+    bool hasAncestorWithFilterOutsets() const;
     IntOutsets filterOutsets() const;
+
     inline bool hasBackdropFilter() const;
 
     bool hasBackdropFilterDescendantsWithoutRoot() const { return m_hasBackdropFilterDescendantsWithoutRoot; }

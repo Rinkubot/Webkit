@@ -711,9 +711,16 @@ inline bool RenderStyle::changeAffectsVisualOverflow(const RenderStyle& other) c
         if (m_nonInheritedData.ptr() == other.m_nonInheritedData.ptr())
             return false;
 
-        if (m_nonInheritedData->miscData.ptr() != other.m_nonInheritedData->miscData.ptr()
-            && m_nonInheritedData->miscData->boxShadow != other.m_nonInheritedData->miscData->boxShadow)
-            return true;
+        if (m_nonInheritedData->miscData.ptr() != other.m_nonInheritedData->miscData.ptr()) {
+            if (m_nonInheritedData->miscData->boxShadow != other.m_nonInheritedData->miscData->boxShadow)
+                return true;
+
+            if (m_nonInheritedData->miscData->filter != other.m_nonInheritedData->miscData->filter) {
+                // FIXME: Repaints due to reference filter outset changes will need to be handled where we have a renderer: webkit.org/b/237538.
+                if (m_nonInheritedData->miscData->filter->operations.outsets() != other.m_nonInheritedData->miscData->filter->operations.outsets())
+                    return true;
+            }
+        }
 
         if (m_nonInheritedData->backgroundData.ptr() != other.m_nonInheritedData->backgroundData.ptr()) {
             auto hasOutlineInVisualOverflow = this->hasOutlineInVisualOverflow();

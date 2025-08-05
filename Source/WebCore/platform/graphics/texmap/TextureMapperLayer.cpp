@@ -211,11 +211,11 @@ void TextureMapperLayer::computeFlattenedRegion(Region& region, bool layerIsFlat
 {
     auto rect = isFlattened() ? m_flattenedLayer->layerRect() : layerRect();
 
-    bool shouldExpand = m_currentFilters.hasOutsets() && !m_state.masksToBounds && !m_state.maskLayer;
+    auto filterOutsets = m_currentFilters.outsets();
+    bool shouldExpand = filterOutsets && !filterOutsets->isZero() && !m_state.masksToBounds && !m_state.maskLayer;
     if (shouldExpand && !layerIsFlatteningRoot) {
-        auto outsets = m_currentFilters.outsets();
-        rect.move(-outsets.left(), -outsets.top());
-        rect.expand(outsets.left() + outsets.right(), outsets.top() + outsets.bottom());
+        rect.move(-filterOutsets->left(), -filterOutsets->top());
+        rect.expand(filterOutsets->left() + filterOutsets->right(), filterOutsets->top() + filterOutsets->bottom());
     }
 
     region.unite(enclosingIntRect(m_layerTransforms.combined.mapRect(rect)));
@@ -230,9 +230,8 @@ void TextureMapperLayer::computeFlattenedRegion(Region& region, bool layerIsFlat
 
     if (shouldExpand && layerIsFlatteningRoot) {
         auto bounds = region.bounds();
-        auto outsets = m_currentFilters.outsets();
-        bounds.move(-outsets.left(), -outsets.top());
-        bounds.expand(outsets.left() + outsets.right(), outsets.top() + outsets.bottom());
+        bounds.move(-filterOutsets->left(), -filterOutsets->top());
+        bounds.expand(filterOutsets->left() + filterOutsets->right(), filterOutsets->top() + filterOutsets->bottom());
         region = bounds;
     }
 }
@@ -943,10 +942,10 @@ void TextureMapperLayer::computeOverlapRegions(ComputeOverlapRegionData& data, c
     else if (m_contentsLayer || m_state.solidColor.isVisible())
         localBoundingRect = m_state.contentsRect;
 
-    if (m_currentFilters.hasOutsets() && !m_state.backdropLayer && !m_state.masksToBounds && !m_state.maskLayer) {
-        auto outsets = m_currentFilters.outsets();
-        localBoundingRect.move(-outsets.left(), -outsets.top());
-        localBoundingRect.expand(outsets.left() + outsets.right(), outsets.top() + outsets.bottom());
+    auto filterOutsets = m_currentFilters.outsets();
+    if (filterOutsets && !filterOutsets->isZero() && !m_state.backdropLayer && !m_state.masksToBounds && !m_state.maskLayer) {
+        localBoundingRect.move(-filterOutsets->left(), -filterOutsets->top());
+        localBoundingRect.expand(filterOutsets->left() + filterOutsets->right(), filterOutsets->top() + filterOutsets->bottom());
     }
 
     TransformationMatrix transform(accumulatedReplicaTransform);

@@ -69,7 +69,7 @@ bool FilterOperations::isReferenceFilter() const
     return m_operations.size() == 1 && m_operations[0]->type() == FilterOperation::Type::Reference;
 }
 
-IntOutsets FilterOperations::outsets() const
+std::optional<IntOutsets> FilterOperations::outsets() const
 {
     IntOutsets totalOutsets;
     for (auto& operation : m_operations) {
@@ -98,8 +98,7 @@ IntOutsets FilterOperations::outsets() const
             break;
         }
         case FilterOperation::Type::Reference:
-            ASSERT_NOT_REACHED();
-            break;
+            return std::nullopt;
         default:
             break;
         }

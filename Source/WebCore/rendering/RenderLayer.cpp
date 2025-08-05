@@ -6439,9 +6439,16 @@ void RenderLayer::updateFilterPaintingStrategy()
 
 IntOutsets RenderLayer::filterOutsets() const
 {
+    if (!renderer().style().hasFilter())
+        return { };
+
     if (m_filters)
         return m_filters->calculateOutsets(renderer(), localBoundingBox());
-    return renderer().style().filterOutsets();
+
+    if (CheckedPtr boxRenderer = renderBox())
+        return boxRenderer->computeFilterOutsets();
+
+    return { };
 }
 
 static RenderLayer* parentLayerCrossFrame(const RenderLayer& layer)

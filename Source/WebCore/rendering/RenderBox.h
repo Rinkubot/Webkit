@@ -166,6 +166,8 @@ public:
     void addVisualOverflow(const LayoutRect&);
     void clearOverflow();
 
+    IntBoxExtent computeFilterOutsets() const;
+
     void addVisualEffectOverflow();
     LayoutRect applyVisualEffectOverflow(const LayoutRect&) const;
 

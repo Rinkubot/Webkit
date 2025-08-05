@@ -69,8 +69,8 @@ public:
 
     bool operationsMatch(const FilterOperations&) const;
 
-    bool hasOutsets() const { return !outsets().isZero(); }
-    IntOutsets outsets() const;
+    // If this returns nullopt, the filters contain reference filters whose outsets can't be computed without a renderer.
+    std::optional<IntOutsets> outsets() const;
 
     bool hasFilterThatAffectsOpacity() const;
     bool hasFilterThatMovesPixels() const;

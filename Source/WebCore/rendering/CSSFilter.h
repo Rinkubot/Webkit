@@ -55,7 +55,7 @@ public:
     FilterStyleVector createFilterStyles(GraphicsContext&, const FilterStyle& sourceStyle) const final;
 
     static bool isIdentity(RenderElement&, const FilterOperations&);
-    static IntOutsets calculateOutsets(RenderElement&, const FilterOperations&, const FloatRect& targetBoundingBox);
+    static IntOutsets calculateOutsets(const RenderElement&, const FilterOperations&, const FloatRect& targetBoundingBox);
 
 private:
     CSSFilter(const FloatSize& filterScale, bool hasFilterThatMovesPixels, bool hasFilterThatShouldBeRestrictedBySecurityOrigin);

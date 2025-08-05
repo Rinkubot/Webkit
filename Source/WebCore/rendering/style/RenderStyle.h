@@ -515,8 +515,6 @@ public:
 
     inline LayoutBoxExtent maskBorderOutsets() const;
 
-    inline IntOutsets filterOutsets() const;
-
     Order rtlOrdering() const { return static_cast<Order>(m_inheritedFlags.rtlOrdering); }
     void setRTLOrdering(Order ordering) { m_inheritedFlags.rtlOrdering = static_cast<unsigned>(ordering); }
 

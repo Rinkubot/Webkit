@@ -204,7 +204,7 @@ static RefPtr<FilterEffect> createSepiaEffect(const BasicColorMatrixFilterOperat
     return FEColorMatrix::create(ColorMatrixType::FECOLORMATRIX_TYPE_MATRIX, WTFMove(inputParameters));
 }
 
-static RefPtr<SVGFilterElement> referenceFilterElement(const Style::ReferenceFilterOperation& filterOperation, RenderElement& renderer)
+static RefPtr<SVGFilterElement> referenceFilterElement(const Style::ReferenceFilterOperation& filterOperation, const RenderElement& renderer)
 {
     RefPtr filterElement = ReferencedSVGResources::referencedFilterElement(renderer.protectedTreeScopeForSVGReferences(), filterOperation);
 
@@ -228,7 +228,7 @@ static bool isIdentityReferenceFilter(const Style::ReferenceFilterOperation& fil
     return SVGFilter::isIdentity(*filterElement);
 }
 
-static IntOutsets calculateReferenceFilterOutsets(const Style::ReferenceFilterOperation& filterOperation, RenderElement& renderer, const FloatRect& targetBoundingBox)
+static IntOutsets calculateReferenceFilterOutsets(const Style::ReferenceFilterOperation& filterOperation, const RenderElement& renderer, const FloatRect& targetBoundingBox)
 {
     RefPtr filterElement = referenceFilterElement(filterOperation, renderer);
     if (!filterElement)
@@ -418,7 +418,7 @@ bool CSSFilter::isIdentity(RenderElement& renderer, const FilterOperations& oper
     return true;
 }
 
-IntOutsets CSSFilter::calculateOutsets(RenderElement& renderer, const FilterOperations& operations, const FloatRect& targetBoundingBox)
+IntOutsets CSSFilter::calculateOutsets(const RenderElement& renderer, const FilterOperations& operations, const FloatRect& targetBoundingBox)
 {
     IntOutsets outsets;
 
