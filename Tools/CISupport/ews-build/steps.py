@@ -85,6 +85,7 @@ if CURRENT_HOSTNAME in EWS_BUILD_HOSTNAMES:
     CURRENT_HOSTNAME = 'ews-build.webkit.org'
 
 
+# test comment
 class ParseByLineLogObserver(logobserver.LineConsumerLogObserver):
     """A pretty wrapper for LineConsumerLogObserver to avoid
        repeatedly setting up generator processors."""
