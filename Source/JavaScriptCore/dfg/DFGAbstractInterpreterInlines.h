@@ -4706,7 +4706,9 @@ bool AbstractInterpreter<AbstractStateType>::executeEffects(unsigned clobberLimi
         }
         ASSERT(node->arrayMode().conversion() == Array::Convert);
         clobberStructures();
-        filterArrayModes(node->child1(), node->arrayMode().arrayModesThatPassFiltering());
+        auto arrayModes = node->arrayMode().arrayModesThatPassFiltering();
+        filterArrayModes(node->child1(), arrayModes);
+        forNode(node->child1()).m_arrayModes = arrayModes;
         break;
     }
     case ArrayifyToStructure: {
