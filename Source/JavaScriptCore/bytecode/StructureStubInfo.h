@@ -25,18 +25,18 @@
 
 #pragma once
 
-#include "CacheableIdentifier.h"
-#include "CodeBlock.h"
-#include "CodeOrigin.h"
-#include "InlineCacheCompiler.h"
-#include "Instruction.h"
-#include "JITStubRoutine.h"
-#include "MacroAssembler.h"
-#include "Options.h"
-#include "RegisterSet.h"
-#include "Structure.h"
-#include "StructureSet.h"
-#include "StructureStubClearingWatchpoint.h"
+#include <JavaScriptCore/CacheableIdentifier.h>
+#include <JavaScriptCore/CodeBlock.h>
+#include <JavaScriptCore/CodeOrigin.h>
+#include <JavaScriptCore/InlineCacheCompiler.h>
+#include <JavaScriptCore/Instruction.h>
+#include <JavaScriptCore/JITStubRoutine.h>
+#include <JavaScriptCore/MacroAssembler.h>
+#include <JavaScriptCore/Options.h>
+#include <JavaScriptCore/RegisterSet.h>
+#include <JavaScriptCore/Structure.h>
+#include <JavaScriptCore/StructureSet.h>
+#include <JavaScriptCore/StructureStubClearingWatchpoint.h>
 #include "StubInfoSummary.h"
 #include <wtf/Box.h>
 #include <wtf/Lock.h>

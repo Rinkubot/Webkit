@@ -32,39 +32,39 @@
 
 WTF_ALLOW_UNSAFE_BUFFER_USAGE_BEGIN
 
-#include "CalleeBits.h"
-#include "CodeSpecializationKind.h"
-#include "ConcurrentJSLock.h"
-#include "DFGDoesGCCheck.h"
-#include "DeleteAllCodeEffort.h"
-#include "ExceptionEventLocation.h"
-#include "FunctionHasExecutedCache.h"
-#include "Heap.h"
-#include "ImplementationVisibility.h"
-#include "IndexingType.h"
-#include "Integrity.h"
-#include "Interpreter.h"
-#include "Intrinsic.h"
-#include "JSCJSValue.h"
-#include "JSDateMath.h"
-#include "JSLock.h"
-#include "JSONAtomStringCache.h"
-#include "KeyAtomStringCache.h"
-#include "MicrotaskQueue.h"
-#include "NativeFunction.h"
-#include "NumericStrings.h"
-#include "SlotVisitorMacros.h"
-#include "SmallStrings.h"
-#include "SourceTaintedOrigin.h"
-#include "StringReplaceCache.h"
-#include "StringSplitCache.h"
-#include "Strong.h"
-#include "SubspaceAccess.h"
-#include "ThunkGenerator.h"
-#include "VMTraps.h"
-#include "WasmContext.h"
-#include "WeakGCMap.h"
-#include "WriteBarrier.h"
+#include <JavaScriptCore/CalleeBits.h>
+#include <JavaScriptCore/CodeSpecializationKind.h>
+#include <JavaScriptCore/ConcurrentJSLock.h>
+#include <JavaScriptCore/DFGDoesGCCheck.h>
+#include <JavaScriptCore/DeleteAllCodeEffort.h>
+#include <JavaScriptCore/ExceptionEventLocation.h>
+#include <JavaScriptCore/FunctionHasExecutedCache.h>
+#include <JavaScriptCore/Heap.h>
+#include <JavaScriptCore/ImplementationVisibility.h>
+#include <JavaScriptCore/IndexingType.h>
+#include <JavaScriptCore/Integrity.h>
+#include <JavaScriptCore/Interpreter.h>
+#include <JavaScriptCore/Intrinsic.h>
+#include <JavaScriptCore/JSCJSValue.h>
+#include <JavaScriptCore/JSDateMath.h>
+#include <JavaScriptCore/JSLock.h>
+#include <JavaScriptCore/JSONAtomStringCache.h>
+#include <JavaScriptCore/KeyAtomStringCache.h>
+#include <JavaScriptCore/MicrotaskQueue.h>
+#include <JavaScriptCore/NativeFunction.h>
+#include <JavaScriptCore/NumericStrings.h>
+#include <JavaScriptCore/SlotVisitorMacros.h>
+#include <JavaScriptCore/SmallStrings.h>
+#include <JavaScriptCore/SourceTaintedOrigin.h>
+#include <JavaScriptCore/StringReplaceCache.h>
+#include <JavaScriptCore/StringSplitCache.h>
+#include <JavaScriptCore/Strong.h>
+#include <JavaScriptCore/SubspaceAccess.h>
+#include <JavaScriptCore/ThunkGenerator.h>
+#include <JavaScriptCore/VMTraps.h>
+#include <JavaScriptCore/WasmContext.h>
+#include <JavaScriptCore/WeakGCMap.h>
+#include <JavaScriptCore/WriteBarrier.h>
 #include <wtf/BumpPointerAllocator.h>
 #include <wtf/CheckedArithmetic.h>
 #include <wtf/DoublyLinkedList.h>
@@ -224,7 +224,7 @@ private:
 enum VMIdentifierType { };
 using VMIdentifier = AtomicObjectIdentifier<VMIdentifierType>;
 
-class VM : public ThreadSafeRefCountedWithSuppressingSaferCPPChecking<VM>, public DoublyLinkedListNode<VM> {
+class VM : public WTF::ThreadSafeRefCountedWithSuppressingSaferCPPChecking<VM>, public WTF::DoublyLinkedListNode<VM> {
     WTF_DEPRECATED_MAKE_FAST_ALLOCATED_WITH_HEAP_IDENTIFIER(VM, VM);
 public:
     // WebCore has a one-to-one mapping of threads to VMs;
@@ -1180,6 +1180,27 @@ template<> struct DefaultRefDerefTraits<JSC::VM> {
     }
 
     static ALWAYS_INLINE void derefIfNotNull(JSC::VM* ptr)
+    {
+        if (ptr) [[likely]]
+            ptr->derefSuppressingSaferCPPChecking();
+    }
+};
+
+template<> struct DefaultRefDerefTraits<const JSC::VM> {
+    static ALWAYS_INLINE const JSC::VM* refIfNotNull(const JSC::VM* ptr)
+    {
+        if (ptr) [[likely]]
+            ptr->refSuppressingSaferCPPChecking();
+        return ptr;
+    }
+
+    static ALWAYS_INLINE const JSC::VM& ref(const JSC::VM& ref)
+    {
+        ref.refSuppressingSaferCPPChecking();
+        return ref;
+    }
+
+    static ALWAYS_INLINE void derefIfNotNull(const JSC::VM* ptr)
     {
         if (ptr) [[likely]]
             ptr->derefSuppressingSaferCPPChecking();

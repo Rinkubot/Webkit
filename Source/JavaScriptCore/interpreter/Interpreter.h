@@ -29,11 +29,11 @@
 
 #pragma once
 
-#include "BytecodeIndex.h"
-#include "JSCJSValue.h"
-#include "MacroAssemblerCodeRef.h"
-#include "NativeFunction.h"
-#include "Opcode.h"
+#include <JavaScriptCore/BytecodeIndex.h>
+#include <JavaScriptCore/JSCJSValue.h>
+#include <JavaScriptCore/MacroAssemblerCodeRef.h>
+#include <JavaScriptCore/NativeFunction.h>
+#include <JavaScriptCore/Opcode.h>
 #include <wtf/HashMap.h>
 #include <wtf/TZoneMalloc.h>
 

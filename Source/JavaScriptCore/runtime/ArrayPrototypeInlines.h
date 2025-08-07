@@ -25,16 +25,16 @@
 
 #pragma once
 
-#include "ArrayConstructor.h"
-#include "ArrayPrototype.h"
-#include "CommonIdentifiers.h"
-#include "Error.h"
-#include "ExceptionHelpers.h"
-#include "GetVM.h"
-#include "JSGlobalObject.h"
+#include <JavaScriptCore/ArrayConstructor.h>
+#include <JavaScriptCore/ArrayPrototype.h>
+#include <JavaScriptCore/CommonIdentifiers.h>
+#include <JavaScriptCore/Error.h>
+#include <JavaScriptCore/ExceptionHelpers.h>
+#include <JavaScriptCore/GetVM.h>
+#include <JavaScriptCore/JSGlobalObject.h>
 #include "JSStringJoiner.h"
-#include "JSStringInlines.h"
-#include "ObjectPrototype.h"
+#include <JavaScriptCore/JSStringInlines.h>
+#include <JavaScriptCore/ObjectPrototype.h>
 #include "StringRecursionChecker.h"
 
 WTF_ALLOW_UNSAFE_BUFFER_USAGE_BEGIN

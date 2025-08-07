@@ -68,11 +68,11 @@ class CppAlternateBackendDispatcherHeaderGenerator(CppGenerator):
         target_framework_name = self.model().framework.name
         header_includes = [
             ([target_framework_name], (target_framework_name, "%sProtocolObjects.h" % self.protocol_name())),
-            (["JavaScriptCore"], ("JavaScriptCore", "inspector/InspectorFrontendRouter.h")),
-            (["JavaScriptCore"], ("JavaScriptCore", "inspector/InspectorBackendDispatcher.h")),
+#            (["JavaScriptCore"], ("JavaScriptCore", "inspector/InspectorFrontendRouter.h")),
+#            (["JavaScriptCore"], ("JavaScriptCore", "inspector/InspectorBackendDispatcher.h")),
         ]
 
-        return '\n'.join(self.generate_includes_from_entries(header_includes))
+        return '\n'.join(self.generate_includes_from_entries(header_includes) + ["#include <JavaScriptCore/InspectorFrontendRouter.h>", "#include <JavaScriptCore/InspectorBackendDispatcher.h>"])
 
     def _generate_handler_declarations_for_domain(self, domain):
         commands = self.commands_for_domain(domain)

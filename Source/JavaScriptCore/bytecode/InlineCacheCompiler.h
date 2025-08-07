@@ -28,11 +28,11 @@
 #if ENABLE(JIT)
 
 #include "AccessCase.h"
-#include "JITStubRoutine.h"
-#include "JSFunctionInlines.h"
-#include "MacroAssembler.h"
-#include "ScratchRegisterAllocator.h"
-#include "StructureStubClearingWatchpoint.h"
+#include <JavaScriptCore/JITStubRoutine.h>
+#include <JavaScriptCore/JSFunctionInlines.h>
+#include <JavaScriptCore/MacroAssembler.h>
+#include <JavaScriptCore/ScratchRegisterAllocator.h>
+#include <JavaScriptCore/StructureStubClearingWatchpoint.h>
 #include <wtf/FixedVector.h>
 #include <wtf/Vector.h>
 

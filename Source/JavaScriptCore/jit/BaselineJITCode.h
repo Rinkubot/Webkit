@@ -25,10 +25,10 @@
 
 #pragma once
 
-#include "CallLinkInfo.h"
-#include "JITCode.h"
-#include "JITCodeMap.h"
-#include "StructureStubInfo.h"
+#include <JavaScriptCore/CallLinkInfo.h>
+#include <JavaScriptCore/JITCode.h>
+#include <JavaScriptCore/JITCodeMap.h>
+#include <JavaScriptCore/StructureStubInfo.h>
 #include <wtf/ButterflyArray.h>
 #include <wtf/CompactPointerTuple.h>
 

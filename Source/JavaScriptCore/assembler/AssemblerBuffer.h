@@ -29,10 +29,10 @@
 
 #if ENABLE(ASSEMBLER)
 
-#include "ExecutableAllocator.h"
-#include "JITCompilationEffort.h"
-#include "SecureARM64EHashPinsInlines.h"
-#include "stdint.h"
+#include <JavaScriptCore/ExecutableAllocator.h>
+#include <JavaScriptCore/JITCompilationEffort.h>
+#include <JavaScriptCore/SecureARM64EHashPinsInlines.h>
+#include <stdint.h>
 #include <string.h>
 #include <wtf/Assertions.h>
 #include <wtf/FastMalloc.h>

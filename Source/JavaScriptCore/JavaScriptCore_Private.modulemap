@@ -1,0 +1,26 @@
+//
+//  JavaScriptCore_Private.modulemap
+//  JavaScriptCore
+//
+//  Created by Richard Robinson on 7/31/25.
+//
+
+framework module JavaScriptCore_Private [system] {
+    umbrella "PrivateHeaders"
+
+    requires cplusplus11
+
+    exclude header "AirOpcodeGenerated.h"
+    exclude header "AirOpcodeUtils.h"
+    exclude header "B3Const128Value.h"
+    exclude header "B3SIMDValue.h"
+    exclude header "B3PCToOriginMap.h"
+    exclude header "ArrayPrototypeInlines.h"
+    exclude header "InlineCacheCompiler.h"
+    exclude header "StructureStubInfo.h"
+
+    explicit module * {
+      export *
+    }
+}
+

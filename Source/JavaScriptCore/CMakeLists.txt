@@ -6,6 +6,7 @@ list(APPEND JavaScriptCore_UNIFIED_SOURCE_LIST_FILES
 
 set(JavaScriptCore_INCLUDE_DIRECTORIES
     "${JavaScriptCore_FRAMEWORK_HEADERS_DIR}"
+    "${JavaScriptCore_PRIVATE_FRAMEWORK_HEADERS_DIR}"
 )
 
 set(JavaScriptCore_PRIVATE_INCLUDE_DIRECTORIES
@@ -405,7 +406,7 @@ set(LLIntSettingsExtractor_PRIVATE_INCLUDE_DIRECTORIES
     $<TARGET_PROPERTY:JavaScriptCore,INCLUDE_DIRECTORIES>
 )
 set(LLIntSettingsExtractor_FRAMEWORKS ${JavaScriptCore_FRAMEWORKS})
-set(LLIntSettingsExtractor_DEPENDENCIES JavaScriptCore_CopyHeaders)
+set(LLIntSettingsExtractor_DEPENDENCIES JavaScriptCore_CopyHeaders JavaScriptCore_CopyLLIntDependentHeaders)
 WEBKIT_EXECUTABLE(LLIntSettingsExtractor)
 
 # LLIntSettingsExtractor target needs to have a direct or indirect
@@ -421,7 +422,7 @@ set(LLIntOffsetsExtractor_SOURCES
 )
 
 set(LLIntOffsetsExtractor_PRIVATE_INCLUDE_DIRECTORIES
-    $<TARGET_PROPERTY:JavaScriptCore,INCLUDE_DIRECTORIES>
+    ${JavaScriptCore_FRAMEWORK_HEADERS_DIR}
 )
 set(LLIntOffsetsExtractor_FRAMEWORKS ${JavaScriptCore_FRAMEWORKS})
 set(LLIntOffsetsExtractor_DEPENDENCIES JavaScriptCore_CopyHeaders JSCBuiltins)
@@ -514,6 +515,37 @@ set(JavaScriptCore_PUBLIC_FRAMEWORK_HEADERS
     API/WebKitAvailability.h
 )
 
+set(JavaScriptCore_PRIVATE_LLINT_DEPENDENT_FRAMEWORK_HEADERS
+    assembler/OSCheck.h
+    assembler/SecureARM64EHashPins.h
+
+    bytecode/Opcode.h
+    bytecode/OpcodeSize.h
+
+    heap/CellAttributes.h
+    heap/CellContainer.h
+    heap/DestructionMode.h
+    heap/GCLogging.h
+    heap/HeapCell.h
+    heap/MarkedBlock.h
+    heap/Weak.h
+    heap/WeakBlock.h
+    heap/WeakImpl.h
+    heap/WeakSet.h
+
+    llint/LLIntOpcode.h
+
+    runtime/Concurrency.h
+    runtime/EnsureStillAliveHere.h
+    runtime/ECMAMode.h
+    runtime/Gate.h
+    runtime/JSCConfig.h
+    runtime/JSCJSValue.h
+    runtime/JSExportMacros.h
+    runtime/OptionsList.h
+    runtime/PureNaN.h
+)
+
 set(JavaScriptCore_PRIVATE_FRAMEWORK_HEADERS
     ${JavaScriptCore_DERIVED_SOURCES_DIR}/Bytecodes.h
     ${JavaScriptCore_DERIVED_SOURCES_DIR}/JSCBuiltins.h
@@ -584,12 +616,10 @@ set(JavaScriptCore_PRIVATE_FRAMEWORK_HEADERS
     assembler/MacroAssemblerHelpers.h
     assembler/MacroAssemblerRISCV64.h
     assembler/MacroAssemblerX86_64.h
-    assembler/OSCheck.h
     assembler/Printer.h
     assembler/RISCV64Assembler.h
     assembler/RISCV64Registers.h
     assembler/RegisterInfo.h
-    assembler/SecureARM64EHashPins.h
     assembler/SecureARM64EHashPinsInlines.h
     assembler/X86Assembler.h
     assembler/X86_64Registers.h
@@ -646,8 +676,6 @@ set(JavaScriptCore_PRIVATE_FRAMEWORK_HEADERS
     bytecode/MetadataTable.h
     bytecode/ObjectAllocationProfile.h
     bytecode/ObjectPropertyCondition.h
-    bytecode/Opcode.h
-    bytecode/OpcodeSize.h
     bytecode/Operands.h
     bytecode/PropertyCondition.h
     bytecode/PutByIdFlags.h
@@ -698,8 +726,6 @@ set(JavaScriptCore_PRIVATE_FRAMEWORK_HEADERS
     heap/BlockDirectory.h
     heap/BlockDirectoryBits.h
     heap/BlockDirectoryInlines.h
-    heap/CellAttributes.h
-    heap/CellContainer.h
     heap/CellContainerInlines.h
     heap/CellState.h
     heap/CollectionScope.h
@@ -712,7 +738,6 @@ set(JavaScriptCore_PRIVATE_FRAMEWORK_HEADERS
     heap/DeferGC.h
     heap/DeferGCInlines.h
     heap/DeleteAllCodeEffort.h
-    heap/DestructionMode.h
     heap/EdenGCActivityCallback.h
     heap/FastMallocAlignedMemoryAllocator.h
     heap/FreeList.h
@@ -725,7 +750,6 @@ set(JavaScriptCore_PRIVATE_FRAMEWORK_HEADERS
     heap/GCIncomingRefCounted.h
     heap/GCIncomingRefCountedInlines.h
     heap/GCIncomingRefCountedSet.h
-    heap/GCLogging.h
     heap/GCMemoryOperations.h
     heap/GCOwnedDataScope.h
     heap/GCRequest.h
@@ -737,7 +761,6 @@ set(JavaScriptCore_PRIVATE_FRAMEWORK_HEADERS
     heap/HandleTypes.h
     heap/Heap.h
     heap/HeapAnalyzer.h
-    heap/HeapCell.h
     heap/HeapCellInlines.h
     heap/HeapCellType.h
     heap/HeapFinalizerCallback.h
@@ -756,7 +779,6 @@ set(JavaScriptCore_PRIVATE_FRAMEWORK_HEADERS
     heap/LocalAllocatorInlines.h
     heap/MachineStackMarker.h
     heap/MarkStack.h
-    heap/MarkedBlock.h
     heap/MarkedBlockInlines.h
     heap/MarkedBlockSet.h
     heap/MarkedSpace.h
@@ -783,12 +805,8 @@ set(JavaScriptCore_PRIVATE_FRAMEWORK_HEADERS
     heap/TinyBloomFilter.h
     heap/VerifierSlotVisitor.h
     heap/VisitRaceKey.h
-    heap/Weak.h
-    heap/WeakBlock.h
     heap/WeakHandleOwner.h
-    heap/WeakImpl.h
     heap/WeakInlines.h
-    heap/WeakSet.h
     heap/WeakSetInlines.h
 
     inspector/AsyncStackTrace.h
@@ -887,7 +905,6 @@ set(JavaScriptCore_PRIVATE_FRAMEWORK_HEADERS
     jit/ThunkGenerator.h
     jit/Width.h
 
-    llint/LLIntOpcode.h
     llint/LLIntThunks.h
 
     parser/Lexer.h
@@ -970,7 +987,6 @@ set(JavaScriptCore_PRIVATE_FRAMEWORK_HEADERS
     runtime/CommonIdentifiers.h
     runtime/CompilationResult.h
     runtime/Completion.h
-    runtime/Concurrency.h
     runtime/ConcurrentJSLock.h
     runtime/ConfigFile.h
     runtime/ConsoleClient.h
@@ -1000,8 +1016,6 @@ set(JavaScriptCore_PRIVATE_FRAMEWORK_HEADERS
     runtime/DisposableStackPrototype.h
     runtime/DisposableStackPrototypeInlines.h
     runtime/DumpContext.h
-    runtime/ECMAMode.h
-    runtime/EnsureStillAliveHere.h
     runtime/EnumerationMode.h
     runtime/Error.h
     runtime/ErrorHandlingScope.h
@@ -1026,7 +1040,6 @@ set(JavaScriptCore_PRIVATE_FRAMEWORK_HEADERS
     runtime/FunctionPrototype.h
     runtime/FunctionRareData.h
     runtime/FuzzerAgent.h
-    runtime/Gate.h
     runtime/GenericArgumentsImpl.h
     runtime/GenericOffset.h
     runtime/GenericTypedArrayView.h
@@ -1069,7 +1082,6 @@ set(JavaScriptCore_PRIVATE_FRAMEWORK_HEADERS
     runtime/JSCBytecodeCacheVersion.h
     runtime/JSCConfig.h
     runtime/JSCInlines.h
-    runtime/JSCJSValue.h
     runtime/JSCJSValueInlines.h
     runtime/JSCPtrTag.h
     runtime/JSCallee.h
@@ -1085,7 +1097,6 @@ set(JavaScriptCore_PRIVATE_FRAMEWORK_HEADERS
     runtime/JSDestructibleObjectHeapCellType.h
     runtime/JSDisposableStack.h
     runtime/JSDisposableStackInlines.h
-    runtime/JSExportMacros.h
     runtime/JSFunction.h
     runtime/JSFunctionInlines.h
     runtime/JSGenerator.h
@@ -1173,7 +1184,6 @@ set(JavaScriptCore_PRIVATE_FRAMEWORK_HEADERS
     runtime/ObjectPrototype.h
     runtime/Operations.h
     runtime/Options.h
-    runtime/OptionsList.h
     runtime/OrderedHashTable.h
     runtime/OrderedHashTableHelper.h
     runtime/PageCount.h
@@ -1191,7 +1201,6 @@ set(JavaScriptCore_PRIVATE_FRAMEWORK_HEADERS
     runtime/Protect.h
     runtime/PrototypeKey.h
     runtime/ProxyObject.h
-    runtime/PureNaN.h
     runtime/PutDirectIndexMode.h
     runtime/PutPropertySlot.h
     runtime/RegExp.h
@@ -1471,6 +1480,7 @@ set(JavaScriptCore_INTERFACE_INCLUDE_DIRECTORIES
 set(JavaScriptCore_INTERFACE_DEPENDENCIES
     JavaScriptCore_CopyHeaders
     JavaScriptCore_CopyPrivateHeaders
+    JavaScriptCore_CopyLLIntDependentHeaders
 )
 
 WEBKIT_FRAMEWORK_DECLARE(JavaScriptCore)
@@ -1511,6 +1521,13 @@ WEBKIT_COPY_FILES(JavaScriptCore_CopyPrivateHeaders
     FILES ${JavaScriptCore_PRIVATE_FRAMEWORK_HEADERS}
     FLATTENED
 )
+
+WEBKIT_COPY_FILES(JavaScriptCore_CopyLLIntDependentHeaders
+    DESTINATION ${JavaScriptCore_PRIVATE_FRAMEWORK_HEADERS_DIR}/JavaScriptCore
+    FILES ${JavaScriptCore_PRIVATE_LLINT_DEPENDENT_FRAMEWORK_HEADERS}
+    FLATTENED
+)
+
 add_dependencies(JavaScriptCore_CopyPrivateHeaders Bytecodes JSCBuiltins)
 # JavaScriptCore_CopyPrivateHeaders needs to have a direct or indirect
 # dependency of JavaScriptCore for CMake Visual Studio generator to
