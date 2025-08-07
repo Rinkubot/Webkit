@@ -2436,12 +2436,12 @@ platform/gamepad/GamepadConstants.cpp
 platform/gamepad/GamepadProvider.cpp
 platform/graphics/AV1Utilities.cpp
 platform/graphics/AlphaPremultiplication.cpp
+platform/graphics/ArrayPixelBuffer.cpp
 platform/graphics/AnimationFrameRate.cpp
 platform/graphics/BifurcatedGraphicsContext.cpp
 platform/graphics/BitmapImage.cpp
 platform/graphics/BitmapImageDescriptor.cpp
 platform/graphics/BitmapImageSource.cpp
-platform/graphics/ByteArrayPixelBuffer.cpp
 platform/graphics/CachedSubimage.cpp
 platform/graphics/CodecUtilities.cpp
 platform/graphics/Color.cpp
@@ -2466,7 +2466,6 @@ platform/graphics/DisplayUpdate.cpp
 platform/graphics/DoublePoint.cpp
 platform/graphics/DoubleRect.cpp
 platform/graphics/DoubleSize.cpp
-platform/graphics/Float16ArrayPixelBuffer.cpp
 platform/graphics/FloatLine.cpp
 platform/graphics/FloatPoint.cpp
 platform/graphics/FloatPoint3D.cpp

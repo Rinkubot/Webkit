@@ -42,13 +42,34 @@ namespace WebCore {
 class PixelBuffer : public RefCounted<PixelBuffer> {
     WTF_MAKE_NONCOPYABLE(PixelBuffer);
 public:
+    static constexpr uint32_t bytesPerPixelComponent(PixelFormat pixelFormat)
+    {
+#if ENABLE(PIXEL_FORMAT_RGBA16F)
+        return (pixelFormat == PixelFormat::RGBA16F) ? 2 : 1;
+#else
+        UNUSED_PARAM(pixelFormat);
+        return 1;
+#endif
+    }
+
+    static constexpr uint32_t componentsPerPixel(PixelFormat pixelFormat)
+    {
+        ASSERT_UNUSED(pixelFormat, supportedPixelFormat(pixelFormat));
+        return 4;
+    }
+
+    static constexpr uint32_t bytesPerPixel(PixelFormat pixelFormat)
+    {
+        return bytesPerPixelComponent(pixelFormat) * componentsPerPixel(pixelFormat);
+    }
+
     static CheckedUint32 computePixelCount(const IntSize&);
     static CheckedUint32 computePixelComponentCount(PixelFormat, const IntSize&);
     WEBCORE_EXPORT static CheckedUint32 computeBufferSize(PixelFormat, const IntSize&);
 
     WEBCORE_EXPORT static bool supportedPixelFormat(PixelFormat);
 
-    WEBCORE_EXPORT virtual ~PixelBuffer();
+    virtual ~PixelBuffer() = default;
 
     const PixelBufferFormat& format() const { return m_format; }
     const IntSize& size() const { return m_size; }
@@ -62,7 +83,7 @@ public:
 #endif
         Other
     };
-    virtual Type type() const { return Type::Other; }
+    virtual Type type() const = 0;
     virtual RefPtr<PixelBuffer> createScratchPixelBuffer(const IntSize&) const = 0;
 
     bool setRange(std::span<const uint8_t> data, size_t byteOffset);
@@ -74,11 +95,12 @@ public:
 
 protected:
     WEBCORE_EXPORT PixelBuffer(const PixelBufferFormat&, const IntSize&, std::span<uint8_t> bytes);
-    
-    PixelBufferFormat m_format;
-    IntSize m_size;
 
-    std::span<uint8_t> m_bytes;
+private:
+    const PixelBufferFormat m_format;
+    const IntSize m_size;
+
+    const std::span<uint8_t> m_bytes;
 };
 
 // Type to use for functions that use the PixelBuffer data as source during the call, but do not store a reference to the object or modify the data.
@@ -112,9 +134,9 @@ private:
     {
     }
 
-    PixelBufferFormat m_format;
-    IntSize m_size;
-    std::span<const uint8_t> m_bytes;
+    const PixelBufferFormat m_format;
+    const IntSize m_size;
+    const std::span<const uint8_t> m_bytes;
 };
 
 } // namespace WebCore

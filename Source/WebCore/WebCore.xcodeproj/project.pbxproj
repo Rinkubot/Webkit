@@ -2916,7 +2916,9 @@
 		72FD30AC27E3217B0023CDAC /* SourceBrush.h in Headers */ = {isa = PBXBuildFile; fileRef = 72FD30AA27E3217B0023CDAC /* SourceBrush.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		72FD88D1295E3C40006FACDC /* MenuListPart.h in Headers */ = {isa = PBXBuildFile; fileRef = 72FD88D0295D56E2006FACDC /* MenuListPart.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		7410760E2D6BDCA9000EC9C0 /* PlatformDynamicRangeLimitCocoa.h in Headers */ = {isa = PBXBuildFile; fileRef = 7410760D2D6BDB77000EC9C0 /* PlatformDynamicRangeLimitCocoa.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		7487E70D2E458B5900D4F9A1 /* TypedArrayPixelBuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = 7487E70A2E458B5900D4F9A1 /* TypedArrayPixelBuffer.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		74C2F53E29AC9B0B006C5F97 /* ApplePayDeferredPaymentRequest.h in Headers */ = {isa = PBXBuildFile; fileRef = 74C2F53D29AC9B0A006C5F97 /* ApplePayDeferredPaymentRequest.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		74FDCF282E4212BD00F31834 /* ArrayPixelBuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = 74FDCF252E4212BD00F31834 /* ArrayPixelBuffer.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		7553CFE8108F473F00EA281E /* TimelineRecordFactory.h in Headers */ = {isa = PBXBuildFile; fileRef = 7553CFE6108F473F00EA281E /* TimelineRecordFactory.h */; };
 		75793E840D0CE0B3007FC0AC /* MessageEvent.h in Headers */ = {isa = PBXBuildFile; fileRef = 75793E810D0CE0B3007FC0AC /* MessageEvent.h */; };
 		75793EC90D0CE72D007FC0AC /* JSMessageEvent.h in Headers */ = {isa = PBXBuildFile; fileRef = 75793EC70D0CE72D007FC0AC /* JSMessageEvent.h */; };
@@ -13718,8 +13720,6 @@
 		72BB9E8C2952590E00842DBB /* ButtonControlMac.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ButtonControlMac.mm; sourceTree = "<group>"; };
 		72BB9E8D2952590F00842DBB /* ButtonControlMac.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ButtonControlMac.h; sourceTree = "<group>"; };
 		72BDF25E2A2B647200260319 /* PathSegmentData.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PathSegmentData.h; sourceTree = "<group>"; };
-		72C11DAB28492A9200E826DD /* ByteArrayPixelBuffer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ByteArrayPixelBuffer.cpp; sourceTree = "<group>"; };
-		72C11DAB28492A9300E826DD /* Float16ArrayPixelBuffer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Float16ArrayPixelBuffer.cpp; sourceTree = "<group>"; };
 		72C11DAC28492A9200E826DD /* ByteArrayPixelBuffer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ByteArrayPixelBuffer.h; sourceTree = "<group>"; };
 		72C11DAC28492A9300E826DD /* Float16ArrayPixelBuffer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Float16ArrayPixelBuffer.h; sourceTree = "<group>"; };
 		72C172102983717500136E02 /* CachedSubimage.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CachedSubimage.cpp; sourceTree = "<group>"; };
@@ -13798,9 +13798,12 @@
 		72FE4047292F3D3B001D3855 /* ImageBufferContextSwitcher.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ImageBufferContextSwitcher.cpp; sourceTree = "<group>"; };
 		7410760D2D6BDB77000EC9C0 /* PlatformDynamicRangeLimitCocoa.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PlatformDynamicRangeLimitCocoa.h; sourceTree = "<group>"; };
 		746357992D7F91B200AFA625 /* PlatformDynamicRangeLimitCocoa.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = PlatformDynamicRangeLimitCocoa.mm; sourceTree = "<group>"; };
+		7487E70A2E458B5900D4F9A1 /* TypedArrayPixelBuffer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TypedArrayPixelBuffer.h; sourceTree = "<group>"; };
 		74C2F53D29AC9B0A006C5F97 /* ApplePayDeferredPaymentRequest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ApplePayDeferredPaymentRequest.h; sourceTree = "<group>"; };
 		74C2F53F29AC9B1C006C5F97 /* ApplePayDeferredPaymentRequest.idl */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ApplePayDeferredPaymentRequest.idl; sourceTree = "<group>"; };
 		74CE9900299503A200096552 /* attachmentElementShadow.css */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.css; path = attachmentElementShadow.css; sourceTree = "<group>"; };
+		74FDCF252E4212BD00F31834 /* ArrayPixelBuffer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ArrayPixelBuffer.h; sourceTree = "<group>"; };
+		74FDCF262E4212BD00F31834 /* ArrayPixelBuffer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ArrayPixelBuffer.cpp; sourceTree = "<group>"; };
 		7553CFE6108F473F00EA281E /* TimelineRecordFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TimelineRecordFactory.h; sourceTree = "<group>"; };
 		7553CFE7108F473F00EA281E /* TimelineRecordFactory.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TimelineRecordFactory.cpp; sourceTree = "<group>"; };
 		75793E800D0CE0B3007FC0AC /* MessageEvent.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = MessageEvent.cpp; sourceTree = "<group>"; };
@@ -34367,6 +34370,8 @@
 				7299BC6423D686A600CC6883 /* AlphaPremultiplication.h */,
 				0F7E475125EEB79A0013F909 /* AnimationFrameRate.cpp */,
 				722A815C238FD50500C00583 /* AnimationFrameRate.h */,
+				74FDCF262E4212BD00F31834 /* ArrayPixelBuffer.cpp */,
+				74FDCF252E4212BD00F31834 /* ArrayPixelBuffer.h */,
 				BEF29EE91715DD0900C4B4C9 /* AudioTrackPrivate.h */,
 				CD1F9B152702360E00617EB6 /* AudioTrackPrivateClient.h */,
 				CD1A22572B0759AC0038923E /* AV1Utilities.cpp */,
@@ -34379,7 +34384,6 @@
 				7224ABCF2C0174EE00D85362 /* BitmapImageDescriptor.h */,
 				72854E672B6987B600E0181A /* BitmapImageSource.cpp */,
 				72854E662B6987B600E0181A /* BitmapImageSource.h */,
-				72C11DAB28492A9200E826DD /* ByteArrayPixelBuffer.cpp */,
 				72C11DAC28492A9200E826DD /* ByteArrayPixelBuffer.h */,
 				72C172102983717500136E02 /* CachedSubimage.cpp */,
 				72C172112983717500136E02 /* CachedSubimage.h */,
@@ -34441,7 +34445,6 @@
 				2A9D2ABF2E34956600E1B1DB /* DoubleRect.h */,
 				2A9D2AC62E3495A800E1B1DB /* DoubleSize.cpp */,
 				2A9D2AC02E34956600E1B1DB /* DoubleSize.h */,
-				72C11DAB28492A9300E826DD /* Float16ArrayPixelBuffer.cpp */,
 				72C11DAC28492A9300E826DD /* Float16ArrayPixelBuffer.h */,
 				2E888CA925F6A4110057914A /* FloatLine.cpp */,
 				2E888CA825F6A4110057914A /* FloatLine.h */,
@@ -34755,6 +34758,7 @@
 				CD1F9B1B27024BC100617EB6 /* TrackPrivateBaseClient.h */,
 				7209C47E2931C86400633C0D /* TransparencyLayerContextSwitcher.cpp */,
 				7209C47F2931C86400633C0D /* TransparencyLayerContextSwitcher.h */,
+				7487E70A2E458B5900D4F9A1 /* TypedArrayPixelBuffer.h */,
 				E4AFCFA40DAF29A300F5F55C /* UnitBezier.h */,
 				0F5A57CA229B18AE0025EDA9 /* VelocityData.cpp */,
 				0F1A0C36229A481800D37ADB /* VelocityData.h */,
@@ -40936,6 +40940,7 @@
 				512DD8FC0D91E6AF000F89EE /* ArchiveResource.h in Headers */,
 				512DD8F80D91E6AF000F89EE /* ArchiveResourceCollection.h in Headers */,
 				716C4C3627EB60C900531467 /* ARKitBadgeSystemImage.h in Headers */,
+				74FDCF282E4212BD00F31834 /* ArrayPixelBuffer.h in Headers */,
 				FD5686CA13AC180200B69C68 /* AsyncAudioDecoder.h in Headers */,
 				E1CDE9221501916900862CC5 /* AsyncFileStream.h in Headers */,
 				01D22A1F2CFD826C002DC857 /* AsyncNodeDeletionQueue.h in Headers */,
@@ -46044,6 +46049,7 @@
 				A336CF352B8649BF00464599 /* TrustedScriptURL.h in Headers */,
 				A336CF322B86492700464599 /* TrustedType.h in Headers */,
 				C375D7FE16639519006184AB /* TypeAhead.h in Headers */,
+				7487E70D2E458B5900D4F9A1 /* TypedArrayPixelBuffer.h in Headers */,
 				E46A2B1C17CA65B9000DBCD8 /* TypedElementDescendantIterator.h in Headers */,
 				CD814C312996C0D9005A780A /* TypedElementDescendantIteratorInlines.h in Headers */,
 				93309E1A099E64920056E581 /* TypingCommand.h in Headers */,

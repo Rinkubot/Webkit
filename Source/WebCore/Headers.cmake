@@ -2104,6 +2104,7 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
 
     platform/graphics/AlphaPremultiplication.h
     platform/graphics/AnimationFrameRate.h
+    platform/graphics/ArrayPixelBuffer.h
     platform/graphics/AudioTrackPrivate.h
     platform/graphics/AudioTrackPrivateClient.h
     platform/graphics/CopyImageOptions.h
@@ -2321,6 +2322,7 @@ set(WebCore_PRIVATE_FRAMEWORK_HEADERS
     platform/graphics/TrackBuffer.h
     platform/graphics/TrackPrivateBase.h
     platform/graphics/TrackPrivateBaseClient.h
+    platform/graphics/TypedArrayPixelBuffer.h
     platform/graphics/VP9Utilities.h
     platform/graphics/VelocityData.h
     platform/graphics/VideoLayerManager.h
