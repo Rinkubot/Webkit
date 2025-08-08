@@ -725,6 +725,12 @@ void TestAPI::proxyReturnedWithJSSubclassing()
     // https://bugs.webkit.org/show_bug.cgi?id=295796, but it still is close to the threshold.
     // If the failure returns, more work is needed to further reduce the frame size.
     check(functionReturnsTrue("(function (subclass, Superclass) { return subclass.__proto__ == Superclass.prototype; })", subclass, Superclass), "proxy's prototype should match Superclass.prototype");
+
+    JSValueRef exception = nullptr;
+    APIString proto("__proto__");
+    JSValueRef proto1 = JSObjectGetProperty(context, subclass, proto, &exception);
+    JSValueRef proto2 = JSObjectGetPrototype(context, subclass);
+    check(!exception && proto1 == proto2, "__proto__ property and JSObjectGetPrototype result should match");
 }
 
 void TestAPI::testJSObjectSetOnGlobalObjectSubclassDefinition()
