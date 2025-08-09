@@ -447,13 +447,19 @@ static inline bool setJSTestTypedefs_bufferSourceAttrSetter(JSGlobalObject& lexi
     UNUSED_PARAM(vm);
     auto throwScope = DECLARE_THROW_SCOPE(vm);
     SUPPRESS_UNCOUNTED_LOCAL auto& impl = thisObject.wrapped();
-    auto nativeValueConversionResult = convert<IDLUnion<IDLArrayBufferView, IDLArrayBuffer>>(lexicalGlobalObject, value);
-    if (nativeValueConversionResult.hasException(throwScope)) [[unlikely]]
-        return false;
-    invokeFunctorPropagatingExceptionIfNecessary(lexicalGlobalObject, throwScope, [&] {
-        return impl.setBufferSourceAttr(nativeValueConversionResult.releaseReturnValue());
-    });
-    return true;
+    auto valueFunctor = [&]<typename T>(T&& nativeValueConversionResult) -> bool {
+        if constexpr (std::same_as<T, ConversionResultException>) {
+            return false;
+        } else {
+            if (nativeValueConversionResult.hasException(throwScope)) [[unlikely]]
+                return false;
+            invokeFunctorPropagatingExceptionIfNecessary(lexicalGlobalObject, throwScope, [&] {
+                return impl.setBufferSourceAttr(nativeValueConversionResult.releaseReturnValue());
+            });
+            return true;
+        }
+    };
+    return convert<IDLUnion<IDLArrayBufferView, IDLArrayBuffer>>(lexicalGlobalObject, value, valueFunctor);
 }
 
 JSC_DEFINE_CUSTOM_SETTER(setJSTestTypedefs_bufferSourceAttr, (JSGlobalObject* lexicalGlobalObject, EncodedJSValue thisValue, EncodedJSValue encodedValue, PropertyName attributeName))

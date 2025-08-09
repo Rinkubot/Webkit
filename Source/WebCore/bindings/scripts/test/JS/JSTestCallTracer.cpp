@@ -310,15 +310,21 @@ static inline bool setJSTestCallTracer_testAttributeWithVariantSetter(JSGlobalOb
     UNUSED_PARAM(vm);
     auto throwScope = DECLARE_THROW_SCOPE(vm);
     SUPPRESS_UNCOUNTED_LOCAL auto& impl = thisObject.wrapped();
-    auto nativeValueConversionResult = convert<IDLUnion<IDLBoolean, IDLFloat, IDLDOMString>>(lexicalGlobalObject, value);
-    if (nativeValueConversionResult.hasException(throwScope)) [[unlikely]]
-        return false;
-    if (impl.hasActiveTestInterfaceCallTracer()) [[unlikely]]
-        TestInterfaceCallTracer::recordAction(impl, "testAttributeWithVariant"_s, { TestInterfaceCallTracer::processArgument(impl, nativeValueConversionResult.returnValue()) });
-    invokeFunctorPropagatingExceptionIfNecessary(lexicalGlobalObject, throwScope, [&] {
-        return impl.setTestAttributeWithVariant(nativeValueConversionResult.releaseReturnValue());
-    });
-    return true;
+    auto valueFunctor = [&]<typename T>(T&& nativeValueConversionResult) -> bool {
+        if constexpr (std::same_as<T, ConversionResultException>) {
+            return false;
+        } else {
+            if (nativeValueConversionResult.hasException(throwScope)) [[unlikely]]
+                return false;
+            if (impl.hasActiveTestInterfaceCallTracer()) [[unlikely]]
+                TestInterfaceCallTracer::recordAction(impl, "testAttributeWithVariant"_s, { TestInterfaceCallTracer::processArgument(impl, IDLUnion<IDLBoolean, IDLFloat, IDLDOMString>::ImplementationType { nativeValueConversionResult.returnValue() }) });
+            invokeFunctorPropagatingExceptionIfNecessary(lexicalGlobalObject, throwScope, [&] {
+                return impl.setTestAttributeWithVariant(nativeValueConversionResult.releaseReturnValue());
+            });
+            return true;
+        }
+    };
+    return convert<IDLUnion<IDLBoolean, IDLFloat, IDLDOMString>>(lexicalGlobalObject, value, valueFunctor);
 }
 
 JSC_DEFINE_CUSTOM_SETTER(setJSTestCallTracer_testAttributeWithVariant, (JSGlobalObject* lexicalGlobalObject, EncodedJSValue thisValue, EncodedJSValue encodedValue, PropertyName attributeName))
