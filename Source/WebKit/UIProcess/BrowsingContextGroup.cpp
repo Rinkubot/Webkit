@@ -248,7 +248,7 @@ void BrowsingContextGroup::transitionPageToRemotePage(WebPageProxy& page, const 
         return HashSet<Ref<RemotePageProxy>> { };
     }).iterator->value;
 
-    Ref newRemotePage = RemotePageProxy::create(page, page.protectedLegacyMainFrameProcess(), openerSite, &page.messageReceiverRegistration(), page.webPageIDInMainFrameProcess());
+    Ref newRemotePage = RemotePageProxy::create(page, page.protectedLegacyMainFrameProcess(), openerSite, &page.messageReceiverRegistration(), &page.backForwardListMessageReceiverRegistration(), page.webPageIDInMainFrameProcess());
 #if ASSERT_ENABLED
     for (auto& existingPage : set) {
         ASSERT(existingPage->process().coreProcessIdentifier() != newRemotePage->process().coreProcessIdentifier() || existingPage->site() != newRemotePage->site());
@@ -264,7 +264,7 @@ void BrowsingContextGroup::transitionProvisionalPageToRemotePage(ProvisionalPage
         return HashSet<Ref<RemotePageProxy>> { };
     }).iterator->value;
 
-    Ref newRemotePage = RemotePageProxy::create(*page.protectedPage(), page.protectedProcess(), provisionalNavigationFailureSite, &page.messageReceiverRegistration(), page.webPageID());
+    Ref newRemotePage = RemotePageProxy::create(*page.protectedPage(), page.protectedProcess(), provisionalNavigationFailureSite, &page.messageReceiverRegistration(), &page.backForwardListMessageReceiverRegistration(), page.webPageID());
 #if ASSERT_ENABLED
     for (auto& existingPage : set) {
         ASSERT(existingPage->process().coreProcessIdentifier() != newRemotePage->process().coreProcessIdentifier() || existingPage->site() != newRemotePage->site());

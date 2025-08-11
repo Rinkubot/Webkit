@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023-2024 Apple Inc. All rights reserved.
+ * Copyright (C) 2023 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -23,46 +23,32 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "config.h"
-#include "WebHistoryItemClient.h"
+#pragma once
 
-#include "MessageSenderInlines.h"
-#include "SessionState.h"
-#include "SessionStateConversion.h"
-#include "WebBackForwardListMessages.h"
-#include "WebPage.h"
-#include "WebPageProxyMessages.h"
-#include <WebCore/HistoryItem.h>
+#include <WebCore/PageIdentifier.h>
+
+namespace IPC {
+class MessageReceiver;
+}
 
 namespace WebKit {
 
-WebHistoryItemClient::WebHistoryItemClient(WebPage& page)
-    : m_page(page)
-{
-}
+class WebProcessProxy;
 
-ScopeExit<CompletionHandler<void()>> WebHistoryItemClient::ignoreChangesForScope()
-{
-    m_shouldIgnoreChanges = true;
-    return makeScopeExit(CompletionHandler<void()> { [this, protectedThis = Ref { *this }] {
-        m_shouldIgnoreChanges = false;
-    } });
-}
+class WebBackForwardListMessageReceiverRegistration {
+public:
+    ~WebBackForwardListMessageReceiverRegistration();
+    void startReceivingMessages(WebProcessProxy&, WebCore::PageIdentifier, IPC::MessageReceiver&);
+    void stopReceivingMessages();
+    void transferMessageReceivingFrom(WebBackForwardListMessageReceiverRegistration&, IPC::MessageReceiver& newReceiver);
+private:
+    struct Data {
+        WebCore::PageIdentifier webPageID;
+        Ref<WebProcessProxy> process;
 
-void WebHistoryItemClient::historyItemChanged(const WebCore::HistoryItem& item)
-{
-    if (m_shouldIgnoreChanges)
-        return;
-    if (RefPtr page = m_page.get())
-        page->send(Messages::WebBackForwardList::BackForwardUpdateItem(toFrameState(item)));
-}
+        Ref<WebProcessProxy> protectedProcess();
+    };
+    std::optional<Data> m_data;
+};
 
-void WebHistoryItemClient::clearChildren(const WebCore::HistoryItem& item) const
-{
-    if (m_shouldIgnoreChanges)
-        return;
-    if (RefPtr page = m_page.get())
-        page->send(Messages::WebBackForwardList::BackForwardClearChildren(item.itemID(), item.frameItemID()));
-}
-
-}
+} // namespace WebKit

@@ -27,6 +27,7 @@
 
 #include "MessageReceiver.h"
 #include "NavigationActionData.h"
+#include "WebBackForwardListMessageReceiverRegistration.h"
 #include "WebPageProxyMessageReceiverRegistration.h"
 #include "WebProcessProxy.h"
 #include <WebCore/FrameIdentifier.h>
@@ -81,7 +82,7 @@ enum class ProcessTerminationReason : uint8_t;
 class RemotePageProxy : public IPC::MessageReceiver, public RefCounted<RemotePageProxy> {
     WTF_MAKE_TZONE_ALLOCATED(RemotePageProxy);
 public:
-    static Ref<RemotePageProxy> create(WebPageProxy&, WebProcessProxy&, const WebCore::Site&, WebPageProxyMessageReceiverRegistration* = nullptr, std::optional<WebCore::PageIdentifier> = std::nullopt);
+    static Ref<RemotePageProxy> create(WebPageProxy&, WebProcessProxy&, const WebCore::Site&, WebPageProxyMessageReceiverRegistration* = nullptr, WebBackForwardListMessageReceiverRegistration* = nullptr, std::optional<WebCore::PageIdentifier> = std::nullopt);
     ~RemotePageProxy();
 
     void ref() const final { RefCounted::ref(); }
@@ -94,6 +95,7 @@ public:
     void processDidTerminate(WebProcessProxy&, ProcessTerminationReason);
 
     WebPageProxyMessageReceiverRegistration& messageReceiverRegistration() { return m_messageReceiverRegistration; }
+    WebBackForwardListMessageReceiverRegistration& backForwardListMessageReceiverRegistration() { return m_backForwardListMessageReceiverRegistration; }
 
     WebProcessProxy& process() { return m_process.get(); }
     WebProcessProxy& siteIsolatedProcess() const { return m_process.get(); }
@@ -107,7 +109,7 @@ public:
     void setDrawingArea(DrawingAreaProxy*);
 
 private:
-    RemotePageProxy(WebPageProxy&, WebProcessProxy&, const WebCore::Site&, WebPageProxyMessageReceiverRegistration*, std::optional<WebCore::PageIdentifier>);
+    RemotePageProxy(WebPageProxy&, WebProcessProxy&, const WebCore::Site&, WebPageProxyMessageReceiverRegistration*, WebBackForwardListMessageReceiverRegistration*, std::optional<WebCore::PageIdentifier>);
     void didReceiveMessage(IPC::Connection&, IPC::Decoder&) final;
     bool didReceiveSyncMessage(IPC::Connection&, IPC::Decoder&, UniqueRef<IPC::Encoder>&) final;
     void isPlayingMediaDidChange(WebCore::MediaProducerMediaStateFlags);
@@ -129,6 +131,7 @@ private:
 #endif
     std::unique_ptr<RemotePageVisitedLinkStoreRegistration> m_visitedLinkStoreRegistration;
     WebPageProxyMessageReceiverRegistration m_messageReceiverRegistration;
+    WebBackForwardListMessageReceiverRegistration m_backForwardListMessageReceiverRegistration;
     WebCore::MediaProducerMediaStateFlags m_mediaState;
 };
 

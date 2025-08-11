@@ -34,6 +34,7 @@
 #include "ProcessThrottler.h"
 #include "ScrollingAccelerationCurve.h"
 #include "VisibleWebPageCounter.h"
+#include "WebBackForwardListMessageReceiverRegistration.h"
 #include "WebColorPicker.h"
 #include "WebDataListSuggestionsDropdown.h"
 #include "WebFrameProxy.h"
@@ -356,6 +357,7 @@ public:
     RefPtr<ProcessThrottlerActivity> pageAllowedToRunInTheBackgroundActivityDueToNotifications;
 
     WebPageProxyMessageReceiverRegistration messageReceiverRegistration;
+    WebBackForwardListMessageReceiverRegistration backForwardListMessageReceiverRegistration;
 
     WeakHashSet<WebPageProxy> m_openedPages;
     HashMap<WebCore::SleepDisablerIdentifier, std::unique_ptr<WebCore::SleepDisabler>> sleepDisablers;

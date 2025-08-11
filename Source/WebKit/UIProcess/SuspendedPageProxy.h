@@ -28,6 +28,7 @@
 #include "Connection.h"
 #include "ProcessThrottler.h"
 #include "WebBackForwardListItem.h"
+#include "WebBackForwardListMessageReceiverRegistration.h"
 #include "WebPageProxyMessageReceiverRegistration.h"
 #include "WebProcessProxy.h"
 #include <WebCore/FrameIdentifier.h>
@@ -77,6 +78,9 @@ public:
     WebBackForwardCache& backForwardCache() const;
     Ref<WebBackForwardCache> protectedBackForwardCache() const;
 
+    WebPageProxyMessageReceiverRegistration& messageReceiverRegistration() { return m_messageReceiverRegistration; }
+    WebBackForwardListMessageReceiverRegistration& backForwardListMessageReceiverRegistration() { return m_backForwardListMessageReceiverRegistration; }
+
     bool pageIsClosedOrClosing() const;
 
     void waitUntilReadyToUnsuspend(CompletionHandler<void(SuspendedPageProxy*)>&&);
@@ -119,6 +123,7 @@ private:
     const Ref<WebFrameProxy> m_mainFrame;
     const Ref<BrowsingContextGroup> m_browsingContextGroup;
     WebPageProxyMessageReceiverRegistration m_messageReceiverRegistration;
+    WebBackForwardListMessageReceiverRegistration m_backForwardListMessageReceiverRegistration;
     bool m_isClosed { false };
     ShouldDelayClosingUntilFirstLayerFlush m_shouldDelayClosingUntilFirstLayerFlush { ShouldDelayClosingUntilFirstLayerFlush::No };
     bool m_shouldCloseWhenEnteringAcceleratedCompositingMode { false };

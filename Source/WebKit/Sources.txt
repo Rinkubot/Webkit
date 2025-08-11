@@ -458,6 +458,7 @@ UIProcess/WebPageGroup.cpp
 UIProcess/WebPageInjectedBundleClient.cpp
 UIProcess/WebPageProxy.cpp
 UIProcess/WebPageProxyMessageReceiverRegistration.cpp
+UIProcess/WebBackForwardListMessageReceiverRegistration.cpp
 UIProcess/WebPageProxyTesting.cpp
 UIProcess/WebPasteboardProxy.cpp
 UIProcess/WebPermissionControllerProxy.cpp

@@ -33,6 +33,7 @@
 #include "Logging.h"
 #include "MessageSenderInlines.h"
 #include "WebBackForwardCache.h"
+#include "WebBackForwardList.h"
 #include "WebFrameProxy.h"
 #include "WebPageMessages.h"
 #include "WebPageProxy.h"
@@ -82,7 +83,7 @@ static const MessageNameSet& messageNamesToIgnoreWhileSuspended()
     static NeverDestroyed<MessageNameSet> messageNames;
     static std::once_flag onceFlag;
     std::call_once(onceFlag, [] {
-        messageNames.get().add(IPC::MessageName::WebPageProxy_BackForwardAddItem);
+        messageNames.get().add(IPC::MessageName::WebBackForwardList_BackForwardAddItem);
         messageNames.get().add(IPC::MessageName::WebPageProxy_ClearAllEditCommands);
         messageNames.get().add(IPC::MessageName::WebPageProxy_DidChangeContentSize);
         messageNames.get().add(IPC::MessageName::WebPageProxy_DidChangeMainDocument);
@@ -133,6 +134,7 @@ SuspendedPageProxy::SuspendedPageProxy(WebPageProxy& page, Ref<WebProcessProxy>&
     allSuspendedPages().add(*this);
     m_process->addSuspendedPageProxy(*this);
     m_messageReceiverRegistration.startReceivingMessages(m_process, m_webPageID, *this);
+    m_backForwardListMessageReceiverRegistration.startReceivingMessages(m_process, m_webPageID, page.backForwardList());
     m_suspensionTimeoutTimer.startOneShot(suspensionTimeout);
     sendWithAsyncReply(Messages::WebPage::SetIsSuspended(true), [weakThis = WeakPtr { *this }](std::optional<bool> didSuspend) {
         RefPtr protectedThis = weakThis.get();
@@ -273,6 +275,7 @@ void SuspendedPageProxy::didProcessRequestToSuspend(SuspensionState newSuspensio
 #endif
 
     m_messageReceiverRegistration.stopReceivingMessages();
+    m_backForwardListMessageReceiverRegistration.stopReceivingMessages();
 
     if (m_suspensionState == SuspensionState::FailedToSuspend)
         closeWithoutFlashing();
