@@ -73,6 +73,7 @@ class LayoutTestFinder(object):
             self._port.host.filesystem,
             self._port.layout_tests_dir(),
             self._port.baseline_search_path(device_type),
+            prefer_wpt_link_match=getattr(self._options, 'prefer_wpt_link_match', False),
         )
 
         return list(finder.get_tests(paths))
@@ -82,6 +83,7 @@ class LayoutTestFinder(object):
             self._port.host.filesystem,
             self._port.layout_tests_dir(),
             self._port.baseline_search_path(),
+            prefer_wpt_link_match=getattr(self._options, 'prefer_wpt_link_match', False),
         )
         return finder.is_test_file(
             dirname, filename
@@ -92,6 +94,7 @@ class LayoutTestFinder(object):
             self._port.host.filesystem,
             self._port.layout_tests_dir(),
             self._port.baseline_search_path(),
+            prefer_wpt_link_match=getattr(self._options, 'prefer_wpt_link_match', False),
         )
 
         if dirname:
