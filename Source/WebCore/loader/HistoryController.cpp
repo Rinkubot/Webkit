@@ -763,8 +763,8 @@ void HistoryController::recursiveUpdateForSameDocumentNavigation()
 
     // The provisional item may represent a different pending navigation.
     // Don't commit it if it isn't a same document navigation.
-    if (m_currentItem && !protectedCurrentItem()->shouldDoSameDocumentNavigationTo(*protectedProvisionalItem()))
-        return;
+    // if (m_currentItem && !protectedCurrentItem()->shouldDoSameDocumentNavigationTo(*protectedProvisionalItem()))
+    //     return;
 
     // Commit the provisional item.
     if (RefPtr provisionalItem = m_provisionalItem) {
