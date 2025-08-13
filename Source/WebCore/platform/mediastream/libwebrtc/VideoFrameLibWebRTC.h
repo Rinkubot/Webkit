@@ -27,6 +27,7 @@
 
 #if PLATFORM(COCOA) && USE(LIBWEBRTC)
 
+#include "LibWebRTCRefWrappers.h"
 #include "LibWebRTCUtils.h"
 #include "VideoFrame.h"
 
