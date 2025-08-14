@@ -1,0 +1,63 @@
+// Copyright (C) 2025 Apple Inc. All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions
+// are met:
+// 1. Redistributions of source code must retain the above copyright
+//    notice, this list of conditions and the following disclaimer.
+// 2. Redistributions in binary form must reproduce the above copyright
+//    notice, this list of conditions and the following disclaimer in the
+//    documentation and/or other materials provided with the distribution.
+//
+// THIS SOFTWARE IS PROVIDED BY APPLE INC. ``AS IS'' AND ANY
+// EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+// IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+// PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL APPLE INC. OR
+// CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+// EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+// PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+// PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
+// OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+#include "BaseTarget.xcconfig"
+
+LIBRARY_SEARCH_PATHS = $(inherited) $(TOOLCHAIN_DIR)/usr/lib/swift/host
+SWIFT_INCLUDE_PATHS = $(inherited) $(TOOLCHAIN_DIR)/usr/lib/swift/host
+
+// Macros are installed into the host Mac's toolchain. The toolchain is only built for
+// x86_64 and arm64. It does not support arm64e.
+ARCHS = arm64 x86_64;
+VALID_ARCHS = arm64 x86_64;
+EXCLUDED_ARCHS = arm64e;
+
+// Macros only need to build for macOS, because they only run on the host machine.
+SUPPORTED_PLATFORMS = macosx
+MACOSX_DEPLOYMENT_TARGET = 13.0;
+
+CODE_SIGN_IDENTITY = $(inherited);
+
+EXECUTABLE_PREFIX = lib;
+PRODUCT_NAME = WebKitSwiftMacros;
+PRODUCT_BUNDLE_IDENTIFIER = com.apple.WebKit.$(PRODUCT_NAME);
+INSTALL_PATH = $(PLATFORM_DIR)/Developer/usr/local/lib/swift/host;
+
+OTHER_LDFLAGS = $(inherited) -Wl,-not_for_dyld_shared_cache;
+
+ALLOW_UNSUPPORTED_TEXT_BASED_API = YES;
+SUPPORTS_TEXT_BASED_API = NO;
+
+SWIFT_LIBRARY_LEVEL=other;
+SWIFT_ENABLE_EMIT_CONST_VALUES = NO;
+SWIFT_ENABLE_OPAQUE_TYPE_ERASURE = NO;
+
+OTHER_SWIFT_FLAGS = -Xfrontend -experimental-spi-only-imports;
+
+SWIFT_VERSION = $(SWIFT_VERSION_$(WK_ENABLE_SWIFT_MACROS));
+SWIFT_VERSION_YES = 6.0;
+SWIFT_VERSION_NO = 5.0;
+
+SKIP_INSTALL = $(SKIP_INSTALL_$(WK_ENABLE_SWIFT_MACROS));
+SKIP_INSTALL_YES = NO;
+SKIP_INSTALL_NO = YES;

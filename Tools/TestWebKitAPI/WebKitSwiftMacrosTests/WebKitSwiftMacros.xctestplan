@@ -1,0 +1,24 @@
+{
+  "configurations" : [
+    {
+      "id" : "0C047FC8-48D9-49B1-81A4-62F885EC7572",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:..\/..\/Tools\/TestWebKitAPI\/TestWebKitAPI.xcodeproj",
+        "identifier" : "077CEF5D2E10E7E50057C96D",
+        "name" : "WebKitSwiftMacrosTests"
+      }
+    }
+  ],
+  "version" : 1
+}
