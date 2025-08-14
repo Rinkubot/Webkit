@@ -353,8 +353,12 @@ LayoutUnit PositionedLayoutConstraints::resolveAlignmentShift(LayoutUnit unusedS
 
     LayoutUnit shift;
     if (ItemPosition::AnchorCenter == resolvedAlignment) {
-        auto anchorCenterPosition = m_anchorArea.min() + (m_anchorArea.size() - itemSize) / 2;
-        shift = anchorCenterPosition - m_insetModifiedContainingRange.min();
+        LayoutUnit anchorCenterPosition = m_anchorArea.min() + (m_anchorArea.size() - itemSize) / 2;
+        if (m_alignment.overflow() == OverflowAlignment::Safe)
+            shift = 0;
+        else
+            shift = anchorCenterPosition - m_insetModifiedContainingRange.min();
+
         if (!isOverflowing && OverflowAlignment::Default == m_alignment.overflow()) {
             // Avoid introducing overflow of the IMCB.
             if (shift < 0)
