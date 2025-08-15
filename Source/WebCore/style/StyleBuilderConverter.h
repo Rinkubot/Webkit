@@ -341,6 +341,8 @@ inline OptionSet<TextDecorationLine> BuilderConverter::convertTextDecorationLine
             return { };
         if (primitiveValue->valueID() == CSSValueSpellingError)
             return TextDecorationLine::SpellingError;
+        if (primitiveValue->valueID() == CSSValueGrammarError)
+            return TextDecorationLine::GrammarError;
     }
     auto result = RenderStyle::initialTextDecorationLine();
     if (auto* list = dynamicDowncast<CSSValueList>(value)) {

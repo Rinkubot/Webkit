@@ -658,9 +658,10 @@ enum class TextDecorationLine : uint8_t {
     Overline      = 1 << 1,
     LineThrough   = 1 << 2,
     Blink         = 1 << 3,
-    SpellingError = 1 << 4
+    SpellingError = 1 << 4,
+    GrammarError  = 1 << 5
 };
-constexpr auto maxTextDecorationLineValue = TextDecorationLine::SpellingError;
+constexpr auto maxTextDecorationLineValue = TextDecorationLine::GrammarError;
 
 enum class TextDecorationStyle : uint8_t {
     Solid,

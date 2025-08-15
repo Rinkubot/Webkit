@@ -1195,6 +1195,7 @@ TextStream& operator<<(TextStream& ts, TextDecorationLine line)
     case TextDecorationLine::LineThrough: ts << "line-through"_s; break;
     case TextDecorationLine::Blink: ts << "blink"_s; break;
     case TextDecorationLine::SpellingError: ts << "spelling-error"_s; break;
+    case TextDecorationLine::GrammarError: ts << "grammar-error"_s; break;
     }
     return ts;
 }
