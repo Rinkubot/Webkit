@@ -877,7 +877,8 @@ void RenderInline::imageChanged(WrappedImagePtr, const IntRect*)
         return;
         
     // FIXME: We can do better.
-    repaint();
+    if (hasLayer())
+        repaint();
 }
 
 namespace {
