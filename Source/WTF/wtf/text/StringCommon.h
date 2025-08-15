@@ -689,7 +689,10 @@ ALWAYS_INLINE const char16_t* find16NonASCII(std::span<const char16_t> data)
 }
 #endif
 
-template<typename CharacterType1, typename CharacterType2, std::enable_if_t<std::is_integral_v<CharacterType1> && std::is_integral_v<CharacterType2> && sizeof(CharacterType1) == sizeof(CharacterType2)>* = nullptr>
+template<typename T> concept IsFindableCharacter = std::is_integral_v<T> || std::same_as<T, LChar>;
+
+template<IsFindableCharacter CharacterType1, IsFindableCharacter CharacterType2>
+    requires (sizeof(CharacterType1) == sizeof(CharacterType2))
 inline size_t find(std::span<const CharacterType1> characters, CharacterType2 matchCharacter, size_t index = 0)
 {
     if constexpr (sizeof(CharacterType1) == 1) {
@@ -732,7 +735,7 @@ inline size_t find(std::span<const LChar> characters, char16_t matchCharacter, s
     return find(characters, static_cast<LChar>(matchCharacter), index);
 }
 
-template<typename CharacterType1, typename CharacterType2, std::enable_if_t<std::is_integral_v<CharacterType1> && std::is_integral_v<CharacterType2>>* = nullptr>
+template<IsFindableCharacter CharacterType1, IsFindableCharacter CharacterType2>
 inline bool contains(std::span<const CharacterType1> characters, CharacterType2 matchCharacter, size_t index = 0)
 {
     return find(characters, matchCharacter, index) != notFound;
@@ -770,7 +773,7 @@ template<typename CharacterType> inline bool equalLettersIgnoringASCIICaseWithLe
     ASSERT(characters.size() >= length);
     ASSERT(lowercaseLetters.size() >= length);
     for (size_t i = 0; i < length; ++i) {
-        if (!isASCIIAlphaCaselessEqual(characters[i], lowercaseLetters[i]))
+        if (!isASCIIAlphaCaselessEqual(characters[i], byteCast<char>(lowercaseLetters[i])))
             return false;
     }
     return true;
@@ -1158,7 +1161,7 @@ ALWAYS_INLINE bool charactersContain(std::span<const CharacterType> span)
 
 #if CPU(ARM64) || CPU(X86_64)
     constexpr size_t stride = SIMD::stride<CharacterType>;
-    using UnsignedType = std::make_unsigned_t<CharacterType>;
+    using UnsignedType = SIMD::SizedUnsigned<CharacterType>;
     using BulkType = decltype(SIMD::load(static_cast<const UnsignedType*>(nullptr)));
     if (length >= stride) {
         size_t index = 0;
@@ -1183,16 +1186,14 @@ ALWAYS_INLINE bool charactersContain(std::span<const CharacterType> span)
 template<typename CharacterType>
 inline size_t countMatchedCharacters(std::span<const CharacterType> span, CharacterType character)
 {
-    using UnsignedType = std::make_unsigned_t<CharacterType>;
+    using UnsignedType = SIMD::SizedUnsigned<CharacterType>;
     auto mask = SIMD::splat<UnsignedType>(character);
     auto vectorMatch = [&](auto input) ALWAYS_INLINE_LAMBDA {
         return SIMD::equal(input, mask);
     };
-
     auto scalarMatch = [&](auto input) ALWAYS_INLINE_LAMBDA {
         return input == character;
     };
-
     return SIMD::count(span, vectorMatch, scalarMatch);
 }
 

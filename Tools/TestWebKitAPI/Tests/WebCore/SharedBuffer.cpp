@@ -53,7 +53,7 @@ TEST_F(FragmentedSharedBufferTest, createWithContentsOfExistingFile)
     auto buffer = SharedBuffer::createWithContentsOfFile(tempFilePath());
     ASSERT_NOT_NULL(buffer);
     EXPECT_TRUE(buffer->size() == strlen(FragmentedSharedBufferTest::testData()));
-    EXPECT_TRUE(String::fromLatin1(FragmentedSharedBufferTest::testData()) == String(buffer->makeContiguous()->span()));
+    EXPECT_TRUE(String::fromLatin1(FragmentedSharedBufferTest::testData()) == String(byteCast<LChar>(buffer->makeContiguous()->span())));
 }
 
 TEST_F(FragmentedSharedBufferTest, createWithContentsOfExistingEmptyFile)
@@ -370,12 +370,12 @@ TEST_F(FragmentedSharedBufferTest, read)
     auto check = [](FragmentedSharedBuffer& sharedBuffer) {
         Vector<uint8_t> data = sharedBuffer.read(4, 3);
         EXPECT_EQ(data.size(), 3u);
-        EXPECT_EQ(StringView(data.subspan(0, 3)), " is"_s);
+        EXPECT_EQ(StringView(byteCast<LChar>(data.subspan(0, 3))), " is"_s);
 
         data = sharedBuffer.read(4, 1000);
         EXPECT_EQ(data.size(), 18u);
 
-        EXPECT_EQ(StringView(data.subspan(0, 18)), " is a simple test."_s);
+        EXPECT_EQ(StringView(byteCast<LChar>(data.subspan(0, 18))), " is a simple test."_s);
     };
     auto sharedBuffer = SharedBuffer::create(simpleText);
     check(sharedBuffer);

@@ -312,13 +312,12 @@ bool isValidUserAgentHeaderValue(const String& value)
 }
 #endif
 
-static constexpr size_t maxInputSampleSize = 128;
-template<typename CharType>
-static String trimInputSample(std::span<const CharType> input)
+static String trimInputSample(std::span<const uint8_t> input)
 {
+    constexpr size_t maxInputSampleSize = 128;
     if (input.size() <= maxInputSampleSize)
-        return input;
-    return makeString(input.first(maxInputSampleSize), horizontalEllipsis);
+        return byteCast<LChar>(input);
+    return makeString(byteCast<LChar>(input.first(maxInputSampleSize)), horizontalEllipsis);
 }
 
 std::optional<WallTime> parseHTTPDate(const String& value)
@@ -754,7 +753,7 @@ size_t parseHTTPHeader(std::span<const uint8_t> data, String& failureReason, Str
     }
 
     nameSize = name.size();
-    nameStr = namePtr.first(nameSize);
+    nameStr = byteCast<LChar>(namePtr.first(nameSize));
 
     WTF::skipWhile(p, ' ');
 

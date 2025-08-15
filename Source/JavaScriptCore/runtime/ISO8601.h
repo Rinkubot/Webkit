@@ -162,7 +162,7 @@ private:
     {
         if (value > 9)
             asStringImpl(builder, value / 10);
-        builder.append(static_cast<LChar>(static_cast<unsigned>(value % 10) + '0'));
+        builder.append(static_cast<char>((value % 10) + '0'));
     }
 
     static Int128 round(Int128 quantity, unsigned increment, TemporalUnit, RoundingMode);
