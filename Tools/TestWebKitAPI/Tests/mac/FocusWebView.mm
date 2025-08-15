@@ -34,6 +34,7 @@
 #import "TestWKWebView.h"
 #import "WKWebViewConfigurationExtras.h"
 #import <QuartzCore/QuartzCore.h>
+#import <WebKit/WKWebViewConfigurationPrivate.h>
 #import <wtf/RetainPtr.h>
 
 namespace TestWebKitAPI {
@@ -41,6 +42,7 @@ namespace TestWebKitAPI {
 TEST(FocusWebView, DoNotFocusWebViewWhenUnparented)
 {
     auto *configuration = [WKWebViewConfiguration _test_configurationWithTestPlugInClassName:@"WebProcessPlugInWithInternals" configureJSCForTesting:YES];
+    [configuration _setAllowTestOnlyIPC:YES];
     auto webView = adoptNS([[TestWKWebView alloc] initWithFrame:NSMakeRect(0, 0, 400, 400) configuration:configuration]);
     [webView synchronouslyLoadTestPageNamed:@"open-in-new-tab"];
 
