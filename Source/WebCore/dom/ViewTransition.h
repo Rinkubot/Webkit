@@ -164,7 +164,7 @@ struct ViewTransitionParams {
 public:
 
     OrderedNamedElementsMap namedElements;
-    FloatSize initialLargeViewportSize;
+    LayoutSize initialSnapshotContainingBlockSize;
     float initialPageZoom;
     MonotonicTime startTime;
 };
@@ -245,7 +245,7 @@ private:
 
     OrderedNamedElementsMap m_namedElements;
     ViewTransitionPhase m_phase { ViewTransitionPhase::PendingCapture };
-    FloatSize m_initialLargeViewportSize;
+    LayoutSize m_initialSnapshotContainingBlockSize;
     float m_initialPageZoom;
 
     RefPtr<ViewTransitionUpdateCallback> m_updateCallback;
