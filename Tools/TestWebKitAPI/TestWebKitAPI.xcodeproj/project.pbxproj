@@ -611,6 +611,9 @@
 		7CD70C4F24A436EE00E61040 /* StringParsingBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7CD70C4E24A436EE00E61040 /* StringParsingBuffer.cpp */; };
 		7CEB62AB223609DE0069CBB0 /* IteratorRange.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7CEB62A92236086C0069CBB0 /* IteratorRange.cpp */; };
 		7CFBCAE51743238F00B2BFCF /* WillLoad_Bundle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7CFBCAE31743238E00B2BFCF /* WillLoad_Bundle.cpp */; };
+		7D5ADAA72E4F987E00B9AA45 /* RegisteredContentScripts.db in Copy Resources */ = {isa = PBXBuildFile; fileRef = 7D5ADAA42E4F987E00B9AA45 /* RegisteredContentScripts.db */; };
+		7D5ADAA82E4F987E00B9AA45 /* RegisteredContentScripts.db-wal in Copy Resources */ = {isa = PBXBuildFile; fileRef = 7D5ADAA62E4F987E00B9AA45 /* RegisteredContentScripts.db-wal */; };
+		7D5ADAA92E4F987E00B9AA45 /* RegisteredContentScripts.db-shm in Copy Resources */ = {isa = PBXBuildFile; fileRef = 7D5ADAA52E4F987E00B9AA45 /* RegisteredContentScripts.db-shm */; };
 		83148B06202AC6A400BADE99 /* InjectedBundleDisableOverrideBuiltinsBehavior.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 83148B05202AC68200BADE99 /* InjectedBundleDisableOverrideBuiltinsBehavior.cpp */; };
 		83148B07202AC6AD00BADE99 /* InjectedBundleDisableOverrideBuiltinsBehavior_Bundle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 83148B04202AC68200BADE99 /* InjectedBundleDisableOverrideBuiltinsBehavior_Bundle.cpp */; };
 		8349D3C21DB96DDE004A9F65 /* ContextMenuDownload.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8349D3C11DB96DDA004A9F65 /* ContextMenuDownload.mm */; };
@@ -2187,6 +2190,9 @@
 				A17C46E22C98E54B0023F3C7 /* push-state.html in Copy Resources */,
 				A17C46E32C98E54B0023F3C7 /* qr-code.png in Copy Resources */,
 				A17C46E42C98E54B0023F3C7 /* red.html in Copy Resources */,
+				7D5ADAA72E4F987E00B9AA45 /* RegisteredContentScripts.db in Copy Resources */,
+				7D5ADAA92E4F987E00B9AA45 /* RegisteredContentScripts.db-shm in Copy Resources */,
+				7D5ADAA82E4F987E00B9AA45 /* RegisteredContentScripts.db-wal in Copy Resources */,
 				56EEE4832D8D706F003D4FB1 /* RemoteObjectRegistry-BadReplyBlock.html in Copy Resources */,
 				A17C46E52C98E54B0023F3C7 /* remove-node-on-drop.html in Copy Resources */,
 				A17C47EF2C98E5C20023F3C7 /* rendered-image-excluding-overflow.html in Copy Resources */,
@@ -3378,6 +3384,9 @@
 		7CEB62A92236086C0069CBB0 /* IteratorRange.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = IteratorRange.cpp; sourceTree = "<group>"; };
 		7CFBCADD1743234F00B2BFCF /* WillLoad.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WillLoad.cpp; sourceTree = "<group>"; };
 		7CFBCAE31743238E00B2BFCF /* WillLoad_Bundle.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WillLoad_Bundle.cpp; sourceTree = "<group>"; };
+		7D5ADAA42E4F987E00B9AA45 /* RegisteredContentScripts.db */ = {isa = PBXFileReference; lastKnownFileType = file; path = RegisteredContentScripts.db; sourceTree = "<group>"; };
+		7D5ADAA52E4F987E00B9AA45 /* RegisteredContentScripts.db-shm */ = {isa = PBXFileReference; lastKnownFileType = file; path = "RegisteredContentScripts.db-shm"; sourceTree = "<group>"; };
+		7D5ADAA62E4F987E00B9AA45 /* RegisteredContentScripts.db-wal */ = {isa = PBXFileReference; lastKnownFileType = text; path = "RegisteredContentScripts.db-wal"; sourceTree = "<group>"; };
 		81B50192140F232300D9EB58 /* StringBuilder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = StringBuilder.cpp; sourceTree = "<group>"; };
 		830F2E0B209A6A7400D36FF1 /* WebContentProcessDidTerminate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = WebContentProcessDidTerminate.mm; sourceTree = "<group>"; };
 		83148B04202AC68200BADE99 /* InjectedBundleDisableOverrideBuiltinsBehavior_Bundle.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = InjectedBundleDisableOverrideBuiltinsBehavior_Bundle.cpp; sourceTree = "<group>"; };
@@ -5867,6 +5876,9 @@
 				46FD40302A6B3E3500A1B210 /* postMessage-various-types.html */,
 				F41AB9941EF4692C0083FA08 /* prevent-operation.html */,
 				F41AB99A1EF4692C0083FA08 /* prevent-start.html */,
+				7D5ADAA42E4F987E00B9AA45 /* RegisteredContentScripts.db */,
+				7D5ADAA52E4F987E00B9AA45 /* RegisteredContentScripts.db-shm */,
+				7D5ADAA62E4F987E00B9AA45 /* RegisteredContentScripts.db-wal */,
 				56EEE4822D8D706F003D4FB1 /* RemoteObjectRegistry-BadReplyBlock.html */,
 				A12DDBFF1E8373C100CF6CAE /* rendered-image-excluding-overflow.html */,
 				498D030926376B2C009CBFAD /* resourceLoadStatisticsMissingUniqueIndex.db */,

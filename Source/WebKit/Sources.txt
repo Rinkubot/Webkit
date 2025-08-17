@@ -313,6 +313,7 @@ Shared/Extensions/WebExtensionSQLiteStore.cpp
 Shared/Extensions/WebExtensionLocalization.cpp
 Shared/Extensions/WebExtensionPermission.cpp
 Shared/Extensions/WebExtensionUtilities.cpp
+Shared/Extensions/WebExtensionRegisteredScriptsSQLiteStore.cpp
 
 Shared/Gamepad/GamepadData.cpp
 
