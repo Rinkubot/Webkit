@@ -238,7 +238,8 @@ bool HTMLFormControlElement::isMouseFocusable() const
 #if (PLATFORM(GTK) || PLATFORM(WPE))
     return HTMLElement::isMouseFocusable();
 #else
-    // FIXME: We should remove the quirk once <rdar://problem/47334655> is fixed.
+    // FIXME: We can remove needsFormControlToBeMouseFocusable if there are no more quirks
+    // or if we decide to change the default behavior and make form control elements focusable
     if (!!tabIndexSetExplicitly() || document().quirks().needsFormControlToBeMouseFocusable())
         return HTMLElement::isMouseFocusable();
     return false;
