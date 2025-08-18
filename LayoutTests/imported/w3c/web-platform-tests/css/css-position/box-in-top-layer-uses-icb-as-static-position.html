@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+
+<html class="reftest-wait">
+
+<head>
+  <title>CSS test: Boxes in the top layer always use the initial containing block as their static-position rectangle.
+  </title>
+
+  <link rel="help" href="https://drafts.csswg.org/css-position-3/#staticpos-rect">
+  <link rel="match" href="box-in-top-layer-uses-icb-as-static-position-ref.html">
+  <link rel="author" href="mailto:kiet.ho@apple.com" title="Kiet Ho">
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    #before-popover {
+      width: 100px;
+      height: 100px;
+      background: red;
+    }
+
+    #popover {
+      width: 100px;
+      height: 100px;
+      background: green;
+
+      /* Override popover UA styles */
+      border: none;
+      padding: 0;
+
+      inset: auto;
+    }
+  </style>
+
+  <script src="/common/reftest-wait.js"></script>
+  <script src="/common/rendering-utils.js"></script>
+</head>
+
+<body>
+
+  <!-- Red box is at the topleft most corner of the viewport -->
+  <div id="before-popover"></div>
+
+  <!-- Green box with the same size as the red box. When invoked,
+       its inset is "auto", meaning the box is aligned to its static
+       position. Since it's in the top layer, spec says the box should
+       "use the initial containing block as the static-position rectangle"
+       The initial containing block is at the same topleft most corner like
+       the red box, so the green box should overlap it. -->
+  <div id="popover" popover></div>
+
+  <script>
+    waitForAtLeastOneFrame().then(() => {
+      document.getElementById("popover").showPopover();
+
+      waitForAtLeastOneFrame().then(() => {
+        takeScreenshot();
+      });
+    });
+  </script>
+
+</body>
+
+</html>

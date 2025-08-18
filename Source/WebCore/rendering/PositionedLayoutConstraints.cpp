@@ -136,6 +136,17 @@ void PositionedLayoutConstraints::captureInsets()
         m_insetAfter = m_style.logicalBottom();
     }
 
+    // If the element is in the top layer and the insets are auto, it's resolved
+    // to the initial containing block, which is at coordinate (0, 0)
+    if (CheckedPtr element = renderer.element(); element && element->isInTopLayer()) {
+        if (startIsBefore() && m_insetBefore.isAuto())
+            m_insetBefore = 0_css_px;
+        else if (!startIsBefore() && m_insetAfter.isAuto())
+            m_insetAfter = 0_css_px;
+
+        m_useStaticPosition = false;
+    }
+
     if (m_defaultAnchorBox) {
         // If the box uses anchor-center and does have a default anchor box,
         // any auto insets are set to zero.
