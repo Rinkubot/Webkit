@@ -44,6 +44,7 @@
 #include "FrameSelection.h"
 #include "FrameTree.h"
 #include "HTMLAreaElement.h"
+#include "HTMLFormControlElement.h"
 #include "HTMLImageElement.h"
 #include "HTMLInputElement.h"
 #include "HTMLPlugInElement.h"
@@ -401,17 +402,30 @@ static inline void dispatchEventsOnWindowAndFocusedElement(Document* document, b
     // If we have a focused node we should dispatch focus on it after we focus the window.
     // https://bugs.webkit.org/show_bug.cgi?id=27105
 
-    // Do not fire events while modal dialogs are up.  See https://bugs.webkit.org/show_bug.cgi?id=33962
+    // Do not fire events while modal dialogs are up. See https://bugs.webkit.org/show_bug.cgi?id=33962
+
     if (Page* page = document->page()) {
         if (page->defersLoading())
             return;
     }
 
-    if (!focused && document->focusedElement())
+
+
+    if (!focused && document->focusedElement()) {
+
         document->focusedElement()->dispatchBlurEvent(nullptr);
+
+
+        if (RefPtr formControlElement = dynamicDowncast<HTMLFormControlElement>(*document->focusedElement())) {
+            if (formControlElement->wasChangedSinceLastFormControlChangeEvent())
+                formControlElement->dispatchFormControlChangeEvent();
+        }
+    }
     document->dispatchWindowEvent(Event::create(focused ? eventNames().focusEvent : eventNames().blurEvent, Event::CanBubble::No, Event::IsCancelable::No));
     if (focused && document->focusedElement())
         document->focusedElement()->dispatchFocusEvent(nullptr, { });
+
+
 }
 
 static inline bool isFocusableElementOrScopeOwner(Element& element, const FocusEventData& focusEventData)
@@ -572,7 +586,7 @@ bool FocusController::setInitialFocus(FocusDirection direction, KeyboardEvent* p
 {
     bool didAdvanceFocus = advanceFocus(direction, providedEvent, true);
 
-    // If focus is being set initially, accessibility needs to be informed that system focus has moved 
+    // If focus is being set initially, accessibility needs to be informed that system focus has moved
     // into the web area again, even if focus did not change within WebCore. PostNotification is called instead
     // of handleFocusedUIElementChanged, because this will send the notification even if the element is the same.
     RefPtr focusedOrMainFrame = this->focusedOrMainFrame();
@@ -697,7 +711,7 @@ FocusableElementSearchResult FocusController::findAndFocusElementInDocumentOrder
         setFocusedFrame(owner->protectedContentFrame().get());
         return findResult;
     }
-    
+
     // FIXME: It would be nice to just be able to call setFocusedElement(node) here, but we can't do
     // that because some elements (e.g. HTMLInputElement and HTMLTextAreaElement) do extra work in
     // their focus() methods.
@@ -1011,10 +1025,11 @@ bool FocusController::setFocusedElement(Element* element, LocalFrame& newFocused
     Ref protectedNewFocusedFrame { newFocusedFrame };
     RefPtr oldFocusedFrame { focusedLocalFrame() };
     RefPtr oldDocument = oldFocusedFrame ? oldFocusedFrame->document() : nullptr;
-    
+
     RefPtr oldFocusedElement = oldDocument ? oldDocument->focusedElement() : nullptr;
     Ref page = m_page.get();
     if (oldFocusedElement == element) {
+
         if (element)
             page->chrome().client().elementDidRefocus(*element, options);
         return true;
@@ -1040,7 +1055,7 @@ bool FocusController::setFocusedElement(Element* element, LocalFrame& newFocused
         page->editorClient().setInputMethodState(element);
         return true;
     }
-    
+
     if (oldDocument && oldDocument != newDocument.ptr())
         oldDocument->setFocusedElement(nullptr);
 
@@ -1101,7 +1116,7 @@ void FocusController::setActiveInternal(bool active)
 
     if (RefPtr focusedOrMainFrame = this->focusedOrMainFrame())
         focusedOrMainFrame->selection().pageActivationChanged();
-    
+
     auto* focusedFrame = focusedLocalFrame();
     if (focusedFrame && isFocused())
         dispatchEventsOnWindowAndFocusedElement(focusedFrame->protectedDocument().get(), active);
