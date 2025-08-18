@@ -773,7 +773,6 @@ protected:
     template<typename NodeClass>
     static NodeClass& traverseToRootNodeInternal(const NodeClass&);
 
-    // FIXME: Replace all uses of convertNodesOrStringsIntoNode by convertNodesOrStringsIntoNodeVector.
     ExceptionOr<RefPtr<Node>> convertNodesOrStringsIntoNode(FixedVector<NodeOrString>&&);
     ExceptionOr<NodeVector> convertNodesOrStringsIntoNodeVector(FixedVector<NodeOrString>&&);
 
