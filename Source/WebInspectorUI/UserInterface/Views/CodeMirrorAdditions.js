@@ -266,12 +266,11 @@
         var style = this._token(stream, state);
 
         if (style) {
-            if (style === "atom") {
-                if (stream.current() === "url") {
-                    // If the current text is "url" then we should expect the next string token to be a link.
-                    state._expectLink = true;
-                } else if (hexColorRegex.test(stream.current()))
-                    style = style + " hex-color";
+            if (style === "atom" && hexColorRegex.test(stream.current())) {
+                style = style + " hex-color";
+            } else if (style.includes("variable callee") && stream.current() === "url") {
+                // If the current text is "url" then we should expect the next string token to be a link.
+                state._expectLink = true;
             } else if (style === "error") {
                 if (state.state=== "atBlock" || state.state === "atBlock_parens") {
                     switch (stream.current()) {

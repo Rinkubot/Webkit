@@ -691,7 +691,7 @@ WI.SpreadsheetStyleProperty = class SpreadsheetStyleProperty extends WI.Object
 
         for (let i = 0; i < tokens.length; i++) {
             let token = tokens[i];
-            if (token.type && token.type.includes("atom") && gradientRegex.test(token.value)) {
+            if (token.type && token.type.includes("variable callee") && gradientRegex.test(token.value)) {
                 gradientStartIndex = i;
                 openParenthesis = 0;
             } else if (token.value === "(" && !isNaN(gradientStartIndex))
@@ -745,7 +745,7 @@ WI.SpreadsheetStyleProperty = class SpreadsheetStyleProperty extends WI.Object
             } else if (isNaN(colorFunctionStartIndex)
                 && WI.Color.FunctionNames.has(token.value)
                 && tokens[i + 1]?.value === "("
-                && (token.type?.includes("atom") || token.type?.includes("keyword"))) {
+                && (token.type?.includes("variable callee") || token.type?.includes("keyword"))) {
                 // Color Function start
                 colorFunctionStartIndex = i;
             } else if (isNaN(colorFunctionStartIndex)
@@ -817,7 +817,7 @@ WI.SpreadsheetStyleProperty = class SpreadsheetStyleProperty extends WI.Object
                 }
             }
 
-            if (token.value === tokenType && token.type?.includes("atom")) {
+            if (token.value === tokenType && token.type?.includes("variable callee")) {
                 startIndex = i;
                 openParenthesis = 0;
                 continue;
@@ -955,7 +955,7 @@ WI.SpreadsheetStyleProperty = class SpreadsheetStyleProperty extends WI.Object
 
         for (let i = 0; i < tokens.length; i++) {
             let token = tokens[i];
-            if (token.value === "var" && token.type && token.type.includes("atom")) {
+            if (token.value === "var" && token.type && token.type.includes("variable callee")) {
                 if (isNaN(startIndex)) {
                     startIndex = i;
                     openParenthesis = 0;
