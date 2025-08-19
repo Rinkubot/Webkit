@@ -2030,6 +2030,13 @@ bool RenderObject::useDarkAppearance() const
     return document().useDarkAppearance(&style());
 }
 
+bool RenderObject::useSystemDarkAppearance() const
+{
+    if (RefPtr page = document().page())
+        return page->useDarkAppearance();
+    return false;
+}
+
 OptionSet<StyleColorOptions> RenderObject::styleColorOptions() const
 {
     return document().styleColorOptions(&style());

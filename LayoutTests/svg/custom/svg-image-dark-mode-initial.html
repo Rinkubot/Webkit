@@ -1,0 +1,39 @@
+<style>
+    svg, img, div {
+        width: 200px;
+        height: 200px;
+    }  
+    div {
+        display: inline-block;
+        background-image: url("resources/light-dark-red-green.svg");
+    }
+    h3.centered {
+        text-align: center;
+    }
+</style>
+<body>
+    <table>
+        <tr>
+            <td>
+                <svg style="color-scheme: light dark;" fill="light-dark(red, green)">
+                    <rect width="100%" height="100%"/>
+                </svg>
+            </td>
+            <td>
+                <img src="resources/light-dark-red-green.svg">
+            </td>
+            <td>
+                <div></div>
+            </td>
+        </tr>
+        <tr>
+            <td><h3 class="centered"> inline SVG </h3></td>
+            <td><h3 class="centered"> &lt;img&gt; src </h3></td>
+            <td><h3 class="centered"> CSS background-image </h3></td>
+        </tr>
+    </table>
+    <script>
+        if (window.testRunner)
+            window.testRunner.setUseDarkAppearanceForTesting(true);
+    </script>
+</body>
