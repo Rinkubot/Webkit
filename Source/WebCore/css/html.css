@@ -1415,3 +1415,7 @@ ins, del {
 :root:lang(zh), [lang|=zh] {
     text-underline-position: left;
 }
+
+:root::spelling-error {
+    text-decoration-line: spelling-error;
+}

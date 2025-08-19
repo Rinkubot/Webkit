@@ -1030,11 +1030,16 @@ void TextBoxPainter::paintCompositionUnderline(const CompositionUnderline& under
 void TextBoxPainter::paintPlatformDocumentMarkers()
 {
     auto markedTexts = MarkedText::collectForDocumentMarkers(m_renderer, m_selectableRange, MarkedText::PaintPhase::Decoration);
+
+    if (m_renderer.style().textDecorationLineInEffect().contains(TextDecorationLine::SpellingError))
+        markedTexts.append({ 0, static_cast<unsigned>(m_renderer.length()), MarkedText::Type::SpellingError });
+
     if (markedTexts.isEmpty())
         return;
 
+    // SpellingError marked text that is styled via ::spelling-error is removed from being painted here such that it is painted as regular text-decoration (TextDecorationPainter), unless its text-decoration-line is spelling-error itself. In the latter case we should paint decoration with our native spelling error markers.
     auto spellingErrorStyle = m_renderer.spellingErrorPseudoStyle();
-    if (spellingErrorStyle && !spellingErrorStyle->textDecorationLineInEffect().isEmpty()) {
+    if (spellingErrorStyle && !spellingErrorStyle->textDecorationLineInEffect().contains(TextDecorationLine::SpellingError)) {
         markedTexts.removeAllMatching([] (auto&& markedText) {
             return markedText.type == MarkedText::Type::SpellingError;
         });
