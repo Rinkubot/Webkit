@@ -1528,6 +1528,7 @@ JS_BINDING_IDLS := \
     $(WebCore)/page/IntersectionObserver.idl \
     $(WebCore)/page/IntersectionObserverCallback.idl \
     $(WebCore)/page/IntersectionObserverEntry.idl \
+    $(WebCore)/page/LargestContentfulPaint.idl \
     $(WebCore)/page/Location.idl \
     $(WebCore)/page/NavigateEvent.idl \
     $(WebCore)/page/Navigation.idl \
@@ -1552,6 +1553,7 @@ JS_BINDING_IDLS := \
     $(WebCore)/page/NavigatorServiceWorker.idl \
     $(WebCore)/page/NavigatorShare.idl \
     $(WebCore)/page/NavigatorStorage.idl \
+    $(WebCore)/page/PaintTimingMixin.idl \
     $(WebCore)/page/Performance+EventCounts.idl \
     $(WebCore)/page/Performance+NavigationTiming.idl \
     $(WebCore)/page/Performance+PerformanceTimeline.idl \

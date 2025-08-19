@@ -293,6 +293,7 @@ namespace WebCore {
     macro(InstallEvent) \
     macro(IntersectionObserver) \
     macro(IntersectionObserverEntry) \
+    macro(LargestContentfulPaint) \
     macro(KeyframeEffect) \
     macro(Lock) \
     macro(LockManager) \
