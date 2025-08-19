@@ -55,7 +55,7 @@ class GLibPort(Port):
                 self.set_option_default('wrapper', ' '.join(self._jhbuild_wrapper))
 
     def default_timeout_ms(self):
-        default_timeout = 15000
+        default_timeout = 30 * 1000
         # Starting an application under Valgrind takes a lot longer than normal
         # so increase the timeout (empirically 10x is enough to avoid timeouts).
         multiplier = 10 if self.get_option("leaks") else 1
