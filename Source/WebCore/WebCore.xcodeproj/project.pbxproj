@@ -436,6 +436,8 @@
 		0FBB5FCC260E9E070054572C /* DisplayUpdate.h in Headers */ = {isa = PBXBuildFile; fileRef = 0FBB5FCB260E9B440054572C /* DisplayUpdate.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		0FC9E65B2BF3D0940065730C /* TileGridIdentifier.h in Headers */ = {isa = PBXBuildFile; fileRef = 0FC9E65A2BF3D0930065730C /* TileGridIdentifier.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		0FCA293526FC3917006B4AEB /* AVAudioSessionCaptureDeviceManager.mm in Sources */ = {isa = PBXBuildFile; fileRef = CDC675201EAEA9B700727C84 /* AVAudioSessionCaptureDeviceManager.mm */; };
+		0FCA8C9F2E45409700A53EEE /* LargestContentfulPaint.h in Headers */ = {isa = PBXBuildFile; fileRef = 0FCA8C9C2E45408D00A53EEE /* LargestContentfulPaint.h */; };
+		0FCA8CA42E455D2000A53EEE /* PaintTimingData.h in Headers */ = {isa = PBXBuildFile; fileRef = 0FCA8CA22E455D1600A53EEE /* PaintTimingData.h */; };
 		0FD3080F117CF7E700A791F7 /* RenderFrameBase.h in Headers */ = {isa = PBXBuildFile; fileRef = 0FD3080D117CF7E700A791F7 /* RenderFrameBase.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		0FD308D6117D168500A791F7 /* RenderIFrame.h in Headers */ = {isa = PBXBuildFile; fileRef = 0FD308D4117D168400A791F7 /* RenderIFrame.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		0FD41E6821F80C0E000C006D /* ScrollingTreeFrameHostingNode.h in Headers */ = {isa = PBXBuildFile; fileRef = 0FD41E6621F80282000C006D /* ScrollingTreeFrameHostingNode.h */; settings = {ATTRIBUTES = (Private, ); }; };
@@ -7815,6 +7817,12 @@
 		0FC692ED2585C9690098E3F9 /* GridLayoutFunctions.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = GridLayoutFunctions.cpp; sourceTree = "<group>"; };
 		0FC692EE2585C96A0098E3F9 /* GridLayoutFunctions.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GridLayoutFunctions.h; sourceTree = "<group>"; };
 		0FC9E65A2BF3D0930065730C /* TileGridIdentifier.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TileGridIdentifier.h; sourceTree = "<group>"; };
+		0FCA8C9C2E45408D00A53EEE /* LargestContentfulPaint.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LargestContentfulPaint.h; sourceTree = "<group>"; };
+		0FCA8C9D2E45408D00A53EEE /* LargestContentfulPaint.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = LargestContentfulPaint.cpp; sourceTree = "<group>"; };
+		0FCA8C9E2E45408D00A53EEE /* LargestContentfulPaint.idl */ = {isa = PBXFileReference; lastKnownFileType = text; path = LargestContentfulPaint.idl; sourceTree = "<group>"; };
+		0FCA8CA22E455D1600A53EEE /* PaintTimingData.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PaintTimingData.h; sourceTree = "<group>"; };
+		0FCA8CA32E455D1600A53EEE /* PaintTimingData.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = PaintTimingData.cpp; sourceTree = "<group>"; };
+		0FCA8CA52E455ECA00A53EEE /* PaintTimingMixin.idl */ = {isa = PBXFileReference; lastKnownFileType = text; path = PaintTimingMixin.idl; sourceTree = "<group>"; };
 		0FCF33230F2B9715004B6795 /* ColorCG.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ColorCG.cpp; sourceTree = "<group>"; };
 		0FD3080C117CF7E700A791F7 /* RenderFrameBase.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RenderFrameBase.cpp; sourceTree = "<group>"; };
 		0FD3080D117CF7E700A791F7 /* RenderFrameBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RenderFrameBase.h; sourceTree = "<group>"; };
@@ -29116,6 +29124,9 @@
 				0F4710DA1DB6FE22002DCEC3 /* IntersectionObserverEntry.idl */,
 				6D46FE012C49C9DA00743D07 /* IsLoggedIn.h */,
 				6DD53F3E2C49D4E20049F1C5 /* IsLoggedIn.idl */,
+				0FCA8C9D2E45408D00A53EEE /* LargestContentfulPaint.cpp */,
+				0FCA8C9C2E45408D00A53EEE /* LargestContentfulPaint.h */,
+				0FCA8C9E2E45408D00A53EEE /* LargestContentfulPaint.idl */,
 				931D72F515FE695300C4C07E /* LayoutMilestone.h */,
 				F45EAC862A8C1972009B986E /* LayoutMilestones.serialization.in */,
 				0245150B297CAF7700DFD845 /* LinkDecorationFilteringData.h */,
@@ -29220,6 +29231,9 @@
 				F40DAAEE25D9F3BF0011B4FA /* PagePasteboardContext.h */,
 				371E65CD13661EED00BEEDB0 /* PageSerializer.cpp */,
 				371E65CB13661EDC00BEEDB0 /* PageSerializer.h */,
+				0FCA8CA32E455D1600A53EEE /* PaintTimingData.cpp */,
+				0FCA8CA22E455D1600A53EEE /* PaintTimingData.h */,
+				0FCA8CA52E455ECA00A53EEE /* PaintTimingMixin.idl */,
 				46893B8327E8D716002CC13D /* PartitionedSecurityOrigin.h */,
 				4822FD202E2A8032004CAFF9 /* Performance+EventCounts.idl */,
 				7C72471E2516758800C363CD /* Performance+NavigationTiming.idl */,
@@ -43888,6 +43902,7 @@
 				A456FA2711AD4A830020B420 /* LabelsNodeList.h in Headers */,
 				1C9F4C1829E529660015819E /* LandmarkInterface.h in Headers */,
 				1C9F4C1929E529660015819E /* LandmarkTypeInterface.h in Headers */,
+				0FCA8C9F2E45409700A53EEE /* LargestContentfulPaint.h in Headers */,
 				419BD1B828E599FE0089D7B7 /* LatencyMode.h in Headers */,
 				0FEC120C22BF2CD2004E9D35 /* LayerAncestorClippingStack.h in Headers */,
 				580371641A66F1D300BAF519 /* LayerFragment.h in Headers */,
@@ -44493,6 +44508,7 @@
 				0885067F11DA045B00182B98 /* PaintInfo.h in Headers */,
 				0885068011DA045B00182B98 /* PaintPhase.h in Headers */,
 				4B1E13EB217937B30042CF98 /* PaintRenderingContext2D.h in Headers */,
+				0FCA8CA42E455D2000A53EEE /* PaintTimingData.h in Headers */,
 				4B6B5CC02164386400603817 /* PaintWorkletGlobalScope.h in Headers */,
 				FD3160A312B026F700C1A359 /* Panner.h in Headers */,
 				FD31601A12B0267600C1A359 /* PannerNode.h in Headers */,

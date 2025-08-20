@@ -33,12 +33,14 @@
 #include "JSPerformanceEntry.h"
 
 #include "JSDOMBinding.h"
+#include "JSLargestContentfulPaint.h"
 #include "JSPerformanceEventTiming.h"
 #include "JSPerformanceMark.h"
 #include "JSPerformanceMeasure.h"
 #include "JSPerformanceNavigationTiming.h"
 #include "JSPerformancePaintTiming.h"
 #include "JSPerformanceResourceTiming.h"
+#include "LargestContentfulPaint.h"
 #include "PerformanceEventTiming.h"
 #include "PerformanceMark.h"
 #include "PerformanceMeasure.h"
@@ -67,6 +69,8 @@ JSValue toJSNewlyCreated(JSGlobalObject*, JSDOMGlobalObject* globalObject, Ref<P
     case PerformanceEntry::Type::FirstInput:
         return createWrapper<PerformanceEventTiming>(globalObject, WTFMove(entry));
         return createWrapper<PerformanceEventTiming>(globalObject, WTFMove(entry));
+    case PerformanceEntry::Type::LargestContentfulPaint:
+        return createWrapper<LargestContentfulPaint>(globalObject, WTFMove(entry));
     }
 
     ASSERT_NOT_REACHED();
