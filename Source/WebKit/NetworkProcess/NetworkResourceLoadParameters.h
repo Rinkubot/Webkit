@@ -126,6 +126,7 @@ struct NetworkResourceLoadParameters {
 
     bool linkPreconnectEarlyHintsEnabled { false };
     bool shouldRecordFrameLoadForStorageAccess { false };
+    bool isInitiatedByDedicatedWorker { false };
 };
 
 } // namespace WebKit

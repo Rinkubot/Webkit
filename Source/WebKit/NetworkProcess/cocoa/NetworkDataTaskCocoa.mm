@@ -223,7 +223,7 @@ NetworkDataTaskCocoa::NetworkDataTaskCocoa(NetworkSession& session, NetworkDataT
         applyBasicAuthorizationHeader(request, m_initialCredential);
     }
 
-    auto thirdPartyCookieBlockingDecision = requestThirdPartyCookieBlockingDecision(request);
+    auto thirdPartyCookieBlockingDecision = parameters.isInitiatedByDedicatedWorker ? WebCore::ThirdPartyCookieBlockingDecision::All : requestThirdPartyCookieBlockingDecision(request);
     restrictRequestReferrerToOriginIfNeeded(request);
 
     RetainPtr<NSURLRequest> nsRequest = request.nsURLRequest(WebCore::HTTPBodyUpdatePolicy::UpdateHTTPBody);
