@@ -792,6 +792,7 @@ ExceptionOr<void> Node::normalize()
         }
 
         // Merge text nodes.
+        StringBuilder builder;
         while (RefPtr nextSibling = node->nextSibling()) {
             if (nextSibling->nodeType() != TEXT_NODE)
                 break;
@@ -803,22 +804,31 @@ ExceptionOr<void> Node::normalize()
                 continue;
             }
 
-            // Both non-empty text nodes. Merge them.
-            unsigned offset = text->length();
+            // Check if merging would cause overflow
+            unsigned offset = text->length() + builder.length();
 
             if (nextText->length() > StringImpl::MaxLength - offset) {
+                if (!builder.isEmpty()) {
+                    text->appendData(builder.toString());
+                    // We just deallocated a ~2GB string, plus one or two ~2GB temporary buffers
+                    // Let's explicitly try and release that memory to minimize disruption
+                    builder.clear();
+                    WTF::releaseFastMallocFreeMemory();
+                }
+
                 return Exception { ExceptionCode::InvalidModificationError,
                     "Normalized Node String representation exceeds implementation maximum length."_s };
             }
 
-            // Update start/end for any affected Ranges before appendData since modifying contents might trigger mutation events that modify ordering.
+            // Both non-empty text nodes. Merge them.
+            builder.append(nextText->data());
+            // Update start/end for any affected Ranges before setData since modifying contents might trigger mutation events that modify ordering.
             document->textNodesMerged(nextText, offset);
-
-            // FIXME: DOM spec requires contents to be replaced all at once (see https://dom.spec.whatwg.org/#dom-node-normalize).
-            // Appending once per sibling may trigger mutation events too many times.
-            text->appendData(nextText->data());            
             nextText->remove();
         }
+
+        if (!builder.isEmpty())
+            text->appendData(builder.toString());
 
         node = NodeTraversal::nextPostOrder(*node);
     }
