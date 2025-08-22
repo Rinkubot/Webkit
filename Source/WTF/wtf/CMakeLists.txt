@@ -695,6 +695,7 @@ elseif (APPLE)
 
     list(APPEND WTF_PUBLIC_HEADERS
         cf/CFURLExtras.h
+        cf/NotificationCenterCF.h
         cf/TypeCastsCF.h
         cf/VectorCF.h
 

@@ -124,6 +124,7 @@
 #import <wtf/ProcessPrivilege.h>
 #import <wtf/RuntimeApplicationChecks.h>
 #import <wtf/SoftLinking.h>
+#import <wtf/cf/NotificationCenterCF.h>
 #import <wtf/cocoa/Entitlements.h>
 #import <wtf/cocoa/NSURLExtras.h>
 #import <wtf/cocoa/RuntimeApplicationChecksCocoa.h>
@@ -1342,7 +1343,7 @@ void WebProcess::updatePageAccessibilitySettings()
 #if PLATFORM(MAC) || PLATFORM(MACCATALYST)
 void WebProcess::colorPreferencesDidChange()
 {
-    CFNotificationCenterPostNotification(CFNotificationCenterGetLocalCenter(), CFSTR("NSColorLocalPreferencesChangedNotification"), nullptr, nullptr, true);
+    CFNotificationCenterPostNotification(WTF::CFNotificationCenterGetLocalCenterSingleton(), CFSTR("NSColorLocalPreferencesChangedNotification"), nullptr, nullptr, true);
 }
 #endif
 
@@ -1400,10 +1401,8 @@ void WebProcess::dispatchSimulatedNotificationsForPreferenceChange(const String&
         [notificationCenter postNotificationName:NSSystemColorsDidChangeNotification object:nil];
     }
 #endif
-    if (key == captionProfilePreferenceKey()) {
-        RetainPtr notificationCenter = CFNotificationCenterGetLocalCenter();
-        CFNotificationCenterPostNotification(notificationCenter.get(), kMAXCaptionAppearanceSettingsChangedNotification, nullptr, nullptr, true);
-    }
+    if (key == captionProfilePreferenceKey())
+        CFNotificationCenterPostNotification(WTF::CFNotificationCenterGetLocalCenterSingleton(), kMAXCaptionAppearanceSettingsChangedNotification, nullptr, nullptr, true);
 }
 
 void WebProcess::handlePreferenceChange(const String& domain, const String& key, id value)
