@@ -2,6 +2,10 @@
 <html>
 <head>
 <title>WebKit Performance Test Results</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/flot/0.8.3/jquery.flot.min.js" integrity="sha512-eO1AKNIv7KSFl5n81oHCKnYLMi8UV4wWD1TcLYKNTssoECDuiGhoRsQkdiZkl8VUjoms2SeJY7zTSw5noGSqbQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.32.0/js/jquery.tablesorter.min.js" integrity="sha512-O/JP2r8BG27p5NOtVhwqsSokAwEP5RwYgvEzU9G6AfNjLYqyt2QT8jqU1XrXCiezS50Qp1i3ZtCQWkHZIRulGA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script src="file://%AbsolutePathToWebKitTrunk%/PerformanceTests/resources/statistics.js"></script>
 <style type="text/css">
 
 section {
@@ -136,55 +140,6 @@ Reference <span id="reference" class="checkbox"></span>
 </div>
 <table id="container"></table>
 <script>
-
-(function () {
-    var jQuery = 'PerformanceTests/Dromaeo/resources/dromaeo/web/lib/jquery-1.6.4.js';
-    var plugins = ['PerformanceTests/resources/jquery.flot.min.js', 'PerformanceTests/resources/jquery.tablesorter.min.js',
-        'PerformanceTests/resources/statistics.js'];
-    var localPath = '%AbsolutePathToWebKitTrunk%';
-    var remotePath = 'https://svn.webkit.org/repository/webkit/trunk';
-    var numberOfFailures = 0;
-    var startedLoadingPlugins = false;
-    var numberOfLoadedPlugins = 0;
-
-    function loadScript(src, loaded, failed) {
-        var script = document.createElement('script');
-        script.async = true;
-        script.src = src;
-        script.onload = loaded;
-        if (failed)
-            script.onerror = failed;
-        document.body.appendChild(script);
-    }
-
-    function loadPlugins(trunkPath) {
-        for (var i = 0; i < plugins.length; i++)
-            loadScript(trunkPath + '/' + plugins[i], loadedPlugin, createFailedToLoadPlugin(plugins[i]));
-    }
-
-    function loadedPlugin() {
-        numberOfLoadedPlugins++;
-        if (numberOfLoadedPlugins == plugins.length)
-            setTimeout(init, 0);            
-    }
-
-    function createFailedToLoadPlugin(plugin) {
-        return function () { alert("Failed to load " + plugin); }
-    }
-
-    function createLoadedJQuery(trunkPath) {
-        return function () { loadPlugins(trunkPath); }
-    }
-
-    loadScript(localPath + '/' + jQuery,
-        createLoadedJQuery(localPath),
-        function () {
-            loadScript(remotePath + '/' + jQuery,
-                createLoadedJQuery(remotePath),
-                function () { alert("Failed to load jQuery."); });
-        });
-})();
-
 function TestResult(metric, values, associatedRun) {
     if (values[0] instanceof Array) {
         var flattenedValues = [];
@@ -624,7 +579,7 @@ function init() {
         });
     });
 }
-
+$(document).ready(init);
 </script>
 <script id="json" type="application/json">%PeformanceTestsResultsJSON%</script>
 </body>
