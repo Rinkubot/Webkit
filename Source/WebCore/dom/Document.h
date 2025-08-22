@@ -1640,6 +1640,9 @@ public:
 
     void addPendingScrollendEventTarget(ContainerNode&);
     void addPendingScrollEventTarget(ContainerNode&);
+
+    struct PendingScrollEventTargetList;
+    void addPendingEventTarget(ContainerNode&, PendingScrollEventTargetList&);
     void setNeedsVisualViewportScrollEvent();
     void runScrollSteps();
     void flushDeferredScrollEvents();
@@ -2548,7 +2551,6 @@ private:
     bool m_shouldListenToVoiceActivity { false };
 #endif
 
-    struct PendingScrollEventTargetList;
     std::unique_ptr<PendingScrollEventTargetList> m_pendingScrollEventTargetList;
     std::unique_ptr<PendingScrollEventTargetList> m_pendingScrollendEventTargetList;
 
