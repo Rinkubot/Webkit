@@ -19,15 +19,19 @@
 
 #pragma once
 
-#include "WebExtensionMatchPattern.h"
-#include "WebKitWebExtensionMatchPattern.h"
-#include <wtf/RefPtr.h>
-
-typedef struct _WebKitWebExtensionMatchPattern WebKitWebExtensionMatchPattern;
-
 #if ENABLE(WK_WEB_EXTENSIONS)
 
-WebKitWebExtensionMatchPattern* webkitWebExtensionMatchPatternCreate(Ref<WebKit::WebExtensionMatchPattern>&);
-WebKitWebExtensionMatchPattern* webkitWebExtensionMatchPatternCreate(const RefPtr<WebKit::WebExtensionMatchPattern>&);
+#include "WebKitWebExtension.h"
+#include <WebKit/WKBase.h>
+#include <wtf/HashMap.h>
+#include <wtf/text/WTFString.h>
 
-#endif
+// Private API required by the unit tests
+
+typedef struct _WebKitWebExtension WebKitWebExtension;
+
+WK_EXPORT WebKitWebExtension* webkitWebExtensionCreate(HashMap<String, GRefPtr<GBytes>>&& resources, GError**);
+WK_EXPORT gboolean webkit_web_extension_get_has_service_worker_background_content(WebKitWebExtension*);
+WK_EXPORT gboolean webkit_web_extension_get_has_modular_background_content(WebKitWebExtension*);
+
+#endif // ENABLE(WK_WEB_EXTENSIONS)

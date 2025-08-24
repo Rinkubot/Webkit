@@ -215,6 +215,7 @@ set(WPE_API_HEADER_TEMPLATES
     ${WEBKIT_DIR}/UIProcess/API/glib/WebKitUserMediaPermissionRequest.h.in
     ${WEBKIT_DIR}/UIProcess/API/glib/WebKitUserMessage.h.in
     ${WEBKIT_DIR}/UIProcess/API/glib/WebKitWebContext.h.in
+    ${WEBKIT_DIR}/UIProcess/API/glib/WebKitWebExtensionMatchPattern.h.in
     ${WEBKIT_DIR}/UIProcess/API/glib/WebKitWebResource.h.in
     ${WEBKIT_DIR}/UIProcess/API/glib/WebKitWebView.h.in
     ${WEBKIT_DIR}/UIProcess/API/glib/WebKitWebViewSessionState.h.in
@@ -230,6 +231,15 @@ set(WPE_API_HEADER_TEMPLATES
 if (ENABLE_2022_GLIB_API)
     list(APPEND WPE_API_HEADER_TEMPLATES
         ${WEBKIT_DIR}/UIProcess/API/glib/WebKitNetworkSession.h.in
+    )
+endif ()
+
+if (ENABLE_2022_GLIB_API)
+    list(APPEND WPE_API_HEADER_TEMPLATES
+        ${WEBKIT_DIR}/UIProcess/API/glib/WebKitWebExtension.h.in
+    )
+    list(APPEND WebKit_SOURCES
+        ${WEBKIT_DIR}/UIProcess/API/glib/WebKitWebExtension.cpp
     )
 endif ()
 

@@ -213,6 +213,15 @@ if (ENABLE_2022_GLIB_API)
     )
 endif ()
 
+if (ENABLE_2022_GLIB_API)
+    list(APPEND WebKitGTK_HEADER_TEMPLATES
+        ${WEBKIT_DIR}/UIProcess/API/glib/WebKitWebExtension.h.in
+    )
+    list(APPEND WebKit_SOURCES
+        ${WEBKIT_DIR}/UIProcess/API/glib/WebKitWebExtension.cpp
+    )
+endif ()
+
 set(WebKitGTK_INSTALLED_HEADERS
     ${WebKitGTK_DERIVED_SOURCES_DIR}/webkit/WebKitEnumTypes.h
     ${WebKitGTK_DERIVED_SOURCES_DIR}/webkit/WebKitVersion.h
