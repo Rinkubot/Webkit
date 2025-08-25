@@ -175,9 +175,6 @@ public:
     void takeScreenshot(std::optional<String> elementID, std::optional<bool> scrollIntoView, Function<void(CommandResult&&)>&&);
 
 #if ENABLE(WEBDRIVER_BIDI)
-    void subscribeForEvents(const Vector<String>& events, Vector<String>&& browsingContextIDs, Vector<String>&& userContextIDs, Function<void(CommandResult&&)>&&);
-    void unsubscribeByIDs(const Vector<EventSubscriptionID>&, Function<void(CommandResult&&)>&&);
-    void unsubscribeByEventName(const Vector<String>& events, Function<void(CommandResult&&)>&&);
     void dispatchBidiMessage(RefPtr<JSON::Object>&&);
     void relayBidiCommand(const String&, unsigned commandId, Function<void(WebSocketMessageHandler::Message&&)>&&);
 #endif
@@ -297,9 +294,7 @@ private:
     HashMap<EventSubscriptionID, EventSubscription> m_eventSubscriptions;
     WeakPtr<WebSocketServer> m_bidiServer;
 
-    bool eventIsEnabled(const String&, const Vector<String>&);
     void emitEvent(const String&, RefPtr<JSON::Object>&&);
-    String toInternalEventName(const String&);
 
     // Actual event handlers
     void doLogEntryAdded(RefPtr<JSON::Object>&&);

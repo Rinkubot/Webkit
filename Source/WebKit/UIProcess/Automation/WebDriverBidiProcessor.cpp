@@ -34,6 +34,7 @@
 #include "BidiBrowserAgent.h"
 #include "BidiBrowsingContextAgent.h"
 #include "BidiScriptAgent.h"
+#include "BidiSessionAgent.h"
 #include "BidiStorageAgent.h"
 #include "Logging.h"
 #include "WebAutomationSession.h"
@@ -55,6 +56,7 @@ WebDriverBidiProcessor::WebDriverBidiProcessor(WebAutomationSession& session)
     , m_browserAgent(makeUniqueRef<BidiBrowserAgent>(session, m_backendDispatcher))
     , m_browsingContextAgent(makeUniqueRef<BidiBrowsingContextAgent>(session, m_backendDispatcher))
     , m_scriptAgent(makeUniqueRef<BidiScriptAgent>(session, m_backendDispatcher))
+    , m_sessionAgent(makeUniqueRef<BidiSessionAgent>(session, m_backendDispatcher))
     , m_storageAgent(makeUniqueRef<BidiStorageAgent>(session, m_backendDispatcher))
     , m_browsingContextDomainNotifier(makeUniqueRef<BidiBrowsingContextFrontendDispatcher>(m_frontendRouter))
     , m_logDomainNotifier(makeUniqueRef<BidiLogFrontendDispatcher>(m_frontendRouter))
@@ -199,6 +201,10 @@ void WebDriverBidiProcessor::sendBidiMessage(const String& message)
     session->sendBidiMessage(msgObj->toJSONString());
 }
 
+bool WebDriverBidiProcessor::eventIsEnabled(const String& eventName, const Vector<String>& contexts)
+{
+    return m_sessionAgent->eventIsEnabled(eventName, contexts);
+}
 
 // MARK: Inspector::FrontendChannel methods.
 

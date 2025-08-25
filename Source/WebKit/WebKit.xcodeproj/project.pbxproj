@@ -1591,6 +1591,8 @@
 		5CFC9C812B71809600F8D289 /* CoreIPCCFDictionary.mm in Sources */ = {isa = PBXBuildFile; fileRef = 5CFC9C7F2B717EFA00F8D289 /* CoreIPCCFDictionary.mm */; };
 		5EEC724C2DC1B30700D012DD /* BidiStorageAgent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5EEC724B2DC1B30700D012DD /* BidiStorageAgent.cpp */; };
 		5EEC724E2DC1B31800D012DD /* BidiStorageAgent.h in Headers */ = {isa = PBXBuildFile; fileRef = 5EEC724D2DC1B31300D012DD /* BidiStorageAgent.h */; };
+		5EEC72522DC1B32300D012DD /* BidiSessionAgent.h in Headers */ = {isa = PBXBuildFile; fileRef = 5EEC72512DC1B32200D012DD /* BidiSessionAgent.h */; };
+		5EEC72502DC1B32100D012DD /* BidiSessionAgent.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5EEC724F2DC1B32000D012DD /* BidiSessionAgent.cpp */; };
 		63108F961F96719C00A0DB84 /* _WKApplicationManifest.h in Headers */ = {isa = PBXBuildFile; fileRef = 63108F941F96719C00A0DB84 /* _WKApplicationManifest.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		63108F991F9671F700A0DB84 /* _WKApplicationManifestInternal.h in Headers */ = {isa = PBXBuildFile; fileRef = 63108F981F9671F700A0DB84 /* _WKApplicationManifestInternal.h */; };
 		634842511FB26E7100946E3C /* APIApplicationManifest.h in Headers */ = {isa = PBXBuildFile; fileRef = 6348424F1FB26E7100946E3C /* APIApplicationManifest.h */; };
@@ -6598,6 +6600,8 @@
 		5EB592AB2DC2049A0058664B /* BidiStorage.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = BidiStorage.json; sourceTree = "<group>"; };
 		5EEC724B2DC1B30700D012DD /* BidiStorageAgent.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = BidiStorageAgent.cpp; sourceTree = "<group>"; };
 		5EEC724D2DC1B31300D012DD /* BidiStorageAgent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BidiStorageAgent.h; sourceTree = "<group>"; };
+		5EEC724F2DC1B32000D012DD /* BidiSessionAgent.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = BidiSessionAgent.cpp; sourceTree = "<group>"; };
+		5EEC72512DC1B32200D012DD /* BidiSessionAgent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BidiSessionAgent.h; sourceTree = "<group>"; };
 		63108F941F96719C00A0DB84 /* _WKApplicationManifest.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = _WKApplicationManifest.h; sourceTree = "<group>"; };
 		63108F951F96719C00A0DB84 /* _WKApplicationManifest.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = _WKApplicationManifest.mm; sourceTree = "<group>"; };
 		63108F981F9671F700A0DB84 /* _WKApplicationManifestInternal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = _WKApplicationManifestInternal.h; sourceTree = "<group>"; };
@@ -14324,6 +14328,8 @@
 				F3272B7C2DB997C6007B3A9A /* BidiBrowsingContextAgent.h */,
 				F3272B7F2DB997C6007B3A9A /* BidiScriptAgent.cpp */,
 				F3272B7E2DB997C6007B3A9A /* BidiScriptAgent.h */,
+				5EEC724F2DC1B32000D012DD /* BidiSessionAgent.cpp */,
+				5EEC72512DC1B32200D012DD /* BidiSessionAgent.h */,
 				5EEC724B2DC1B30700D012DD /* BidiStorageAgent.cpp */,
 				5EEC724D2DC1B31300D012DD /* BidiStorageAgent.h */,
 				F3A94F002DB6F3310023CE9D /* BidiUserContext.cpp */,
@@ -17239,6 +17245,7 @@
 				F3EEEE592DB318270038CC1D /* BidiBrowserAgent.h in Headers */,
 				F3272B822DB997C6007B3A9A /* BidiBrowsingContextAgent.h in Headers */,
 				F3272B832DB997C6007B3A9A /* BidiScriptAgent.h in Headers */,
+				5EEC72522DC1B32300D012DD /* BidiSessionAgent.h in Headers */,
 				5EEC724E2DC1B31800D012DD /* BidiStorageAgent.h in Headers */,
 				F3A94F022DB6F3310023CE9D /* BidiUserContext.h in Headers */,
 				E164A2F2191AF14E0010737D /* BlobDataFileReferenceWithSandboxExtension.h in Headers */,
@@ -20731,6 +20738,7 @@
 				F3EEEE5A2DB318270038CC1D /* BidiBrowserAgent.cpp in Sources */,
 				F3272B802DB997C6007B3A9A /* BidiBrowsingContextAgent.cpp in Sources */,
 				F3272B812DB997C6007B3A9A /* BidiScriptAgent.cpp in Sources */,
+				5EEC72502DC1B32100D012DD /* BidiSessionAgent.cpp in Sources */,
 				5EEC724C2DC1B30700D012DD /* BidiStorageAgent.cpp in Sources */,
 				F3A94F012DB6F3310023CE9D /* BidiUserContext.cpp in Sources */,
 				1C62747E288B4C3E00CED3A2 /* CocoaHelpers.mm in Sources */,

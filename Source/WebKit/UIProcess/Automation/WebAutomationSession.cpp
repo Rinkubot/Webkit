@@ -762,7 +762,8 @@ void WebAutomationSession::willShowJavaScriptDialog(WebPageProxy& page, const St
 
         // FIXME: propagate the 'userPromptHandler' from session capabilities.
         auto userPromptHandlerType = Inspector::Protocol::BidiSession::UserPromptHandlerType::Accept;
-        m_bidiProcessor->browsingContextDomainNotifier().userPromptOpened(handleForWebPageProxy(page), userPromptType, userPromptHandlerType, message, m_client->defaultTextOfCurrentJavaScriptDialogOnPage(*this, page).value_or(defaultText.value_or(emptyString())));
+        if (m_bidiProcessor->eventIsEnabled("browsingContext.userPromptOpened"_s, { }))
+            m_bidiProcessor->browsingContextDomainNotifier().userPromptOpened(handleForWebPageProxy(page), userPromptType, userPromptHandlerType, message, m_client->defaultTextOfCurrentJavaScriptDialogOnPage(*this, page).value_or(defaultText.value_or(emptyString())));
 #endif
 
         if (page->protectedPageLoadState()->isLoading()) {
@@ -1336,7 +1337,8 @@ CommandResult<void> WebAutomationSession::dismissCurrentJavaScriptDialog(const I
     auto apiDialogType = m_client->typeOfCurrentJavaScriptDialogOnPage(*this, *page);
     SYNC_FAIL_WITH_PREDEFINED_ERROR_IF(!apiDialogType, InternalError);
 
-    m_bidiProcessor->browsingContextDomainNotifier().userPromptClosed(handleForWebPageProxy(*page), toProtocolUserPromptType(apiDialogType.value()), false, m_client->userInputOfCurrentJavaScriptDialogOnPage(*this, *page).value_or(emptyString()));
+    if (m_bidiProcessor->eventIsEnabled("browsingContext.userPromptClosed"_s, { }))
+        m_bidiProcessor->browsingContextDomainNotifier().userPromptClosed(handleForWebPageProxy(*page), toProtocolUserPromptType(apiDialogType.value()), false, m_client->userInputOfCurrentJavaScriptDialogOnPage(*this, *page).value_or(emptyString()));
 #endif
     m_client->dismissCurrentJavaScriptDialogOnPage(*this, *page);
 
@@ -1358,7 +1360,8 @@ CommandResult<void> WebAutomationSession::acceptCurrentJavaScriptDialog(const In
     auto apiDialogType = m_client->typeOfCurrentJavaScriptDialogOnPage(*this, *page);
     SYNC_FAIL_WITH_PREDEFINED_ERROR_IF(!apiDialogType, InternalError);
 
-    m_bidiProcessor->browsingContextDomainNotifier().userPromptClosed(handleForWebPageProxy(*page), toProtocolUserPromptType(apiDialogType.value()), true, m_client->userInputOfCurrentJavaScriptDialogOnPage(*this, *page).value_or(emptyString()));
+    if (m_bidiProcessor->eventIsEnabled("browsingContext.userPromptClosed"_s, { }))
+        m_bidiProcessor->browsingContextDomainNotifier().userPromptClosed(handleForWebPageProxy(*page), toProtocolUserPromptType(apiDialogType.value()), true, m_client->userInputOfCurrentJavaScriptDialogOnPage(*this, *page).value_or(emptyString()));
 #endif
 
     m_client->acceptCurrentJavaScriptDialogOnPage(*this, *page);
@@ -2587,6 +2590,10 @@ static String logEntryTypeForMessage(const JSC::MessageSource& messageSource)
 void WebAutomationSession::logEntryAdded(const JSC::MessageSource& messageSource, const JSC::MessageLevel& messageLevel, const String& messageText, const JSC::MessageType& messageType, const WallTime& timestamp)
 {
 #if ENABLE(WEBDRIVER_BIDI)
+    // FIXME Store logged messages in a buffer to avoid losing messages that are logged before the Bidi processor is created.
+    // https://bugs.webkit.org/show_bug.cgi?id=282980
+    if (!m_bidiProcessor->eventIsEnabled("log.entryAdded"_s, { }))
+        return;
     // FIXME Support getting source information
     // https://bugs.webkit.org/show_bug.cgi?id=282978
     String sourceString;
