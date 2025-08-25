@@ -31,8 +31,10 @@
 
 namespace WebKit {
 
-struct RemoteGraphicsContextIdentifierType;
-using RemoteGraphicsContextIdentifier = AtomicObjectIdentifier<RemoteGraphicsContextIdentifierType>;
+// RemoteDisplayListRecorderIdentifier has conceptual subclass relationship with
+// RemoteGraphicsContextIdentifier.
+struct RemoteDisplayListRecorderIdentifierType;
+using RemoteDisplayListRecorderIdentifier = AtomicObjectIdentifier<RemoteDisplayListRecorderIdentifierType>;
 
 } // namespace WebKit
 

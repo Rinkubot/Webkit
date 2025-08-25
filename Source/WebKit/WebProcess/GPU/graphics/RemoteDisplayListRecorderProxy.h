@@ -27,13 +27,19 @@
 
 #if ENABLE(GPU_PROCESS)
 
-#include <wtf/ObjectIdentifier.h>
+#include "RemoteDisplayListRecorderIdentifier.h"
+#include "RemoteGraphicsContextProxy.h"
 
 namespace WebKit {
 
-struct RemoteGraphicsContextIdentifierType;
-using RemoteGraphicsContextIdentifier = AtomicObjectIdentifier<RemoteGraphicsContextIdentifierType>;
+class RemoteDisplayListRecorderProxy : public RemoteGraphicsContextProxy {
+    WTF_MAKE_TZONE_ALLOCATED(RemoteDisplayListRecorderProxy);
 
-} // namespace WebKit
+public:
+    RemoteDisplayListRecorderProxy(RemoteRenderingBackendProxy&);
+    RemoteDisplayListRecorderIdentifier identifier() const { return RemoteDisplayListRecorderIdentifier { RemoteGraphicsContextProxy::identifier().toUInt64() }; }
+};
+
+}
 
 #endif

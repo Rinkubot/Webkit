@@ -1266,7 +1266,6 @@
 		329C0C2328BD96D600F187D2 /* TagName.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3227A92628BD744A00BC2697 /* TagName.cpp */; };
 		329C0C2428BD96DE00F187D2 /* Namespace.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3227A92928BD744B00BC2697 /* Namespace.cpp */; };
 		329C0C2528BD96EB00F187D2 /* NodeName.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 3227A92728BD744A00BC2697 /* NodeName.cpp */; };
-		32A70D532836134B0080060C /* DecomposedGlyphs.h in Headers */ = {isa = PBXBuildFile; fileRef = 32A70D522836134A0080060C /* DecomposedGlyphs.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		32DAE2382994A51500F0E767 /* StyleVisitedLinkColorData.h in Headers */ = {isa = PBXBuildFile; fileRef = 32DAE2372994A50C00F0E767 /* StyleVisitedLinkColorData.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		32EAFB8D274C5EA600650557 /* FontCascadeCache.h in Headers */ = {isa = PBXBuildFile; fileRef = 32EAFB8B274C5EA500650557 /* FontCascadeCache.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		334408C433F8CA4C10044234 /* SVGLayerTransformUpdater.h in Headers */ = {isa = PBXBuildFile; fileRef = 3344077412D9BC4A00044234 /* SVGLayerTransformUpdater.h */; };
@@ -10064,8 +10063,6 @@
 		32899FB7274B410C00855A9D /* SystemFallbackFontCache.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = SystemFallbackFontCache.cpp; sourceTree = "<group>"; };
 		32899FB9274B410C00855A9D /* SystemFallbackFontCache.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SystemFallbackFontCache.h; sourceTree = "<group>"; };
 		3294ECF9274EFA57006BE8C8 /* FontFamilySpecificationCoreTextCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FontFamilySpecificationCoreTextCache.h; sourceTree = "<group>"; };
-		32A70D522836134A0080060C /* DecomposedGlyphs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DecomposedGlyphs.h; sourceTree = "<group>"; };
-		32A70D542836135A0080060C /* DecomposedGlyphs.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = DecomposedGlyphs.cpp; sourceTree = "<group>"; };
 		32B0B0CF283C7483006217C6 /* GlyphDisplayListCache.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = GlyphDisplayListCache.cpp; sourceTree = "<group>"; };
 		32B17614285FDDA100ED6DB8 /* GradientColorStop.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = GradientColorStop.cpp; sourceTree = "<group>"; };
 		32B17615285FDDA100ED6DB8 /* GradientColorStops.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = GradientColorStops.cpp; sourceTree = "<group>"; };
@@ -34515,8 +34512,6 @@
 				2D2FC0551460CD6F00263633 /* CrossfadeGeneratedImage.h */,
 				A8CB41020E85B8A50032C4F0 /* DashArray.h */,
 				555130001E7CCCCA00A69E38 /* DecodingOptions.h */,
-				32A70D542836135A0080060C /* DecomposedGlyphs.cpp */,
-				32A70D522836134A0080060C /* DecomposedGlyphs.h */,
 				BC2CCA0F2655DDB200B8C035 /* DestinationColorSpace.cpp */,
 				BC2CCA0E2655DDB200B8C035 /* DestinationColorSpace.h */,
 				49FC7A4F1444AF5F00A5D864 /* DisplayRefreshMonitor.cpp */,
@@ -41982,7 +41977,6 @@
 				464E5D292901A53B0051ACDA /* DeclaredStylePropertyMap.h in Headers */,
 				A8C228A111D5722E00D5A7D3 /* DecodedDataDocumentParser.h in Headers */,
 				555130011E7CCCCB00A69E38 /* DecodingOptions.h in Headers */,
-				32A70D532836134B0080060C /* DecomposedGlyphs.h in Headers */,
 				2B59E5CD287B81B3004CC9FF /* DecompressionStreamDecoder.h in Headers */,
 				4162A451101145AE00DFF3ED /* DedicatedWorkerGlobalScope.h in Headers */,
 				41A3D58F101C152D00316D07 /* DedicatedWorkerThread.h in Headers */,
