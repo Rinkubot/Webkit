@@ -402,7 +402,7 @@ using WebkitBorderSpacing = Length<CSS::Nonnegative>;
 }
 
 constexpr auto PublicPseudoIDBits = 17;
-constexpr auto TextDecorationLineBits = 5;
+constexpr auto TextDecorationLineBits = 6;
 constexpr auto TextTransformBits = 5;
 constexpr auto PseudoElementTypeBits = 5;
 
@@ -2421,7 +2421,7 @@ private:
         PREFERRED_TYPE(OptionSet<TextDecorationLine>) unsigned textDecorationLine : TextDecorationLineBits; // Text decorations defined *only* by this element.
 
         // If you add more style bits here, you will also need to update RenderStyle::NonInheritedFlags::copyNonInheritedFrom().
-    };
+    }; // Total = 65 bits
 
     struct InheritedFlags {
         bool operator==(const InheritedFlags&) const = default;
@@ -2468,7 +2468,7 @@ private:
 #if ENABLE(TEXT_AUTOSIZING)
         unsigned autosizeStatus : 5;
 #endif
-        // Total = 56 bits (fits in 8 bytes)
+        // Total = 57 bits (fits in 8 bytes)
     };
 
     // This constructor is used to implement the replace operation.

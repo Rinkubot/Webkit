@@ -920,6 +920,8 @@ inline Ref<CSSValue> ExtractorConverter::convertTextDecorationLine(ExtractorStat
         return CSSPrimitiveValue::create(CSSValueNone);
     if (textDecorationLine & TextDecorationLine::SpellingError)
         return CSSPrimitiveValue::create(CSSValueSpellingError);
+    if (textDecorationLine & TextDecorationLine::GrammarError)
+        return CSSPrimitiveValue::create(CSSValueGrammarError);
 
     CSSValueListBuilder list;
     if (textDecorationLine & TextDecorationLine::Underline)

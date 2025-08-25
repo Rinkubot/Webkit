@@ -93,6 +93,7 @@ struct SameSizeAsRenderStyle : CanMakeCheckedPtr<SameSizeAsRenderStyle> {
     void* nonInheritedDataRefs[1];
     struct NonInheritedFlags {
         unsigned m_bitfields[2];
+        unsigned char m_bitfields2[1];
     } m_nonInheritedFlags;
     void* inheritedDataRefs[2];
     struct InheritedFlags {
@@ -231,7 +232,7 @@ RenderStyle::RenderStyle(CreateDefaultStyleTag)
     m_nonInheritedFlags.pseudoBits = static_cast<unsigned>(PseudoId::None);
 
     static_assert((sizeof(InheritedFlags) <= 8), "InheritedFlags does not grow");
-    static_assert((sizeof(NonInheritedFlags) <= 8), "NonInheritedFlags does not grow");
+    static_assert((sizeof(NonInheritedFlags) <= 12), "NonInheritedFlags does not grow");
 }
 
 inline RenderStyle::RenderStyle(const RenderStyle& other, CloneTag)

@@ -1111,6 +1111,10 @@ inline void ExtractorSerializer::serializeTextDecorationLine(ExtractorState& sta
         serializationForCSS(builder, context, state.style, CSS::Keyword::SpellingError { });
         return;
     }
+    if (textDecorationLine & TextDecorationLine::GrammarError) {
+        serializationForCSS(builder, context, state.style, CSS::Keyword::GrammarError { });
+        return;
+    }
     bool listEmpty = true;
     auto appendOption = [&](TextDecorationLine test, CSSValueID value) {
         if (textDecorationLine & test) {
