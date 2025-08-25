@@ -2461,7 +2461,6 @@ platform/graphics/ComplexTextController.cpp
 platform/graphics/ContentTypeUtilities.cpp
 platform/graphics/ContentsFormat.cpp
 platform/graphics/CrossfadeGeneratedImage.cpp
-platform/graphics/DecomposedGlyphs.cpp
 platform/graphics/DestinationColorSpace.cpp
 platform/graphics/DisplayRefreshMonitor.cpp
 platform/graphics/DisplayRefreshMonitorClient.cpp

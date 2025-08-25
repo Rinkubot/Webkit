@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2022-2023 Apple Inc. All rights reserved.
+ * Copyright (C) 2025 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -24,33 +24,22 @@
  */
 
 #include "config.h"
-#include "DecomposedGlyphs.h"
+#include "RemoteDisplayListRecorderProxy.h"
+
+#if ENABLE(GPU_PROCESS)
 
 #include <wtf/TZoneMallocInlines.h>
 
-namespace WebCore {
+namespace WebKit {
+using namespace WebCore;
 
-WTF_MAKE_TZONE_ALLOCATED_IMPL(DecomposedGlyphs);
+WTF_MAKE_TZONE_ALLOCATED_IMPL(RemoteDisplayListRecorderProxy);
 
-Ref<DecomposedGlyphs> DecomposedGlyphs::create(Vector<GlyphBufferGlyph>&& glyphs, Vector<GlyphBufferAdvance>&& advances, const FloatPoint& localAnchor, FontSmoothingMode fontSmoothingMode, RenderingResourceIdentifier identifier)
+RemoteDisplayListRecorderProxy::RemoteDisplayListRecorderProxy(RemoteRenderingBackendProxy& renderingBackend)
+    : RemoteGraphicsContextProxy(DestinationColorSpace::SRGB(), std::nullopt, RenderingMode::Accelerated, { }, { }, DrawGlyphsMode::Normal, RemoteGraphicsContextIdentifier::generate(), renderingBackend)
 {
-    return adoptRef(*new DecomposedGlyphs(WTFMove(glyphs), WTFMove(advances), localAnchor, fontSmoothingMode, identifier));
 }
 
-DecomposedGlyphs::DecomposedGlyphs(Vector<GlyphBufferGlyph>&& glyphs, Vector<GlyphBufferAdvance>&& advances, const FloatPoint& localAnchor, FontSmoothingMode fontSmoothingMode, RenderingResourceIdentifier identifier)
-    : RenderingResource(identifier)
-    , m_glyphs(WTFMove(glyphs))
-    , m_advances(WTFMove(advances))
-    , m_localAnchor(localAnchor)
-    , m_fontSmoothingMode(fontSmoothingMode)
-{
-    ASSERT(m_glyphs.size() == m_advances.size());
 }
 
-DecomposedGlyphs::~DecomposedGlyphs()
-{
-    for (auto& observer : m_observers)
-        observer.willDestroyDecomposedGlyphs(renderingResourceIdentifier());
-}
-
-} // namespace WebCore
+#endif

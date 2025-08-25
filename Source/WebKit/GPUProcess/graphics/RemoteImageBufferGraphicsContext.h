@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2025 Apple Inc. All rights reserved.
+ * Copyright (C) 2021-2024 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -27,13 +27,26 @@
 
 #if ENABLE(GPU_PROCESS)
 
-#include <wtf/ObjectIdentifier.h>
+#include "RemoteGraphicsContext.h"
 
 namespace WebKit {
 
-struct RemoteGraphicsContextIdentifierType;
-using RemoteGraphicsContextIdentifier = AtomicObjectIdentifier<RemoteGraphicsContextIdentifierType>;
+// RemoteGraphicsContext playing back the IPC GraphicsContext drawing commands to a GraphicsContext of an ImageBuffer.
+// Used to create renderings to the ImageBuffer.
+class RemoteImageBufferGraphicsContext final : public RemoteGraphicsContext {
+public:
+    static Ref<RemoteImageBufferGraphicsContext> create(WebCore::ImageBuffer&, RemoteGraphicsContextIdentifier, RemoteRenderingBackend&);
+    ~RemoteImageBufferGraphicsContext();
+    void stopListeningForIPC();
+
+private:
+    RemoteImageBufferGraphicsContext(WebCore::ImageBuffer&, RemoteGraphicsContextIdentifier, RemoteRenderingBackend&);
+    void startListeningForIPC();
+
+    const Ref<WebCore::ImageBuffer> m_imageBuffer;
+    const RemoteGraphicsContextIdentifier m_identifier;
+};
 
 } // namespace WebKit
 
-#endif
+#endif // ENABLE(GPU_PROCESS)
