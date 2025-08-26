@@ -506,6 +506,7 @@ void WebLocalFrameLoaderClient::didSameDocumentNavigationForFrameViaJS(SameDocum
         WebCore::LockBackForwardList::No,
         { }, /* clientRedirectSourceForHistory */
         localFrame->effectiveSandboxFlags(),
+        localFrame->effectiveReferrerPolicy(),
         std::nullopt, /* ownerPermissionsPolicy */
         std::nullopt, /* privateClickMeasurement */
         { }, /* advancedPrivacyProtections */
@@ -1013,6 +1014,7 @@ void WebLocalFrameLoaderClient::dispatchDecidePolicyForNewWindowAction(const Nav
         WebCore::LockBackForwardList::No,
         { }, /* clientRedirectSourceForHistory */
         localFrame->effectiveSandboxFlags(),
+        localFrame->effectiveReferrerPolicy(),
         std::nullopt, /* ownerPermissionsPolicy */
         navigationAction.privateClickMeasurement(),
         { }, /* advancedPrivacyProtections */
@@ -1063,6 +1065,11 @@ void WebLocalFrameLoaderClient::dispatchDecidePolicyForNavigationAction(const Na
 void WebLocalFrameLoaderClient::updateSandboxFlags(WebCore::SandboxFlags sandboxFlags)
 {
     WebFrameLoaderClient::updateSandboxFlags(sandboxFlags);
+}
+
+void WebLocalFrameLoaderClient::updateReferrerPolicy(WebCore::ReferrerPolicy referrerPolicy)
+{
+    WebFrameLoaderClient::updateReferrerPolicy(referrerPolicy);
 }
 
 void WebLocalFrameLoaderClient::updateOpener(const WebCore::Frame& newOpener)

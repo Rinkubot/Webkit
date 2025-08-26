@@ -177,7 +177,7 @@ static const LocalFrame& rootFrame(const LocalFrame& frame, Frame* parent)
     return frame;
 }
 
-LocalFrame::LocalFrame(Page& page, ClientCreator&& clientCreator, FrameIdentifier identifier, SandboxFlags sandboxFlags, std::optional<ScrollbarMode> scrollingMode, HTMLFrameOwnerElement* ownerElement, Frame* parent, Frame* opener, Ref<FrameTreeSyncData>&& frameTreeSyncData, AddToFrameTree addToFrameTree)
+LocalFrame::LocalFrame(Page& page, ClientCreator&& clientCreator, FrameIdentifier identifier, SandboxFlags sandboxFlags, ReferrerPolicy referrerPolicy, std::optional<ScrollbarMode> scrollingMode, HTMLFrameOwnerElement* ownerElement, Frame* parent, Frame* opener, Ref<FrameTreeSyncData>&& frameTreeSyncData, AddToFrameTree addToFrameTree)
     : Frame(page, identifier, FrameType::Local, ownerElement, parent, opener, WTFMove(frameTreeSyncData), addToFrameTree)
     , m_loader(makeUniqueRefWithoutRefCountedCheck<FrameLoader>(*this, WTFMove(clientCreator)))
     , m_script(makeUniqueRef<ScriptController>(*this))
@@ -190,6 +190,7 @@ LocalFrame::LocalFrame(Page& page, ClientCreator&& clientCreator, FrameIdentifie
     , m_textZoomFactor(parentTextZoomFactor(this))
     , m_rootFrame(WebCore::rootFrame(*this, parent))
     , m_sandboxFlags(sandboxFlags)
+    , m_ReferrerPolicy(referrerPolicy)
     , m_eventHandler(makeUniqueRef<EventHandler>(*this))
 {
     ProcessWarming::initializeNames();
@@ -220,19 +221,19 @@ void LocalFrame::init()
     loader().init();
 }
 
-Ref<LocalFrame> LocalFrame::createMainFrame(Page& page, ClientCreator&& clientCreator, FrameIdentifier identifier, SandboxFlags effectiveSandboxFlags, Frame* opener, Ref<FrameTreeSyncData>&& frameTreeSyncData)
+Ref<LocalFrame> LocalFrame::createMainFrame(Page& page, ClientCreator&& clientCreator, FrameIdentifier identifier, SandboxFlags effectiveSandboxFlags, ReferrerPolicy effectiveReferrerPolicy, Frame* opener, Ref<FrameTreeSyncData>&& frameTreeSyncData)
 {
-    return adoptRef(*new LocalFrame(page, WTFMove(clientCreator), identifier, effectiveSandboxFlags, ScrollbarMode::Auto, nullptr, nullptr, opener, WTFMove(frameTreeSyncData)));
+    return adoptRef(*new LocalFrame(page, WTFMove(clientCreator), identifier, effectiveSandboxFlags, effectiveReferrerPolicy, ScrollbarMode::Auto, nullptr, nullptr, opener, WTFMove(frameTreeSyncData)));
 }
 
-Ref<LocalFrame> LocalFrame::createSubframe(Page& page, ClientCreator&& clientCreator, FrameIdentifier identifier, SandboxFlags effectiveSandboxFlags, HTMLFrameOwnerElement& ownerElement, Ref<FrameTreeSyncData>&& frameTreeSyncData)
+Ref<LocalFrame> LocalFrame::createSubframe(Page& page, ClientCreator&& clientCreator, FrameIdentifier identifier, SandboxFlags effectiveSandboxFlags, ReferrerPolicy effectiveReferrerPolicy, HTMLFrameOwnerElement& ownerElement, Ref<FrameTreeSyncData>&& frameTreeSyncData)
 {
-    return adoptRef(*new LocalFrame(page, WTFMove(clientCreator), identifier, effectiveSandboxFlags, std::nullopt, &ownerElement, ownerElement.document().frame(), nullptr, WTFMove(frameTreeSyncData)));
+    return adoptRef(*new LocalFrame(page, WTFMove(clientCreator), identifier, effectiveSandboxFlags, effectiveReferrerPolicy, std::nullopt, &ownerElement, ownerElement.document().frame(), nullptr, WTFMove(frameTreeSyncData)));
 }
 
-Ref<LocalFrame> LocalFrame::createProvisionalSubframe(Page& page, ClientCreator&& clientCreator, FrameIdentifier identifier, SandboxFlags effectiveSandboxFlags, ScrollbarMode scrollingMode, Frame& parent, Ref<FrameTreeSyncData>&& frameTreeSyncData)
+Ref<LocalFrame> LocalFrame::createProvisionalSubframe(Page& page, ClientCreator&& clientCreator, FrameIdentifier identifier, SandboxFlags effectiveSandboxFlags, ReferrerPolicy effectiveReferrerPolicy, ScrollbarMode scrollingMode, Frame& parent, Ref<FrameTreeSyncData>&& frameTreeSyncData)
 {
-    return adoptRef(*new LocalFrame(page, WTFMove(clientCreator), identifier, effectiveSandboxFlags, scrollingMode, nullptr, &parent, nullptr, WTFMove(frameTreeSyncData), AddToFrameTree::No));
+    return adoptRef(*new LocalFrame(page, WTFMove(clientCreator), identifier, effectiveSandboxFlags, effectiveReferrerPolicy, scrollingMode, nullptr, &parent, nullptr, WTFMove(frameTreeSyncData), AddToFrameTree::No));
 }
 
 LocalFrame::~LocalFrame()
@@ -1404,6 +1405,16 @@ void LocalFrame::updateSandboxFlags(SandboxFlags flags, NotifyUIProcess notifyUI
 {
     Frame::updateSandboxFlags(flags, notifyUIProcess);
     m_sandboxFlags = flags;
+}
+
+ReferrerPolicy LocalFrame::effectiveReferrerPolicy() const
+{
+    return m_ReferrerPolicy;
+}
+
+void LocalFrame::updateEffectiveReferrerPolicy(ReferrerPolicy referrerPolicy)
+{
+    m_ReferrerPolicy = referrerPolicy;
 }
 
 void LocalFrame::updateScrollingMode()

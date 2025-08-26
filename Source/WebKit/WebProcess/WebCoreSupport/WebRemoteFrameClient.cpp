@@ -194,6 +194,11 @@ void WebRemoteFrameClient::updateSandboxFlags(WebCore::SandboxFlags sandboxFlags
     WebFrameLoaderClient::updateSandboxFlags(sandboxFlags);
 }
 
+void WebRemoteFrameClient::updateReferrerPolicy(WebCore::ReferrerPolicy referrerPolicy)
+{
+    WebFrameLoaderClient::updateReferrerPolicy(referrerPolicy);
+}
+
 void WebRemoteFrameClient::updateOpener(const WebCore::Frame& newOpener)
 {
     WebFrameLoaderClient::updateOpener(newOpener);

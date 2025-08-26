@@ -331,6 +331,7 @@ struct WebPageCreationParameters {
     String openedMainFrameName;
     std::optional<WebCore::FrameIdentifier> mainFrameOpenerIdentifier { };
     WebCore::SandboxFlags initialSandboxFlags;
+    WebCore::ReferrerPolicy initialReferrerPolicy { WebCore::ReferrerPolicy::Default };
     std::optional<WebCore::WindowFeatures> windowFeatures { };
 
 #if ENABLE(ADVANCED_PRIVACY_PROTECTIONS)

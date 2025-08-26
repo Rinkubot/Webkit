@@ -669,6 +669,10 @@ void EmptyFrameLoaderClient::updateSandboxFlags(SandboxFlags)
 {
 }
 
+void EmptyFrameLoaderClient::updateReferrerPolicy(ReferrerPolicy)
+{
+}
+
 void EmptyFrameLoaderClient::updateOpener(const Frame&)
 {
 }
@@ -1227,6 +1231,7 @@ PageConfiguration pageConfigurationWithEmptyClients(std::optional<PageIdentifier
                 return makeUniqueRefWithoutRefCountedCheck<EmptyFrameLoaderClient>(frameLoader);
             } },
             SandboxFlags::all(),
+            ReferrerPolicy::Default
         },
         generateFrameIdentifier(),
         nullptr,

@@ -104,6 +104,7 @@
 #import <WebCore/PluginData.h>
 #import <WebCore/PrintContext.h>
 #import <WebCore/Range.h>
+#import <WebCore/ReferrerPolicy.h>
 #import <WebCore/RemoteUserInputEventData.h>
 #import <WebCore/RenderElementInlines.h>
 #import <WebCore/RenderLayer.h>
@@ -315,12 +316,13 @@ WebView *getWebView(WebFrame *webFrame)
     RetainPtr<WebFrame> frame = adoptNS([[self alloc] _initWithWebFrameView:frameView webView:webView]);
 
     auto effectiveSandboxFlags = ownerElement.sandboxFlags();
+    auto effectiveReferrerPolicy = ownerElement.referrerPolicy();
     if (RefPtr parentLocalFrame = ownerElement.document().frame())
         effectiveSandboxFlags.add(parentLocalFrame->effectiveSandboxFlags());
 
     auto coreFrame = WebCore::LocalFrame::createSubframe(page, [frame] (auto&, auto& frameLoader) {
         return makeUniqueRefWithoutRefCountedCheck<WebFrameLoaderClient>(frameLoader, frame.get());
-    }, WebCore::generateFrameIdentifier(), effectiveSandboxFlags, ownerElement, WebCore::FrameTreeSyncData::create());
+    }, WebCore::generateFrameIdentifier(), effectiveSandboxFlags, effectiveReferrerPolicy, ownerElement, WebCore::FrameTreeSyncData::create());
     frame->_private->coreFrame = coreFrame.ptr();
 
     coreFrame.get().tree().setSpecifiedName(name);
