@@ -10162,7 +10162,6 @@
 		37E3524C12450C6600BAF5D9 /* InputType.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InputType.h; sourceTree = "<group>"; };
 		37F818FB0D657606005E1F05 /* WebCoreURLResponse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WebCoreURLResponse.h; sourceTree = "<group>"; };
 		37F818FC0D657606005E1F05 /* WebCoreURLResponse.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = WebCoreURLResponse.mm; sourceTree = "<group>"; };
-		3A0171CF2BEDAC5F00AFEAED /* WebXROpaqueFramebufferCocoa.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = WebXROpaqueFramebufferCocoa.cpp; sourceTree = "<group>"; };
 		3A0BAA3D2D0B6B2B00DE30E4 /* FileSystemWriteCloseReason.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FileSystemWriteCloseReason.h; sourceTree = "<group>"; };
 		3A18A2EC2AFEAA7C00DB976C /* MarkupExclusionRule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MarkupExclusionRule.h; sourceTree = "<group>"; };
 		3A25C5122CF7E26E00DB9C39 /* FileSystemWritableFileStreamSink.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FileSystemWritableFileStreamSink.h; sourceTree = "<group>"; };
@@ -38024,7 +38023,6 @@
 				E12FDAFE24A0FD1F0070236E /* WebXRLayer.idl */,
 				314F169B2640B67E00663ECE /* WebXROpaqueFramebuffer.cpp */,
 				314F169D2640B67E00663ECE /* WebXROpaqueFramebuffer.h */,
-				3A0171CF2BEDAC5F00AFEAED /* WebXROpaqueFramebufferCocoa.cpp */,
 				E1EE8AE52412B17000E794D6 /* WebXRPose.cpp */,
 				E1EE8AE12412B17000E794D6 /* WebXRPose.h */,
 				E19490A12434F16800416A99 /* WebXRPose.idl */,
