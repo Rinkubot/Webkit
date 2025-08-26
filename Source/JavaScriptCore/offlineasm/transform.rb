@@ -752,20 +752,34 @@ end
 
 class Node
     def assertClobberedJSRs()
-        $stderr.puts self
-        self
-        # mapChildren {
-        #     | node |
-        #     return node.assertClobberedJSRs unless node.is_a? Instruction
-        #     operands = []
-        #     mapChildren {
-        #         | child |
-        #         operands += child.dump if child.is_a? RegisterID
-        #     }
-        #     $stderr.puts node.dump()
-        #     $stderr.puts operands
-        #     Sequence.new(node)
-        # }
+        mapChildren { | node | node.assertClobberedJSRs }
+    end
+end
+
+class Sequence
+    def assertClobberedJSRs()
+        newInstrs = []
+        children.each {
+            | node |
+            newInstrs << node.assertClobberedJSRs
+            next unless node.is_a? Instruction
+
+            operands = []
+            node.descendants.each {
+                | node |
+                operands << node.dump if node.is_a? RegisterID
+            }
+
+            operands = operands.filter {
+                | o |
+                ["wa0", "wa1", "wa2", "wa3", "a0", "a1"].include? o
+            }
+            next if operands.size == 0
+
+            newInstrs << Instruction.new(node.codeOrigin, "ci2f",
+                [RegisterID.new(node.codeOrigin, operands[0]), FPRegisterID.new(node.codeOrigin, "ft0")])
+        }
+        Sequence.new(codeOrigin, newInstrs)
     end
 end
 
