@@ -92,7 +92,7 @@ public:
     ScriptExecutionContext* scriptExecutionContext() const { return m_context.get(); }
     Ref<ScriptExecutionContext> protectedScriptExecutionContext() const { return *m_context; }
 
-    FontFaceSet* fontFaceSetIfExists();
+    RefPtr<FontFaceSet> fontFaceSetIfExists();
     FontFaceSet& fontFaceSet();
     CSSFontFaceSet& cssFontFaceSet() { return m_cssFontFaceSet; }
 
