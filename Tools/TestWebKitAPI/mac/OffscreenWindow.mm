@@ -40,7 +40,9 @@
     _isKeyWindow = isKeyWindow;
 
     NSRect rect = NSMakeRect(0, 0, size.width, size.height);
-    NSRect windowRect = NSOffsetRect(rect, -10000, [(NSScreen *)[[NSScreen screens] objectAtIndex:0] frame].size.height - rect.size.height + 10000);
+    NSScreen *firstScreen = [[NSScreen screens] firstObject];
+    RELEASE_ASSERT_WITH_MESSAGE(firstScreen, "No screens found, possibly due to no WindowServer session. This configuration is not supported.");
+    NSRect windowRect = NSOffsetRect(rect, -10000, [firstScreen frame].size.height - rect.size.height + 10000);
     self = [super initWithContentRect:windowRect styleMask:NSWindowStyleMaskBorderless backing:NSBackingStoreBuffered defer:YES];
     if (!self)
         return nil;

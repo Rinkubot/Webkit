@@ -348,8 +348,8 @@
 
 static CGRect coreGraphicsScreenRectForAppKitScreenRect(NSRect rect)
 {
-    NSScreen *firstScreen = [NSScreen screens][0];
-    return CGRectMake(NSMinX(rect), NSHeight(firstScreen.frame) - NSMinY(rect) - NSHeight(rect), NSWidth(rect), NSHeight(rect));
+    NSScreen *firstScreen = [[NSScreen screens] firstObject];
+    return CGRectMake(NSMinX(rect), NSHeight([firstScreen frame]) - NSMinY(rect) - NSHeight(rect), NSWidth(rect), NSHeight(rect));
 }
 
 - (NSImage *)sharingService:(NSSharingService *)sharingService transitionImageForShareItem:(id)item contentRect:(NSRect *)contentRect
