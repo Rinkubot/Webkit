@@ -390,7 +390,9 @@ File.open(outputFlnm, "w") {
                 $emitELFDebugDirectives = false
             end
 
+$stderr.puts("Hi!")
             lowLevelAST = lowLevelAST.demacroify({})
+            lowLevelAST = lowLevelAST.assertClobberedJSRs()
             lowLevelAST = lowLevelAST.resolve(buildOffsetsMap(lowLevelAST, offsetsList))
             lowLevelAST.validate
             emitCodeInConfiguration(concreteSettings, lowLevelAST, backend) {

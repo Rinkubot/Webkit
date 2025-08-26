@@ -747,3 +747,25 @@ class Skip
     def validate
     end
 end
+
+# AssertClobberedJSRs
+
+class Node
+    def assertClobberedJSRs()
+        $stderr.puts self
+        self
+        # mapChildren {
+        #     | node |
+        #     return node.assertClobberedJSRs unless node.is_a? Instruction
+        #     operands = []
+        #     mapChildren {
+        #         | child |
+        #         operands += child.dump if child.is_a? RegisterID
+        #     }
+        #     $stderr.puts node.dump()
+        #     $stderr.puts operands
+        #     Sequence.new(node)
+        # }
+    end
+end
+
