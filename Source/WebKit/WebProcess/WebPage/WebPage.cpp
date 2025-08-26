@@ -10142,6 +10142,29 @@ void WebPage::remoteDictionaryPopupInfoToRootView(WebCore::FrameIdentifier frame
     completionHandler(popupInfo);
 }
 
+void WebPage::getFramePositionInMainFrameCoordinates(WebCore::FrameIdentifier childFrameID, WebCore::FloatRect childFrameRect, CompletionHandler<void(WebCore::FloatRect)>&& completionHandler)
+{
+    RefPtr childWebFrame = WebProcess::singleton().webFrame(childFrameID);
+    if (!childWebFrame)
+        return completionHandler(childFrameRect);
+
+    RefPtr childCoreFrame = childWebFrame->coreRemoteFrame();
+    if (!childCoreFrame)
+        return completionHandler(childFrameRect);
+
+    RefPtr mainFrame = protectedCorePage()->localMainFrame();
+    if (!mainFrame)
+        return completionHandler(childFrameRect);
+
+    RefPtr mainFrameView = mainFrame->view();
+    RefPtr childFrameView = childCoreFrame->view();
+    if (!mainFrameView || !childFrameView)
+        return completionHandler(childFrameRect);
+
+    FloatRect transformedRect = mainFrameView->contentsToScreen(IntRect(mainFrameView->rootViewToContents(childFrameView->contentsToRootView(childFrameRect))));
+    completionHandler(transformedRect);
+}
+
 void WebPage::hitTestAtPoint(WebCore::FrameIdentifier frameID, WebCore::FloatPoint point, CompletionHandler<void(NodeHitTestResult)>&& completionHandler)
 {
     RefPtr frame = WebFrame::webFrame(frameID);

@@ -35,6 +35,7 @@ messages -> WebFullScreenManagerProxy {
     ExitFullScreen() -> ()
     BeganEnterFullScreen(WebCore::IntRect initialRect, WebCore::IntRect finalRect) -> (bool success)
     BeganExitFullScreen(WebCore::FrameIdentifier frameID, WebCore::IntRect initialRect, WebCore::IntRect finalRect) -> ()
+    GetFramePositionInMainFrameCoordinates(WebCore::FrameIdentifier childFrameID, WebCore::FloatRect childFrameRect) -> (WebCore::FloatRect mainFrameRect)
     Close()
 }
 #endif
