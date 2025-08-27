@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020-2021 Apple Inc. All rights reserved.
+ * Copyright (c) 2020-2025 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -147,6 +147,8 @@ void pas_root_construct(pas_root* root)
 
     root->baseline_allocator_table = &pas_baseline_allocator_table;
     root->num_baseline_allocators = PAS_NUM_BASELINE_ALLOCATORS;
+
+    root->root_pas_crash_report_version = 4;
 }
 
 pas_root* pas_root_create(void)

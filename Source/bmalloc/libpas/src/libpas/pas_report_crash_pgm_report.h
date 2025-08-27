@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Apple Inc. All rights reserved.
+ * Copyright (c) 2023-2025 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -46,7 +46,9 @@ extern "C" {
 /* Read memory from crashed process. */
 typedef void *(*crash_reporter_memory_reader_t)(task_t task, vm_address_t address, size_t size);
 
-/* Crash Report Version number. This must be in sync between ReportCrash and libpas to generate a report. */
+/* Crash Report Version number is found here and in `pas_root`. 
+ * This must be in sync between ReportCrash and libpas to generate a report. 
+ * When bumping version number, make sure to bump it in both locations. */
 const unsigned pas_crash_report_version = 4;
 
 /* Report sent back to the ReportCrash process. */

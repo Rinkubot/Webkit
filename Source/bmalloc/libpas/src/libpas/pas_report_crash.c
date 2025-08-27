@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Apple Inc. All rights reserved.
+ * Copyright (c) 2023-2025 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -77,9 +77,6 @@ static PAS_ALWAYS_INLINE kern_return_t PAS_WARN_UNUSED_RETURN pas_update_report_
  */
 kern_return_t pas_report_crash_extract_pgm_failure(vm_address_t fault_address, mach_vm_address_t pas_dead_root, unsigned version, task_t task, pas_report_crash_pgm_report* report, crash_reporter_memory_reader_t crm_reader)
 {
-    if (version != pas_crash_report_version)
-        return KERN_FAILURE;
-
     memory_reader_t* reader = setup_memory_reader(crm_reader);
 
     pas_root* read_pas_dead_root = NULL;
@@ -93,11 +90,14 @@ kern_return_t pas_report_crash_extract_pgm_failure(vm_address_t fault_address, m
     if (kr != KERN_SUCCESS)
         return KERN_FAILURE;
 
-    kr = reader(task, (vm_address_t)read_pas_dead_root->probabilistic_guard_malloc_has_been_used, sizeof(report->pgm_has_been_used), (void**)&report->pgm_has_been_used);
-    if (kr != KERN_SUCCESS)
+    // Read the pas_crash_report_version from the dead root
+    unsigned dead_root_crash_report_version = 0;
+    kr = reader(task, (vm_address_t)read_pas_dead_root->root_pas_crash_report_version, sizeof(unsigned), (void**)&dead_root_crash_report_version);
+    if (kr != KERN_SUCCESS || version != dead_root_crash_report_version)
         return KERN_FAILURE;
 
-    if (!report->pgm_has_been_used)
+    kr = reader(task, (vm_address_t)read_pas_dead_root->probabilistic_guard_malloc_has_been_used, sizeof(report->pgm_has_been_used), (void**)&report->pgm_has_been_used);
+    if (kr != KERN_SUCCESS || !report->pgm_has_been_used)
         return KERN_FAILURE;
 
     kr = reader(task, (vm_address_t)read_pas_dead_root->pas_pgm_hash_map_instance, sizeof(pas_ptr_hash_map), (void**)&hash_map);
