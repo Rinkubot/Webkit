@@ -554,7 +554,6 @@ svg/SVGMaskElement.cpp
 svg/SVGSVGElement.cpp
 svg/SVGStopElement.cpp
 svg/SVGSwitchElement.cpp
-svg/SVGToOTFFontConversion.cpp
 svg/SVGUseElement.cpp
 svg/graphics/SVGImage.cpp
 svg/properties/SVGAnimatedString.cpp

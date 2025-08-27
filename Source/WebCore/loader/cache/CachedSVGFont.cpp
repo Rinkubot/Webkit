@@ -37,7 +37,6 @@
 #include "SVGElementTypeHelpers.h"
 #include "SVGFontElement.h"
 #include "SVGFontFaceElement.h"
-#include "SVGToOTFFontConversion.h"
 #include "ScriptDisallowedScope.h"
 #include "Settings.h"
 #include "SharedBuffer.h"
@@ -95,8 +94,6 @@ bool CachedSVGFont::ensureCustomFontData()
             maybeInitializeExternalSVGFontElement();
         if (!m_externalSVGFontElement || !firstFontFace())
             return false;
-        if (auto convertedFont = convertSVGToOTFFont(Ref { *m_externalSVGFontElement }))
-            m_convertedFont = SharedBuffer::create(WTFMove(convertedFont.value()));
         else {
             m_externalSVGDocument = nullptr;
             m_externalSVGFontElement = nullptr;

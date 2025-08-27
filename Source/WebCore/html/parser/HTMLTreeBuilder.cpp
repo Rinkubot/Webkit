@@ -505,7 +505,6 @@ static MemoryCompactLookupOnlyRobinHoodHashMap<AtomString, QualifiedName> create
         SVGNames::diffuseConstantAttr,
         SVGNames::edgeModeAttr,
         SVGNames::filterUnitsAttr,
-        SVGNames::glyphRefAttr,
         SVGNames::gradientTransformAttr,
         SVGNames::gradientUnitsAttr,
         SVGNames::kernelMatrixAttr,
