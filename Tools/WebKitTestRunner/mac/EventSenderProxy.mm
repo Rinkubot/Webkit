@@ -142,6 +142,8 @@ static CGSGesturePhase EventSenderCGGesturePhaseFromNSEventPhase(NSEventPhase ph
     CGEventSetIntegerValueField(cgEvent.get(), kCGEventGestureHIDType, kIOHIDEventTypeZoom);
     CGEventSetIntegerValueField(cgEvent.get(), kCGEventGesturePhase, EventSenderCGGesturePhaseFromNSEventPhase(phase));
     CGEventSetDoubleValueField(cgEvent.get(), kCGEventGestureZoomValue, magnification);
+    // Set a value that won't be interpreted as a falsy timestamp:
+    CGEventSetTimestamp(cgEvent.get(), 1);
 
     if (!(self = [super _initWithCGEvent:cgEvent.get() eventRef:nullptr]))
         return nil;
