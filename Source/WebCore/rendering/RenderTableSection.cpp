@@ -1410,11 +1410,11 @@ void RenderTableSection::recalcCells()
     // and update its dimensions to be consistent with the table's column representation before we rebuild
     // the grid using addCell().
     m_needsCellRecalc = false;
-
     m_cCol = 0;
     m_cRow = 0;
     m_grid.clear();
 
+    bool resizedGrid = false;
     for (RenderTableRow* row = firstRow(); row; row = row->nextRow()) {
         unsigned insertionRow = m_cRow;
         m_cRow++;
@@ -1425,12 +1425,21 @@ void RenderTableSection::recalcCells()
         row->setRowIndex(insertionRow);
         setRowLogicalHeightToRowStyleLogicalHeight(m_grid[insertionRow]);
 
-        for (RenderTableCell* cell = row->firstCell(); cell; cell = cell->nextCell())
-            addCell(cell, row);
-    }
+        for (RenderTableCell* cell = row->firstCell(); cell; cell = cell->nextCell()) {
+            if (!cell->parseRowSpan() && !resizedGrid) {
+                unsigned rowPos = row->rowIndex() + 1;
+
+                for (RenderTableRow* remainingRow = row; remainingRow; remainingRow = remainingRow->nextRow())
+                    rowPos++;
+                ensureRows(rowPos);
+                resizedGrid = true;
+            }
+        addCell(cell, row);
+        }
 
     m_grid.shrinkToFit();
     setNeedsLayout();
+    }
 }
 
 void RenderTableSection::removeRedundantColumns()
