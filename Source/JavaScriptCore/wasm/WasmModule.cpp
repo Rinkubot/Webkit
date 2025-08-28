@@ -129,6 +129,9 @@ void Module::copyInitialCalleeGroupToAllMemoryModes(MemoryMode initialMode)
     }
 }
 
+uint64_t Module::virtualBaseAddress() { return m_moduleInformation->virtualBaseAddress; }
+void Module::setVirtualBaseAddress(uint64_t virtualBaseAddress) { m_moduleInformation->virtualBaseAddress = virtualBaseAddress; }
+
 } } // namespace JSC::Wasm
 
 WTF_ALLOW_UNSAFE_BUFFER_USAGE_END

@@ -61,6 +61,8 @@ public:
     Ref<ModuleInformation>&& takeModuleInformation()
     {
         RELEASE_ASSERT(!failed() && !hasWork());
+        if (Options::enableWasmDebugger())
+            m_moduleInformation->debugBinary = WTFMove(m_source);
         return WTFMove(m_moduleInformation);
     }
 

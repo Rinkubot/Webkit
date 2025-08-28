@@ -218,6 +218,39 @@ struct ModuleInformation final : public ThreadSafeRefCounted<ModuleInformation> 
     mutable FixedBitVector m_clobberingTailCalls;
     size_t m_totalFunctionSize { 0 };
 
+    // FIXME: Here only functionIndex is used in practice. Let's leave metadataOffset and metadataSize as they are for validation purposes.
+    struct MetadataDebugInfo {
+        size_t functionIndex;
+        size_t metadataOffset;
+        size_t metadataSize;
+    
+        MetadataDebugInfo() = default;
+        MetadataDebugInfo(size_t functionIndex, size_t metadataOffset, size_t metadataSize)
+            : functionIndex(functionIndex)
+            , metadataOffset(metadataOffset)
+            , metadataSize(metadataSize)
+        {
+        }
+    };
+    
+    const MetadataDebugInfo& metadataDebugInfo(uint32_t offset) const
+    {
+        auto it = m_metadataDebugInfoMap.find(offset);
+        RELEASE_ASSERT(it != m_metadataDebugInfoMap.end());
+        return it->value;
+    }
+    
+    void addMetaDebugInfo(uint32_t offset, MetadataDebugInfo&& info)
+    {
+        Locker locker { m_lock };
+        m_metadataDebugInfoMap.add(offset, WTFMove(info));
+    }
+    
+    Lock m_lock;
+    UncheckedKeyHashMap<uint32_t, MetadataDebugInfo, DefaultHash<uint32_t>, WTF::UnsignedWithZeroKeyHashTraits<uint32_t>> m_metadataDebugInfoMap;
+    Vector<uint8_t> debugBinary;
+    uint64_t virtualBaseAddress { 0 };
+
 private:
     void populateImportShouldBeHidden();
 

@@ -82,6 +82,9 @@ public:
 
     CodePtr<WasmEntryPtrTag> importFunctionStub(FunctionSpaceIndex importFunctionNum) { return m_wasmToJSExitStubs[importFunctionNum].code(); }
 
+    uint64_t virtualBaseAddress();
+    void setVirtualBaseAddress(uint64_t);
+
 private:
     Ref<CalleeGroup> getOrCreateCalleeGroup(VM&, MemoryMode);
 
