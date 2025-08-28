@@ -55,7 +55,7 @@ Ref<WebInspectorUI> WebInspectorUI::create(WebPage& page)
 
 WebInspectorUI::WebInspectorUI(WebPage& page)
     : m_page(page)
-    , m_frontendAPIDispatcher(InspectorFrontendAPIDispatcher::create(*page.corePage()))
+    , m_frontendAPIDispatcher(InspectorFrontendAPIDispatcher::create(*page.protectedCorePage()))
     , m_debuggableInfo(DebuggableInfoData::empty())
 {
 }
@@ -85,8 +85,8 @@ void WebInspectorUI::establishConnection(WebPageProxyIdentifier inspectedPageIde
 
 void WebInspectorUI::updateConnection()
 {
-    if (m_backendConnection) {
-        m_backendConnection->invalidate();
+    if (RefPtr backendConnection = m_backendConnection) {
+        backendConnection->invalidate();
         m_backendConnection = nullptr;
     }
     auto connectionIdentifiers = IPC::Connection::createConnectionIdentifierPair();
@@ -94,18 +94,22 @@ void WebInspectorUI::updateConnection()
         return;
 
     m_backendConnection = IPC::Connection::createServerConnection(WTFMove(connectionIdentifiers->server));
-    m_backendConnection->open(*this);
+    Ref { *m_backendConnection }->open(*this);
 
     sendToParentProcess(Messages::WebInspectorUIProxy::SetFrontendConnection(WTFMove(connectionIdentifiers->client)));
 }
 
 void WebInspectorUI::windowObjectCleared()
 {
-    if (m_frontendHost)
-        m_frontendHost->disconnectClient();
+    if (RefPtr frontendHost = m_frontendHost)
+        frontendHost->disconnectClient();
 
-    m_frontendHost = InspectorFrontendHost::create(this, m_page->corePage());
-    m_frontendHost->addSelfToGlobalObjectInWorld(mainThreadNormalWorldSingleton());
+    RefPtr page = m_page;
+    if (!page)
+        return;
+
+    m_frontendHost = InspectorFrontendHost::create(this, page->protectedCorePage().get());
+    Ref { *m_frontendHost }->addSelfToGlobalObjectInWorld(mainThreadNormalWorldSingleton());
 }
 
 void WebInspectorUI::frontendLoaded()
@@ -144,16 +148,16 @@ void WebInspectorUI::closeWindow()
 {
     sendToParentProcess(Messages::WebInspectorUIProxy::DidClose());
 
-    if (m_backendConnection) {
-        m_backendConnection->invalidate();
+    if (RefPtr backendConnection = m_backendConnection) {
+        backendConnection->invalidate();
         m_backendConnection = nullptr;
     }
 
     if (RefPtr frontendController = std::exchange(m_frontendController, nullptr).get())
         frontendController->setInspectorFrontendClient(nullptr);
 
-    if (m_frontendHost)
-        m_frontendHost->disconnectClient();
+    if (RefPtr frontendHost = m_frontendHost)
+        frontendHost->disconnectClient();
 
     m_inspectedPageIdentifier = std::nullopt;
     m_underTest = false;
@@ -324,12 +328,13 @@ void WebInspectorUI::setInspectorPageDeveloperExtrasEnabled(bool enabled)
 #if ENABLE(INSPECTOR_TELEMETRY)
 bool WebInspectorUI::supportsDiagnosticLogging()
 {
-    return m_page->corePage()->settings().diagnosticLoggingEnabled();
+    RefPtr page = m_page;
+    return page && page->corePage()->settings().diagnosticLoggingEnabled();
 }
 
 void WebInspectorUI::logDiagnosticEvent(const String& eventName, const DiagnosticLoggingClient::ValueDictionary& dictionary)
 {
-    m_page->corePage()->checkedDiagnosticLoggingClient()->logDiagnosticMessageWithValueDictionary(eventName, "Web Inspector Frontend Diagnostics"_s, dictionary, ShouldSample::No);
+    m_page->protectedCorePage()->checkedDiagnosticLoggingClient()->logDiagnosticMessageWithValueDictionary(eventName, "Web Inspector Frontend Diagnostics"_s, dictionary, ShouldSample::No);
 }
 
 void WebInspectorUI::setDiagnosticLoggingAvailable(bool available)
