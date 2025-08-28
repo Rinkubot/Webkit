@@ -8259,3 +8259,7 @@ webkit.org/b/298106 [ Debug ] http/wpt/mediasession/gpuProcessCrash-voiceDetecti
 webkit.org/b/298125 imported/w3c/web-platform-tests/mediacapture-streams/parallel-capture-requests.https.html [ Pass Failure ]
 
 imported/w3c/web-platform-tests/css/css-break/block-in-inline-012.html [ ImageOnlyFailure ]
+
+imported/w3c/web-platform-tests/webrtc/protocol/h265-loopback.https.html [ Skip ]
+imported/w3c/web-platform-tests/webrtc/RTCRtpReceiver-track-settings.tentative.html [ Failure Pass ]
+imported/w3c/web-platform-tests/webrtc/RTCDataChannel-worker-GC.html [ Failure Pass ]
