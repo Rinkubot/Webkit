@@ -351,6 +351,9 @@ public:
         });
     }
 
+    bool developerExtrasEnabled() const { return m_developerExtrasEnabled; }
+    void setDeveloperExtrasEnabled() { m_developerExtrasEnabled = true; }
+
 private:
     friend class AggregateLogger;
     friend class NativePromiseBase;
@@ -434,6 +437,7 @@ private:
     }
 
     bool m_enabled { true };
+    bool m_developerExtrasEnabled { false };
     const void* m_owner;
 };
 

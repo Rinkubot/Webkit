@@ -27,13 +27,14 @@
 
 #include <wtf/Assertions.h>
 #include <wtf/Forward.h>
+#include <wtf/StdLibExtras.h>
 
 #if __has_include("WebCoreLogDefinitions.h")
 #include "WebCoreLogDefinitions.h"
 #endif
 
 #define COMMA() ,
-#define OPTIONAL_ARGS(...) __VA_OPT__(COMMA()) __VA_ARGS__
+#define OPTIONAL_ARGS(...) __VA_OPT__(COMMA()) SAFE_PRINTF_TYPE(__VA_ARGS__)
 
 #if ENABLE(LOGD_BLOCKING_IN_WEBCONTENT)
 #include <WebCore/LogClient.h>

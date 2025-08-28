@@ -603,6 +603,15 @@ void Document::configureSharedLogger()
         return document->isAlwaysOnLoggingAllowed();
     });
     logger->setEnabled(sharedLoggerOwner(), alwaysOnLoggingAllowed);
+
+    bool developerExtrasEnabled = !allDocumentsMap().isEmpty() && std::ranges::all_of(allDocumentsMap().values(), [](auto& document) {
+        if (RefPtr page = document->page())
+            return page->settings().developerExtrasEnabled();
+        return false;
+    });
+
+    if (developerExtrasEnabled)
+        logger->setDeveloperExtrasEnabled();
 }
 
 void Document::addToDocumentsMap()
@@ -10501,9 +10510,11 @@ Logger& Document::logger()
     if (!m_logger) {
         Ref logger = Logger::create(this);
         m_logger = logger.copyRef();
-        RefPtr page = this->page();
         logger->setEnabled(this, isAlwaysOnLoggingAllowed());
         logger->addObserver(*this);
+        RefPtr page = this->page();
+        if (page && page->settings().developerExtrasEnabled())
+            logger->setDeveloperExtrasEnabled();
     }
 
     return *m_logger;
