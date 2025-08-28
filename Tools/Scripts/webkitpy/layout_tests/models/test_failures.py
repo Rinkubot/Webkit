@@ -27,6 +27,7 @@
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 import logging
+from abc import ABCMeta, abstractmethod
 
 from webkitpy.layout_tests.models import test_expectations
 
@@ -53,6 +54,8 @@ def determine_result_type(failure_list):
 
     failure_types = [type(f) for f in failure_list]
     if FailureCrash in failure_types:
+        return test_expectations.CRASH
+    elif FailureSequenceMismatch in failure_types:
         return test_expectations.CRASH
     elif FailureTimeout in failure_types:
         return test_expectations.TIMEOUT
@@ -84,12 +87,13 @@ def determine_result_type(failure_list):
                              + str(failure_types))
 
 
-class TestFailure(object):
+class TestFailure(metaclass=ABCMeta):
     """Abstract base class that defines the failure interface."""
 
+    @abstractmethod
     def message(self):
         """Returns a string describing the failure in more detail."""
-        raise NotImplementedError
+        raise NotImplementedError()
 
     def __eq__(self, other):
         return self.__class__.__name__ == other.__class__.__name__
@@ -104,8 +108,10 @@ class TestFailure(object):
         """Returns True if we should kill DumpRenderTree/WebKitTestRunner before the next test."""
         return False
 
+    @abstractmethod
     def write_failure(self, writer, driver_output, expected_driver_output, port):
-        assert isinstance(self, (FailureTimeout, FailureReftestNoImagesGenerated))
+        """Writes the actual result files and diffs"""
+        raise NotImplementedError()
 
 
 class FailureText(TestFailure):
@@ -130,6 +136,9 @@ class FailureTimeout(TestFailure):
 
     def driver_needs_restart(self):
         return True
+
+    def write_failure(self, writer, driver_output, expected_driver_output, port):
+        pass
 
 
 class FailureCrash(TestFailure):
@@ -284,6 +293,9 @@ class FailureReftestNoImagesGenerated(TestFailure):
     def message(self):
         return "reference didn't generate pixel results."
 
+    def write_failure(self, writer, driver_output, expected_driver_output, port):
+        pass
+
 
 class FailureMissingAudio(FailureAudio):
     def message(self):
@@ -299,6 +311,25 @@ class FailureEarlyExit(TestFailure):
     def message(self):
         return "skipped due to early exit"
 
+    def write_failure(self, writer, driver_output, expected_driver_output, port):
+        pass
+
+
+class FailureSequenceMismatch(TestFailure):
+    def __init__(self, expected_sequence=0, actual_sequence=0):
+        super(FailureSequenceMismatch, self).__init__()
+        self.expected_sequence = expected_sequence
+        self.actual_sequence = actual_sequence
+
+    def message(self):
+        return "test sequence mismatch: expected %d, got %d" % (self.expected_sequence, self.actual_sequence)
+
+    def driver_needs_restart(self):
+        return True
+
+    def write_failure(self, writer, driver_output, expected_driver_output, port):
+        writer.write_crash_log(self.message())
+
 
 # Convenient collection of all failure classes for anything that might
 # need to enumerate over them all.
@@ -308,4 +339,4 @@ ALL_FAILURE_CLASSES = (FailureTimeout, FailureCrash, FailureMissingResult, Failu
                        FailureImageHashIncorrect, FailureReftestMismatch,
                        FailureReftestMismatchDidNotOccur, FailureReftestNoImagesGenerated,
                        FailureMissingAudio, FailureAudioMismatch, FailureDocumentLeak,
-                       FailureEarlyExit)
+                       FailureEarlyExit, FailureSequenceMismatch)

@@ -72,14 +72,14 @@ static cairo_status_t writeFunction(void* closure, const unsigned char* data, un
     return CAIRO_STATUS_SUCCESS;
 }
 
-static void dumpBitmap(cairo_surface_t* surface, const char* checksum)
+static void dumpBitmap(cairo_surface_t* surface, const char* checksum, int testSequenceNumber)
 {
     Vector<unsigned char> pixelData;
     cairo_surface_write_to_png_stream(surface, writeFunction, &pixelData);
     const size_t dataLength = pixelData.size();
     const unsigned char* data = pixelData.span().data();
 
-    printPNG(data, dataLength, checksum);
+    printPNG(data, dataLength, checksum, testSequenceNumber);
 }
 
 static void paintRepaintRectOverlay(cairo_surface_t* surface, WKArrayRef repaintRects)
@@ -126,7 +126,7 @@ void TestInvocation::dumpPixelsAndCompareWithExpected(SnapshotResultType snapsho
     char actualHash[33];
     computeSHA1HashStringForCairoSurface(surface, actualHash);
     if (!compareActualHashToExpectedAndDumpResults(actualHash))
-        dumpBitmap(surface, actualHash);
+        dumpBitmap(surface, actualHash, m_testSequenceNumber);
 
     cairo_surface_destroy(surface);
 }

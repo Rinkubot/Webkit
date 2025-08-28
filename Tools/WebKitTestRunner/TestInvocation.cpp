@@ -78,17 +78,18 @@ static void postPageMessage(const char* name)
     postPageMessage(name, WKRetainPtr<WKTypeRef> { });
 }
 
-Ref<TestInvocation> TestInvocation::create(WKURLRef url, const TestOptions& options)
+Ref<TestInvocation> TestInvocation::create(WKURLRef url, const TestOptions& options, int testSequenceNumber)
 {
-    return adoptRef(*new TestInvocation(url, options));
+    return adoptRef(*new TestInvocation(url, options, testSequenceNumber));
 }
 
-TestInvocation::TestInvocation(WKURLRef url, const TestOptions& options)
+TestInvocation::TestInvocation(WKURLRef url, const TestOptions& options, int testSequenceNumber)
     : m_options(options)
     , m_url(url)
     , m_waitToDumpWatchdogTimer(RunLoop::mainSingleton(), "TestInvocation::WaitToDumpWatchdogTimer"_s, this, &TestInvocation::waitToDumpWatchdogTimerFired)
     , m_waitForPostDumpWatchdogTimer(RunLoop::mainSingleton(), "TestInvocation::WaitForPostDumpWatchdogTimer"_s, this, &TestInvocation::waitForPostDumpWatchdogTimerFired)
     , m_textOutput(OverflowPolicy::RecordOverflow)
+    , m_testSequenceNumber(testSequenceNumber)
 {
     m_urlString = toWTFString(adoptWK(WKURLCopyString(m_url.get())).get());
 
@@ -247,9 +248,10 @@ void TestInvocation::dumpWebProcessUnresponsiveness(const char* errorMessage)
         fprintf(stderr, "Failed receive expected sample response, got:\n\t\"%s\"\nContinuing...\n", buffer);
 }
 
-void TestInvocation::dump(const char* textToStdout, const char* textToStderr, bool seenError)
+void TestInvocation::dump(const char* textToStdout, const char* textToStderr, bool seenError, int testSequenceNumber)
 {
     printf("Content-Type: text/plain\n");
+    printf("Test-Sequence: %d\n", testSequenceNumber);
     if (textToStdout)
         fputs(textToStdout, stdout);
     if (textToStderr)
@@ -291,9 +293,9 @@ void TestInvocation::dumpResults()
         m_textOutput.append(TestController::singleton().dumpPrivateClickMeasurement());
 
     if (m_textOutput.hasOverflowed())
-        dump("text output overflowed");
+        dump("text output overflowed", nullptr, false, m_testSequenceNumber);
     else if (m_textOutput.length() || !m_audioResult)
-        dump(m_textOutput.toString().utf8().data());
+        dump(m_textOutput.toString().utf8().data(), nullptr, false, m_testSequenceNumber);
     else
         dumpAudio(m_audioResult.get());
 
@@ -322,6 +324,7 @@ void TestInvocation::dumpAudio(WKDataRef audioData)
         return;
 
     printf("Content-Type: audio/wav\n");
+    printf("Test-Sequence: %d\n", m_testSequenceNumber);
     printf("Content-Length: %lu\n", static_cast<unsigned long>(span.size()));
 
     fwrite(span.data(), 1, span.size(), stdout);

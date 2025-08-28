@@ -2167,7 +2167,7 @@ bool TestController::runTest(const char* inputLine)
     if (!m_mainResourceURL)
         return false;
 
-    Ref currentInvocation = TestInvocation::create(m_mainResourceURL.get(), options);
+    Ref currentInvocation = TestInvocation::create(m_mainResourceURL.get(), options, m_testSequenceNumber++);
     m_currentInvocation = currentInvocation.copyRef();
 
     if (command.shouldDumpPixels || m_shouldDumpPixelsForAllTests)

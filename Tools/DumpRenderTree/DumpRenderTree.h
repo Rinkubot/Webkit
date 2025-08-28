@@ -51,6 +51,7 @@ extern bool gUsingServerMode;
 
 // FIXME: This is a bad abstraction.  We should insted pass this to other controller objects which need access to it.
 extern RefPtr<TestRunner> gTestRunner;
+extern int gTestSequenceNumber;
 
 void dump();
 void displayWebView();
