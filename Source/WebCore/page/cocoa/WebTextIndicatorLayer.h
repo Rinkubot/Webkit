@@ -25,7 +25,7 @@
 
 #pragma once
 
-#import "TextIndicator.h"
+#import <WebCore/TextIndicator.h>
 #import <QuartzCore/CALayer.h>
 #import <wtf/Noncopyable.h>
 #import <wtf/RefPtr.h>

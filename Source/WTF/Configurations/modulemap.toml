@@ -1,6 +1,6 @@
 module-name = 'wtf'
 config-macros = ['UCHAR_TYPE']
-requirements = ['cplusplus11']
+requirements = ['cplusplus20']
 
 # Swift's C++ import struggles with some of the templates found in
 # WTF. To avoid Swift trying to import everything, we divide WTF

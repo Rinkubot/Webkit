@@ -1,0 +1,10 @@
+//
+//  WebCore.modulemap
+//  WebCore
+//
+//  Created by Richard Robinson on 8/20/25.
+//
+
+framework module WebCore [system] {
+    export *
+}

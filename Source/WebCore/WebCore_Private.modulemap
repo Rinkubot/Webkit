@@ -1,0 +1,27 @@
+//
+//  WebCore_Private.modulemap
+//  WebCore
+//
+//  Created by Richard Robinson on 8/20/25.
+//
+
+framework module WebCore_Private [system] {
+    umbrella "PrivateHeaders"
+
+    requires cplusplus20
+    requires objc
+
+    exclude header "WebCoreObjCExtras.h"
+
+    explicit module WebCoreObjCExtras {
+        requires !objc_arc
+        header "WebCoreObjCExtras.h"
+        export *
+    }
+
+    explicit module * {
+//        requires cplusplus20
+//        requires objc
+        export *
+    }
+}

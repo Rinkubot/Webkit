@@ -30,8 +30,13 @@
 #include <WebCore/ColorUtilities.h>
 #include <WebCore/DestinationColorSpace.h>
 #include <bit>
+//#include <bmalloc/TZoneHeap.h>
 #include <functional>
+#include <utility>
+#include <wtf/Assertions.h>
+#include <wtf/Compiler.h>
 #include <wtf/Forward.h>
+#include <wtf/GetPtr.h>
 #include <wtf/HashFunctions.h>
 #include <wtf/Hasher.h>
 #include <wtf/OptionSet.h>
@@ -40,6 +45,7 @@
 #include <wtf/StdLibExtras.h>
 #include <wtf/TZoneMalloc.h>
 #include <wtf/ThreadSafeRefCounted.h>
+#include <wtf/Variant.h>
 
 #if USE(SKIA)
 WTF_IGNORE_WARNINGS_IN_THIRD_PARTY_CODE_BEGIN

@@ -27,7 +27,7 @@
 
 #if PLATFORM(COCOA) && HAVE(AVKIT)
 
-#import <pal/spi/cocoa/AVKitSPI.h>
+//#import <pal/spi/cocoa/AVKitSPI.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -37,6 +37,13 @@ class PlaybackSessionInterfaceIOS;
 }
 
 @class AVTimeRange;
+@class AVValueTiming;
+@class AVPlayerController;
+
+typedef NS_ENUM(NSInteger, AVPlayerControllerStatus);
+typedef NS_ENUM(NSInteger, AVPlayerControllerExternalPlaybackType);
+
+typedef NSString * AVMediaType;
 
 @interface WebAVMediaSelectionOption : NSObject
 - (instancetype)initWithMediaType:(AVMediaType)type displayName:(NSString *)displayName;
