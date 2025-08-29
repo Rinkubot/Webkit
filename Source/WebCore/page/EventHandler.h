@@ -676,6 +676,7 @@ private:
 
     RefPtr<Node> m_lastTouchedNode;
     RefPtr<Node> m_clickNode;
+    RefPtr<Element> m_clickCaptureElement;
     RefPtr<HTMLFrameSetElement> m_frameSetBeingResized;
 
     LayoutSize m_offsetFromResizeCorner; // In the coords of m_resizeLayer.
