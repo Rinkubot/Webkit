@@ -285,6 +285,9 @@ set(bmalloc_PUBLIC_HEADERS
     bmalloc/List.h
     bmalloc/Logging.h
     bmalloc/Map.h
+    bmalloc/MARCrashReporter.h
+    bmalloc/MARCrashReporterReport.h
+    bmalloc/MARRegistry.h
     bmalloc/Mutex.h
     bmalloc/Object.h
     bmalloc/ObjectType.h

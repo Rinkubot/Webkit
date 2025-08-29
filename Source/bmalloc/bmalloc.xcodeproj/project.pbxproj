@@ -695,6 +695,11 @@
 		EB17D11123BFCD42002093A7 /* HeapConstants.cpp in Sources */ = {isa = PBXBuildFile; fileRef = EB17D11023BFC8C4002093A7 /* HeapConstants.cpp */; };
 		EB17D11223BFCD7A002093A7 /* HeapConstants.h in Headers */ = {isa = PBXBuildFile; fileRef = EB17D10E23BE691D002093A7 /* HeapConstants.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		F15AF5192D791B4B001AE01E /* pas_thread.h in Headers */ = {isa = PBXBuildFile; fileRef = F15AF5182D791B4B001AE01E /* pas_thread.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		F36818D32E25AE2D002F1AA1 /* MARCrashReporterReport.h in Headers */ = {isa = PBXBuildFile; fileRef = F36818D22E25AE2D002F1AA1 /* MARCrashReporterReport.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		F3D699122E1EFD37006B54BD /* MARRegistry.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F3D699112E1EFD37006B54BD /* MARRegistry.cpp */; };
+		F3D699132E1EFD37006B54BD /* MARCrashReporter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F3D6990F2E1EFD37006B54BD /* MARCrashReporter.cpp */; };
+		F3D699142E1EFD37006B54BD /* MARRegistry.h in Headers */ = {isa = PBXBuildFile; fileRef = F3D699102E1EFD37006B54BD /* MARRegistry.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		F3D699152E1EFD37006B54BD /* MARCrashReporter.h in Headers */ = {isa = PBXBuildFile; fileRef = F3D6990E2E1EFD37006B54BD /* MARCrashReporter.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		FE0383202ABC0E9F00A576A2 /* TZoneHeap.h in Headers */ = {isa = PBXBuildFile; fileRef = FE03831E2ABC0E9F00A576A2 /* TZoneHeap.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		FE0383212ABC0E9F00A576A2 /* TZoneHeap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = FE03831F2ABC0E9F00A576A2 /* TZoneHeap.cpp */; };
 		FE0383232ABC988C00A576A2 /* TZoneHeapInlines.h in Headers */ = {isa = PBXBuildFile; fileRef = FE0383222ABC988C00A576A2 /* TZoneHeapInlines.h */; settings = {ATTRIBUTES = (Private, ); }; };
@@ -1417,6 +1422,11 @@
 		EB17D10E23BE691D002093A7 /* HeapConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = HeapConstants.h; path = bmalloc/HeapConstants.h; sourceTree = "<group>"; };
 		EB17D11023BFC8C4002093A7 /* HeapConstants.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = HeapConstants.cpp; path = bmalloc/HeapConstants.cpp; sourceTree = "<group>"; };
 		F15AF5182D791B4B001AE01E /* pas_thread.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = pas_thread.h; path = libpas/src/libpas/pas_thread.h; sourceTree = "<group>"; };
+		F36818D22E25AE2D002F1AA1 /* MARCrashReporterReport.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MARCrashReporterReport.h; path = bmalloc/MARCrashReporterReport.h; sourceTree = "<group>"; };
+		F3D6990E2E1EFD37006B54BD /* MARCrashReporter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MARCrashReporter.h; path = bmalloc/MARCrashReporter.h; sourceTree = "<group>"; };
+		F3D6990F2E1EFD37006B54BD /* MARCrashReporter.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = MARCrashReporter.cpp; path = bmalloc/MARCrashReporter.cpp; sourceTree = "<group>"; };
+		F3D699102E1EFD37006B54BD /* MARRegistry.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = MARRegistry.h; path = bmalloc/MARRegistry.h; sourceTree = "<group>"; };
+		F3D699112E1EFD37006B54BD /* MARRegistry.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = MARRegistry.cpp; path = bmalloc/MARRegistry.cpp; sourceTree = "<group>"; };
 		FE03831E2ABC0E9F00A576A2 /* TZoneHeap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TZoneHeap.h; path = bmalloc/TZoneHeap.h; sourceTree = "<group>"; };
 		FE03831F2ABC0E9F00A576A2 /* TZoneHeap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TZoneHeap.cpp; path = bmalloc/TZoneHeap.cpp; sourceTree = "<group>"; };
 		FE0383222ABC988C00A576A2 /* TZoneHeapInlines.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = TZoneHeapInlines.h; path = bmalloc/TZoneHeapInlines.h; sourceTree = "<group>"; };
@@ -2084,6 +2094,7 @@
 				147AAA9C18CE6010002201E4 /* heap: large */,
 				147AAA9A18CE5FD3002201E4 /* heap: small */,
 				0F7EB7FB1F95416900F1ABCB /* iso */,
+				F3D6990D2E1EFCD0006B54BD /* mar */,
 				145F6840179DC45F00D65598 /* Products */,
 				14D9DB4F17F2868900EAAB79 /* stdlib */,
 			);
@@ -2236,6 +2247,18 @@
 			name = darwin;
 			sourceTree = "<group>";
 		};
+		F3D6990D2E1EFCD0006B54BD /* mar */ = {
+			isa = PBXGroup;
+			children = (
+				F3D6990F2E1EFD37006B54BD /* MARCrashReporter.cpp */,
+				F3D6990E2E1EFD37006B54BD /* MARCrashReporter.h */,
+				F36818D22E25AE2D002F1AA1 /* MARCrashReporterReport.h */,
+				F3D699112E1EFD37006B54BD /* MARRegistry.cpp */,
+				F3D699102E1EFD37006B54BD /* MARRegistry.h */,
+			);
+			name = mar;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -2328,6 +2351,9 @@
 				141D9B001C8E51C0000ABBA0 /* List.h in Headers */,
 				4426E2811C838EE0008EB042 /* Logging.h in Headers */,
 				14C8992B1CC485E70027A057 /* Map.h in Headers */,
+				F3D699152E1EFD37006B54BD /* MARCrashReporter.h in Headers */,
+				F36818D32E25AE2D002F1AA1 /* MARCrashReporterReport.h in Headers */,
+				F3D699142E1EFD37006B54BD /* MARRegistry.h in Headers */,
 				52F47249210BA30200B730BB /* MemoryStatusSPI.h in Headers */,
 				5C3986CA2E0D89A600C450A4 /* module.modulemap in Headers */,
 				143CB81D19022BC900B16A45 /* Mutex.h in Headers */,
@@ -2910,6 +2936,8 @@
 				0F7EB83F1F9541B000F1ABCB /* IsoTLSLayout.cpp in Sources */,
 				144C07F41C7B70260051BB6A /* LargeMap.cpp in Sources */,
 				4426E2801C838EE0008EB042 /* Logging.cpp in Sources */,
+				F3D699132E1EFD37006B54BD /* MARCrashReporter.cpp in Sources */,
+				F3D699122E1EFD37006B54BD /* MARRegistry.cpp in Sources */,
 				143CB81C19022BC900B16A45 /* Mutex.cpp in Sources */,
 				14F271C818EA3990008C152F /* ObjectType.cpp in Sources */,
 				E378A9DF246B68720029C2BB /* ObjectTypeTable.cpp in Sources */,

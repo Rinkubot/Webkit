@@ -36,6 +36,7 @@ BALLOW_UNSAFE_BUFFER_USAGE_BEGIN
 #include "Gigacage.h"
 #include "Heap.h"
 #include "IsoTLS.h"
+#include "MARRegistry.h"
 #include "Mutex.h"
 #include "PerHeapKind.h"
 #include "Scavenger.h"
@@ -62,9 +63,16 @@ inline pas_primitive_heap_ref& heapForKind(Gigacage::Kind kind)
 BINLINE void* tryMalloc(size_t size, CompactAllocationMode mode, HeapKind kind = HeapKind::Primary)
 {
 #if BUSE(LIBPAS)
-    if (!isGigacage(kind))
-        return bmalloc_try_allocate_inline(size, asPasAllocationMode(mode));
-    return bmalloc_try_allocate_auxiliary_inline(&heapForKind(gigacageKind(kind)), size, asPasAllocationMode(mode));
+    if (!isGigacage(kind)) {
+        void* allocation = bmalloc_try_allocate_inline(size, asPasAllocationMode(mode));
+        if (mode == CompactAllocationMode::NonCompact && MAR_isAddressInQualifyingPage(allocation))
+            MAR_didAllocate(&marRegistry, allocation, size);
+        return allocation;
+    }
+    void* allocation = bmalloc_try_allocate_auxiliary_inline(&heapForKind(gigacageKind(kind)), size, asPasAllocationMode(mode));
+    if (mode == CompactAllocationMode::NonCompact && MAR_isAddressInQualifyingPage(allocation))
+        MAR_didAllocate(&marRegistry, allocation, size);
+    return allocation;
 #else
     BUNUSED(mode);
     return Cache::tryAllocate(kind, size);
@@ -75,9 +83,16 @@ BINLINE void* tryMalloc(size_t size, CompactAllocationMode mode, HeapKind kind =
 BINLINE void* malloc(size_t size, CompactAllocationMode mode, HeapKind kind = HeapKind::Primary)
 {
 #if BUSE(LIBPAS)
-    if (!isGigacage(kind))
-        return bmalloc_allocate_inline(size, asPasAllocationMode(mode));
-    return bmalloc_allocate_auxiliary_inline(&heapForKind(gigacageKind(kind)), size, asPasAllocationMode(mode));
+    if (!isGigacage(kind)) {
+        void* allocation = bmalloc_allocate_inline(size, asPasAllocationMode(mode));
+        if (mode == CompactAllocationMode::NonCompact && MAR_isAddressInQualifyingPage(allocation))
+            MAR_didAllocate(&marRegistry, allocation, size);
+        return allocation;
+    }
+    void* allocation = bmalloc_allocate_auxiliary_inline(&heapForKind(gigacageKind(kind)), size, asPasAllocationMode(mode));
+    if (mode == CompactAllocationMode::NonCompact && MAR_isAddressInQualifyingPage(allocation))
+        MAR_didAllocate(&marRegistry, allocation, size);
+    return allocation;
 #else
     BUNUSED(mode);
     return Cache::allocate(kind, size);
@@ -87,9 +102,16 @@ BINLINE void* malloc(size_t size, CompactAllocationMode mode, HeapKind kind = He
 BINLINE void* tryZeroedMalloc(size_t size, CompactAllocationMode mode, HeapKind kind = HeapKind::Primary)
 {
 #if BUSE(LIBPAS)
-    if (!isGigacage(kind))
-        return bmalloc_try_allocate_zeroed_inline(size, asPasAllocationMode(mode));
-    return bmalloc_try_allocate_auxiliary_zeroed_inline(&heapForKind(gigacageKind(kind)), size, asPasAllocationMode(mode));
+    if (!isGigacage(kind)) {
+        void* allocation = bmalloc_try_allocate_zeroed_inline(size, asPasAllocationMode(mode));
+        if (mode == CompactAllocationMode::NonCompact && MAR_isAddressInQualifyingPage(allocation))
+            MAR_didAllocate(&marRegistry, allocation, size);
+        return allocation;
+    }
+    void* allocation = bmalloc_try_allocate_auxiliary_zeroed_inline(&heapForKind(gigacageKind(kind)), size, asPasAllocationMode(mode));
+    if (mode == CompactAllocationMode::NonCompact && MAR_isAddressInQualifyingPage(allocation))
+        MAR_didAllocate(&marRegistry, allocation, size);
+    return allocation;
 #else
     BUNUSED(mode);
     auto* mem = Cache::tryAllocate(kind, size);
@@ -103,9 +125,16 @@ BINLINE void* tryZeroedMalloc(size_t size, CompactAllocationMode mode, HeapKind 
 BINLINE void* zeroedMalloc(size_t size, CompactAllocationMode mode, HeapKind kind = HeapKind::Primary)
 {
 #if BUSE(LIBPAS)
-    if (!isGigacage(kind))
-        return bmalloc_allocate_zeroed_inline(size, asPasAllocationMode(mode));
-    return bmalloc_allocate_auxiliary_zeroed_inline(&heapForKind(gigacageKind(kind)), size, asPasAllocationMode(mode));
+    if (!isGigacage(kind)) {
+        void* allocation = bmalloc_allocate_zeroed_inline(size, asPasAllocationMode(mode));
+        if (mode == CompactAllocationMode::NonCompact && MAR_isAddressInQualifyingPage(allocation))
+            MAR_didAllocate(&marRegistry, allocation, size);
+        return allocation;
+    }
+    void* allocation = bmalloc_allocate_auxiliary_zeroed_inline(&heapForKind(gigacageKind(kind)), size, asPasAllocationMode(mode));
+    if (mode == CompactAllocationMode::NonCompact && MAR_isAddressInQualifyingPage(allocation))
+        MAR_didAllocate(&marRegistry, allocation, size);
+    return allocation;
 #else
     BUNUSED(mode);
     auto* mem = Cache::allocate(kind, size);
@@ -120,10 +149,17 @@ BEXPORT void* mallocOutOfLine(size_t size, CompactAllocationMode mode, HeapKind 
 BINLINE void* tryMemalign(size_t alignment, size_t size, CompactAllocationMode mode, HeapKind kind = HeapKind::Primary)
 {
 #if BUSE(LIBPAS)
-    if (!isGigacage(kind))
-        return bmalloc_try_allocate_with_alignment_inline(size, alignment, asPasAllocationMode(mode));
-    return bmalloc_try_allocate_auxiliary_with_alignment_inline(
+    if (!isGigacage(kind)) {
+        void* allocation = bmalloc_try_allocate_with_alignment_inline(size, alignment, asPasAllocationMode(mode));
+        if (mode == CompactAllocationMode::NonCompact && MAR_isAddressInQualifyingPage(allocation))
+            MAR_didAllocate(&marRegistry, allocation, size);
+        return allocation;
+    }
+    void* allocation = bmalloc_try_allocate_auxiliary_with_alignment_inline(
         &heapForKind(gigacageKind(kind)), size, alignment, asPasAllocationMode(mode));
+    if (mode == CompactAllocationMode::NonCompact && MAR_isAddressInQualifyingPage(allocation))
+        MAR_didAllocate(&marRegistry, allocation, size);
+    return allocation;
 #else
     BUNUSED(mode);
     return Cache::tryAllocate(kind, alignment, size);
@@ -134,10 +170,17 @@ BINLINE void* tryMemalign(size_t alignment, size_t size, CompactAllocationMode m
 BINLINE void* memalign(size_t alignment, size_t size, CompactAllocationMode mode, HeapKind kind = HeapKind::Primary)
 {
 #if BUSE(LIBPAS)
-    if (!isGigacage(kind))
-        return bmalloc_allocate_with_alignment_inline(size, alignment, asPasAllocationMode(mode));
-    return bmalloc_allocate_auxiliary_with_alignment_inline(
+    if (!isGigacage(kind)) {
+        void* allocation = bmalloc_allocate_with_alignment_inline(size, alignment, asPasAllocationMode(mode));
+        if (mode == CompactAllocationMode::NonCompact && MAR_isAddressInQualifyingPage(allocation))
+            MAR_didAllocate(&marRegistry, allocation, size);
+        return allocation;
+    }
+    void* allocation = bmalloc_allocate_auxiliary_with_alignment_inline(
         &heapForKind(gigacageKind(kind)), size, alignment, asPasAllocationMode(mode));
+    if (mode == CompactAllocationMode::NonCompact && MAR_isAddressInQualifyingPage(allocation))
+        MAR_didAllocate(&marRegistry, allocation, size);
+    return allocation;
 #else
     BUNUSED(mode);
     return Cache::allocate(kind, alignment, size);
@@ -182,11 +225,17 @@ BINLINE void* tryRealloc(void* object, size_t newSize, CompactAllocationMode mod
 {
 #if BUSE(LIBPAS)
     if (!isGigacage(kind)) {
-        return bmalloc_try_reallocate_inline(
+        void* allocation = bmalloc_try_reallocate_inline(
             object, newSize, asPasAllocationMode(mode), pas_reallocate_free_if_successful);
+        if (mode == CompactAllocationMode::NonCompact && MAR_isAddressInQualifyingPage(allocation))
+            MAR_didAllocate(&marRegistry, allocation, newSize);
+        return allocation;
     }
-    return bmalloc_try_reallocate_auxiliary_inline(
+    void* allocation = bmalloc_try_reallocate_auxiliary_inline(
         object, &heapForKind(gigacageKind(kind)), newSize, asPasAllocationMode(mode), pas_reallocate_free_if_successful);
+    if (mode == CompactAllocationMode::NonCompact && MAR_isAddressInQualifyingPage(allocation))
+        MAR_didAllocate(&marRegistry, allocation, newSize);
+    return allocation;
 #else
     BUNUSED(mode);
     return Cache::tryReallocate(kind, object, newSize);
@@ -197,10 +246,17 @@ BINLINE void* tryRealloc(void* object, size_t newSize, CompactAllocationMode mod
 BINLINE void* realloc(void* object, size_t newSize, CompactAllocationMode mode, HeapKind kind = HeapKind::Primary)
 {
 #if BUSE(LIBPAS)
-    if (!isGigacage(kind))
-        return bmalloc_reallocate_inline(object, newSize, asPasAllocationMode(mode), pas_reallocate_free_if_successful);
-    return bmalloc_reallocate_auxiliary_inline(
+    if (!isGigacage(kind)) {
+        void* allocation = bmalloc_reallocate_inline(object, newSize, asPasAllocationMode(mode), pas_reallocate_free_if_successful);
+        if (mode == CompactAllocationMode::NonCompact && MAR_isAddressInQualifyingPage(allocation))
+            MAR_didAllocate(&marRegistry, allocation, newSize);
+        return allocation;
+    }
+    void* allocation = bmalloc_reallocate_auxiliary_inline(
         object, &heapForKind(gigacageKind(kind)), newSize, asPasAllocationMode(mode), pas_reallocate_free_if_successful);
+    if (mode == CompactAllocationMode::NonCompact && MAR_isAddressInQualifyingPage(allocation))
+        MAR_didAllocate(&marRegistry, allocation, newSize);
+    return allocation;
 #else
     BUNUSED(mode);
     return Cache::reallocate(kind, object, newSize);
