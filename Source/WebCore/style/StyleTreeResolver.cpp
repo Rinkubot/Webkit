@@ -1825,9 +1825,9 @@ static Vector<Function<void ()>>& postResolutionCallbackQueue()
     return vector;
 }
 
-static Vector<RefPtr<LocalFrame>>& memoryCacheClientCallsResumeQueue()
+static Vector<RefPtr<Frame>>& memoryCacheClientCallsResumeQueue()
 {
-    static NeverDestroyed<Vector<RefPtr<LocalFrame>>> vector;
+    static NeverDestroyed<Vector<RefPtr<Frame>>> vector;
     return vector;
 }
 
@@ -1844,8 +1844,8 @@ static void suspendMemoryCacheClientCalls(Document& document)
 
     page->setMemoryCacheClientCallsEnabled(false);
 
-    if (RefPtr localMainFrame = page->localMainFrame())
-        memoryCacheClientCallsResumeQueue().append(localMainFrame);
+    if (RefPtr mainFrame = page->mainFrame())
+        memoryCacheClientCallsResumeQueue().append(mainFrame);
 }
 
 static unsigned resolutionNestingDepth;
