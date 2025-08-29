@@ -1143,6 +1143,7 @@ TEST(ServiceWorkers, SWProcessConnectionCreation)
 
     RetainPtr<WKWebViewConfiguration> configuration = adoptNS([[WKWebViewConfiguration alloc] init]);
     setConfigurationInjectedBundlePath(configuration.get());
+    [configuration _setAllowTestOnlyIPC:YES];
 
     done = false;
 
@@ -1287,6 +1288,7 @@ TEST(ServiceWorkers, ServiceWorkerProcessCreation)
     // Now that a sw is registered, let's create a new configuration and try loading a regular page, there should be no service worker process created.
     RetainPtr<WKWebViewConfiguration> newConfiguration = adoptNS([[WKWebViewConfiguration alloc] init]);
     setConfigurationInjectedBundlePath(newConfiguration.get());
+    [newConfiguration _setAllowTestOnlyIPC:YES];
     newConfiguration.get().websiteDataStore = [configuration websiteDataStore];
 
     [[newConfiguration userContentController] addScriptMessageHandler:messageHandler.get() name:@"sw"];
@@ -1577,6 +1579,7 @@ TEST(ServiceWorkers, ServiceWorkerAndCacheStorageDefaultDirectories)
 
     auto configuration = adoptNS([[WKWebViewConfiguration alloc] init]);
     setConfigurationInjectedBundlePath(configuration.get());
+    [configuration _setAllowTestOnlyIPC:YES];
 
     RetainPtr<DirectoryPageMessageHandler> directoryPageMessageHandler = adoptNS([[DirectoryPageMessageHandler alloc] init]);
     [[configuration userContentController] addScriptMessageHandler:directoryPageMessageHandler.get() name:@"sw"];
@@ -3101,6 +3104,7 @@ TEST(ServiceWorker, ExtensionServiceWorker)
     auto otherViewConfiguration = adoptNS([WKWebViewConfiguration new]);
     otherViewConfiguration.get().processPool = webViewConfiguration.processPool;
     [otherViewConfiguration setURLSchemeHandler:schemeHandler.get() forURLScheme:@"sw-ext"];
+    [otherViewConfiguration _setAllowTestOnlyIPC:YES];
     auto otherWebView = adoptNS([[WKWebView alloc] initWithFrame:NSMakeRect(0, 0, 800, 600) configuration:otherViewConfiguration.get()]);
     [otherWebView loadRequest:[NSURLRequest requestWithURL:[NSURL URLWithString:@"sw-ext://ABC/other.html"]]];
     [otherWebView _test_waitForDidFinishNavigation];

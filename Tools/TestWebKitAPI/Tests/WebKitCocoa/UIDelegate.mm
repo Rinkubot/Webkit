@@ -46,6 +46,7 @@
 #import <WebKit/WKRetainPtr.h>
 #import <WebKit/WKUIDelegatePrivate.h>
 #import <WebKit/WKWebViewConfiguration.h>
+#import <WebKit/WKWebViewConfigurationPrivate.h>
 #import <WebKit/WKWebViewPrivateForTesting.h>
 #import <WebKit/WKWebViewPrivateForTestingMac.h>
 
@@ -97,7 +98,9 @@ static bool didReceiveMessage;
 
 TEST(WebKit, WKWebViewIsPlayingAudio)
 {
-    auto webView = adoptNS([[TestWKWebView alloc] initWithFrame:CGRectMake(0, 0, 800, 600) configuration:adoptNS([[WKWebViewConfiguration alloc] init]).get()]);
+    auto configuration = adoptNS([[WKWebViewConfiguration alloc] init]);
+    [configuration _setAllowTestOnlyIPC:YES];
+    auto webView = adoptNS([[TestWKWebView alloc] initWithFrame:CGRectMake(0, 0, 800, 600) configuration:configuration.get()]);
     auto observer = adoptNS([[AudioObserver alloc] init]);
     [webView addObserver:observer.get() forKeyPath:@"_isPlayingAudio" options:NSKeyValueObservingOptionNew | NSKeyValueObservingOptionOld context:nil];
     [webView synchronouslyLoadTestPageNamed:@"file-with-video"];
@@ -190,6 +193,7 @@ TEST(WebKit, GeolocationPermission)
     WKGeolocationManagerSetProvider(WKContextGetGeolocationManager((WKContextRef)pool.get()), &providerCallback.base);
 
     auto configuration = adoptNS([[WKWebViewConfiguration alloc] init]);
+    [configuration _setAllowTestOnlyIPC:YES];
     configuration.get().processPool = pool.get();
 
     auto schemeHandler = adoptNS([[TestURLSchemeHandler alloc] init]);
@@ -305,6 +309,7 @@ TEST(WebKit, GeolocationPermissionInIFrame)
     WKGeolocationManagerSetProvider(WKContextGetGeolocationManager((WKContextRef)pool.get()), &providerCallback.base);
 
     auto configuration = adoptNS([[WKWebViewConfiguration alloc] init]);
+    [configuration _setAllowTestOnlyIPC:YES];
     configuration.get().processPool = pool.get();
 
     auto messageHandler = adoptNS([[GeolocationPermissionMessageHandler alloc] init]);
@@ -368,6 +373,7 @@ TEST(WebKit, GeolocationPermissionInDisallowedIFrame)
     WKGeolocationManagerSetProvider(WKContextGetGeolocationManager((WKContextRef)pool.get()), &providerCallback.base);
 
     auto configuration = adoptNS([[WKWebViewConfiguration alloc] init]);
+    [configuration _setAllowTestOnlyIPC:YES];
     configuration.get().processPool = pool.get();
 
     auto messageHandler = adoptNS([[GeolocationPermissionMessageHandler alloc] init]);
@@ -594,6 +600,7 @@ static bool gShouldKeepScreenAwake = false;
 TEST(WebKit, SetShouldKeepScreenAwake)
 {
     auto configuration = adoptNS([[WKWebViewConfiguration alloc] init]);
+    [configuration _setAllowTestOnlyIPC:YES];
     auto webView = adoptNS([[TestWKWebView alloc] initWithFrame:CGRectMake(0, 0, 800, 600) configuration:configuration.get() addToWindow:YES]);
     auto delegate = adoptNS([SetShouldKeepScreenAwakeDelegate new]);
     [webView setUIDelegate:delegate.get()];
@@ -608,6 +615,7 @@ TEST(WebKit, SetShouldKeepScreenAwake)
 TEST(WebKit, SetShouldKeepScreenAwakeLastPageIsClosed)
 {
     auto configuration = adoptNS([[WKWebViewConfiguration alloc] init]);
+    [configuration _setAllowTestOnlyIPC:YES];
     auto webView = adoptNS([[TestWKWebView alloc] initWithFrame:CGRectMake(0, 0, 800, 600) configuration:configuration.get() addToWindow:YES]);
     auto delegate = adoptNS([SetShouldKeepScreenAwakeDelegate new]);
     [webView setUIDelegate:delegate.get()];
@@ -629,6 +637,7 @@ TEST(WebKit, SetShouldKeepScreenAwakeLastPageIsClosed)
 TEST(WebKit, SetShouldKeepScreenAwakeWebProcessCrash)
 {
     auto configuration = adoptNS([[WKWebViewConfiguration alloc] init]);
+    [configuration _setAllowTestOnlyIPC:YES];
     auto webView = adoptNS([[TestWKWebView alloc] initWithFrame:CGRectMake(0, 0, 800, 600) configuration:configuration.get() addToWindow:YES]);
     auto delegate = adoptNS([SetShouldKeepScreenAwakeDelegate new]);
     [webView setUIDelegate:delegate.get()];
@@ -692,6 +701,7 @@ TEST(WebKit, ShowWebView)
 {
     delegate = adoptNS([[UITestDelegate alloc] init]);
     auto configuration = adoptNS([[WKWebViewConfiguration alloc] init]);
+    [configuration _setAllowTestOnlyIPC:YES];
     [configuration setURLSchemeHandler:delegate.get() forURLScheme:@"test"];
     auto webView = adoptNS([[WKWebView alloc] initWithFrame:CGRectMake(0, 0, 800, 600) configuration:configuration.get()]);
     [webView setUIDelegate:delegate.get()];
@@ -896,7 +906,9 @@ TEST(WebKit, PrintWithCompletionHandler)
 TEST(WebKit, NotificationPermission)
 {
     NSString *html = @"<script>function requestPermission() { Notification.requestPermission(function(p){alert('permission '+p)}); }</script>";
-    auto webView = adoptNS([[TestWKWebView alloc] initWithFrame:CGRectMake(0, 0, 800, 600) configuration:adoptNS([[WKWebViewConfiguration alloc] init]).get()]);
+    auto configuration = adoptNS([[WKWebViewConfiguration alloc] init]);
+    [configuration _setAllowTestOnlyIPC:YES];
+    auto webView = adoptNS([[TestWKWebView alloc] initWithFrame:CGRectMake(0, 0, 800, 600) configuration:configuration.get()]);
     auto uiDelegate = adoptNS([[NotificationDelegate alloc] initWithAllowNotifications:YES]);
     [webView setUIDelegate:uiDelegate.get()];
     [webView synchronouslyLoadHTMLString:html baseURL:[NSURL URLWithString:@"https://example.org"]];
@@ -938,7 +950,9 @@ bool firstToolbarDone;
 
 TEST(WebKit, ToolbarVisible)
 {
-    auto webView = adoptNS([[TestWKWebView alloc] initWithFrame:CGRectMake(0, 0, 800, 600) configuration:adoptNS([[WKWebViewConfiguration alloc] init]).get()]);
+    auto configuration = adoptNS([[WKWebViewConfiguration alloc] init]);
+    [configuration _setAllowTestOnlyIPC:YES];
+    auto webView = adoptNS([[TestWKWebView alloc] initWithFrame:CGRectMake(0, 0, 800, 600) configuration:configuration.get()]);
     auto delegate = adoptNS([[ToolbarDelegate alloc] init]);
     [webView setUIDelegate:delegate.get()];
     [webView synchronouslyLoadHTMLString:@"<script>alert('visible:' + window.toolbar.visible);alert('visible:' + window.toolbar.visible)</script>"];
@@ -1633,6 +1647,7 @@ private:
     static RetainPtr<WKWebViewConfiguration> configurationForWebViewTestingPointerLock()
     {
         RetainPtr configuration = [WKWebViewConfiguration _test_configurationWithTestPlugInClassName:@"WebProcessPlugInWithInternals" configureJSCForTesting:YES];
+        [configuration _setAllowTestOnlyIPC:YES];
 
         for (_WKFeature *feature in [WKPreferences _features]) {
             if ([feature.key isEqualToString:@"PointerLockEnabled"])
