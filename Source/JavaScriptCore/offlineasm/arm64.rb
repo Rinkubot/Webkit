@@ -181,6 +181,8 @@ class RegisterID
           arm64GPRName('x11', kind)
         when 't12', 'ws3'
           arm64GPRName('x12', kind)
+        when 'jxcsr0'
+          arm64GPRName('x15', kind)
         when 'cfr'
             arm64GPRName('x29', kind)
         when 'csr0'

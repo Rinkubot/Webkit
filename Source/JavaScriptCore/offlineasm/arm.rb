@@ -29,8 +29,8 @@ require "risc"
 
 # GPR conventions, to match the baseline JIT
 #
-#  x0 => t0, a0, r0
-#  x1 => t1, a1, r1
+#  x0 => t0, a0, r0, j0
+#  x1 => t1, a1, r1, j1
 #  x2 => t2, a2
 #  x3 => t3, a3
 #  x4 => t4                 (callee-save, PC)
@@ -38,17 +38,19 @@ require "risc"
 #  x6 => scratch            (callee-save)
 #  x7 => cfr
 #  x8 => t6                 (callee-save)
-#  x9 => t7, also scratch!  (callee-save)
+#  x9 => scratch            (callee-save)
 # x10 => csr0               (callee-save, metadataTable)
 # x11 => csr1               (callee-save, PB)
-# x12 => scratch            (callee-save)
+# x12 => jx (jsr scratch)   (callee-save)
 #  lr => lr
 #  sp => sp
 #  pc => pc
 #
+# jxcsr0 => Fake register in csfr0/jx
+# 
 # FPR conventions, to match the baseline JIT
 #
-#  d0 => ft0, fa0, fr
+#  d0 => ft0, fa0, fr, j0
 #  d1 => ft1, fa1
 #  d2 => ft2
 #  d3 => ft3
@@ -85,9 +87,8 @@ class SpecialRegister
 end
 
 # These are allocated from the end. Use the low order r6 first, ast it's often
-# cheaper to encode. r12 and r9 are equivalent, but r9 conflicts with t7, so r9
-# only as last resort.
-ARM_EXTRA_GPRS = [SpecialRegister.new("r9"), SpecialRegister.new("r12"), SpecialRegister.new("r6")]
+# cheaper to encode.
+ARM_EXTRA_GPRS = [SpecialRegister.new("r9"), SpecialRegister.new("r6")]
 ARM_EXTRA_FPRS = [SpecialRegister.new("d7")]
 ARM_SCRATCH_FPR = SpecialRegister.new("d15")
 OS_DARWIN = ((RUBY_PLATFORM =~ /darwin/i) != nil)
