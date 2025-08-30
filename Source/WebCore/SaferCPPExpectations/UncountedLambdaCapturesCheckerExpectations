@@ -55,7 +55,6 @@ page/IntelligenceTextEffectsSupport.cpp
 page/Navigator.cpp
 page/ShareDataReader.cpp
 page/cocoa/ResourceUsageOverlayCocoa.mm
-page/csp/ContentSecurityPolicy.cpp
 page/writing-tools/WritingToolsController.mm
 platform/RemoteCommandListener.cpp
 platform/ScrollableArea.cpp
