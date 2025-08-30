@@ -42,6 +42,7 @@
 #import <WebKit/WKWebViewPrivate.h>
 #import <WebKit/WKWebViewPrivateForTesting.h>
 #import <pal/spi/cocoa/IOKitSPI.h>
+#import <wtf/MonotonicTime.h>
 #import <wtf/RetainPtr.h>
 #import <wtf/cocoa/TypeCastsCocoa.h>
 
@@ -765,6 +766,7 @@ void EventSenderProxy::mouseScrollByWithWheelAndMomentumPhases(int x, int y, int
     CGEventSetIntegerValueField(cgScrollEvent.get(), kCGScrollWheelEventIsContinuous, 1);
     CGEventSetIntegerValueField(cgScrollEvent.get(), kCGScrollWheelEventScrollPhase, phase);
     CGEventSetIntegerValueField(cgScrollEvent.get(), kCGScrollWheelEventMomentumPhase, momentum);
+    CGEventSetTimestamp(cgScrollEvent.get(), MonotonicTime::now().secondsSinceEpoch().nanoseconds());
 
     NSEvent* event = [NSEvent eventWithCGEvent:cgScrollEvent.get()];
 
