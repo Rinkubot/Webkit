@@ -1,0 +1,9 @@
+framework module JavaScriptCore_Private [system] {
+    umbrella "PrivateHeaders"
+
+    requires cplusplus11
+
+    explicit module * {
+        export *
+    }
+}
