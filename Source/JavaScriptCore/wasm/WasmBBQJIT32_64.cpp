@@ -1205,7 +1205,23 @@ void BBQJIT::truncInBounds(TruncationKind truncationKind, Location operandLocati
 
 PartialResult WARN_UNUSED_RETURN BBQJIT::truncTrapping(OpType truncationOp, Value operand, Value& result, Type returnType, Type operandType)
 {
-    ScratchScope<0, 2> scratches(*this);
+    TruncationKind kind = truncationKind(truncationOp);
+    auto range = lookupTruncationRange(kind);
+
+    Location minFloat;
+    Location maxFloat;
+    {
+        ScratchScope<0, 2> scratches(*this);
+        auto minFloatConst = range.min;
+        auto maxFloatConst = range.max;
+        minFloat = Location::fromFPR(scratches.fpr(0));
+        maxFloat = Location::fromFPR(scratches.fpr(1));
+
+        // FIXME: Can we do better isel here? Two floating-point constant materializations for every
+        // trunc seems costly.
+        emitMoveConst(minFloatConst, minFloat);
+        emitMoveConst(maxFloatConst, maxFloat);
+    }
 
     Location operandLocation;
     if (operand.isConst()) {
@@ -1219,19 +1235,8 @@ PartialResult WARN_UNUSED_RETURN BBQJIT::truncTrapping(OpType truncationOp, Valu
 
     result = topValue(returnType.kind);
     Location resultLocation = allocate(result);
-    TruncationKind kind = truncationKind(truncationOp);
-    auto range = lookupTruncationRange(kind);
-    auto minFloatConst = range.min;
-    auto maxFloatConst = range.max;
-    Location minFloat = Location::fromFPR(scratches.fpr(0));
-    Location maxFloat = Location::fromFPR(scratches.fpr(1));
 
-    // FIXME: Can we do better isel here? Two floating-point constant materializations for every
-    // trunc seems costly.
-    emitMoveConst(minFloatConst, minFloat);
-    emitMoveConst(maxFloatConst, maxFloat);
-
-    LOG_INSTRUCTION("TruncSaturated", operand, operandLocation, RESULT(result));
+    LOG_INSTRUCTION("TruncTrapping", operand, operandLocation, RESULT(result));
 
     DoubleCondition minCondition = range.closedLowerEndpoint ? DoubleCondition::DoubleLessThanOrUnordered : DoubleCondition::DoubleLessThanOrEqualOrUnordered;
     Jump belowMin = operandType == Types::F32
@@ -1251,19 +1256,24 @@ PartialResult WARN_UNUSED_RETURN BBQJIT::truncTrapping(OpType truncationOp, Valu
 
 PartialResult WARN_UNUSED_RETURN BBQJIT::truncSaturated(Ext1OpType truncationOp, Value operand, Value& result, Type returnType, Type operandType)
 {
-    ScratchScope<0, 2> scratches(*this);
-
     TruncationKind kind = truncationKind(truncationOp);
-    auto range = lookupTruncationRange(kind);
-    auto minFloatConst = range.min;
-    auto maxFloatConst = range.max;
-    Location minFloat = Location::fromFPR(scratches.fpr(0));
-    Location maxFloat = Location::fromFPR(scratches.fpr(1));
 
-    // FIXME: Can we do better isel here? Two floating-point constant materializations for every
-    // trunc seems costly.
-    emitMoveConst(minFloatConst, minFloat);
-    emitMoveConst(maxFloatConst, maxFloat);
+    Location minFloat;
+    Location maxFloat;
+    {
+        // This is only used to materialize the min/max float constants
+        ScratchScope<0, 2> scratches(*this);
+        auto range = lookupTruncationRange(kind);
+        auto minFloatConst = range.min;
+        auto maxFloatConst = range.max;
+        minFloat = Location::fromFPR(scratches.fpr(0));
+        maxFloat = Location::fromFPR(scratches.fpr(1));
+
+        // FIXME: Can we do better isel here? Two floating-point constant materializations for every
+        // trunc seems costly.
+        emitMoveConst(minFloatConst, minFloat);
+        emitMoveConst(maxFloatConst, maxFloat);
+    }
 
     // FIXME: Lots of this is duplicated from AirIRGeneratorBase. Might be nice to unify it?
     uint64_t minResult = 0;
