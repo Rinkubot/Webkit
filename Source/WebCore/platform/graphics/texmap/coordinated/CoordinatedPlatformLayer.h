@@ -175,7 +175,9 @@ public:
     void updateContents(bool affectedByTransformAnimation);
     void updateBackingStore();
 
-    void flushCompositingState(TextureMapper&);
+    void flushCompositingState();
+    bool hasPendingBackingStoreUpdates() const { return m_pendingBackingStoreUpdate; }
+    void processPendingBackingStoreUpdates(TextureMapper&);
 
     bool hasPendingTilesCreation() const { return m_pendingTilesCreation; }
     bool isCompositionRequiredOrOngoing() const;
@@ -247,6 +249,7 @@ private:
     GraphicsLayerCoordinated* m_owner { nullptr };
     std::unique_ptr<TextureMapperLayer> m_target;
     bool m_pendingTilesCreation { false };
+    bool m_pendingBackingStoreUpdate { false };
     bool m_needsTilesUpdate { false };
 
 #if ENABLE(DAMAGE_TRACKING)

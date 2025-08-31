@@ -47,6 +47,7 @@ public:
     };
     void addUpdate(Update&&);
 
+    bool hasPendingUpdates() const { return !m_updates.isEmpty(); }
     void processPendingUpdates(TextureMapper&);
 
     bool canBePainted() const { return !!m_texture; }

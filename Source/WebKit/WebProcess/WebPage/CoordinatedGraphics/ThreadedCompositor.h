@@ -114,7 +114,8 @@ private:
     void frameComplete();
 
 #if HAVE(DISPLAY_LINK)
-    void didRenderFrameTimerFired();
+    void didUpdateSceneStateTimerFired();
+    void didCompositeTimerFired();
 #else
     void displayUpdateFired();
     void sceneUpdateFinished();
@@ -166,7 +167,8 @@ private:
     std::atomic<uint32_t> m_compositionRequestID { 0 };
 #if HAVE(DISPLAY_LINK)
     std::atomic<uint32_t> m_compositionResponseID { 0 };
-    RunLoop::Timer m_didRenderFrameTimer;
+    RunLoop::Timer m_didUpdateSceneStateTimer;
+    RunLoop::Timer m_didCompositeTimer;
 #else
     struct {
         WebCore::PlatformDisplayID displayID;

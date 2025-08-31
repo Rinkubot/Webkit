@@ -114,6 +114,7 @@ public:
     void willRenderFrame();
     void didRenderFrame();
 #if HAVE(DISPLAY_LINK)
+    void didUpdateSceneState();
     void didComposite(uint32_t);
 #endif
 
@@ -194,6 +195,8 @@ private:
     bool m_isFlushingLayers { false };
     bool m_waitUntilPaintingComplete { false };
     bool m_isSuspended { false };
+    bool m_isCommitSceneStatePending { false };
+    bool m_isWaitingForComposition { false };
     bool m_isWaitingForRenderer { false };
     bool m_scheduledWhileWaitingForRenderer { false };
     bool m_forceFrameSync { false };

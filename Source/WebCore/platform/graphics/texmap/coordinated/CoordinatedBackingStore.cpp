@@ -47,6 +47,15 @@ void CoordinatedBackingStore::updateTile(uint32_t id, const IntRect& sourceRect,
     it->value.addUpdate({ WTFMove(buffer), sourceRect, tileRect, offset });
 }
 
+bool CoordinatedBackingStore::hasPendingUpdates() const
+{
+    for (const auto& tile : m_tiles.values()) {
+        if (tile.hasPendingUpdates())
+            return true;
+    }
+    return false;
+}
+
 void CoordinatedBackingStore::processPendingUpdates(TextureMapper& textureMapper)
 {
     for (auto& tile : m_tiles.values())

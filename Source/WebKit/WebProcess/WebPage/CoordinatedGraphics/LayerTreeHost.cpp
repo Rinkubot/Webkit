@@ -167,6 +167,9 @@ void LayerTreeHost::scheduleLayerFlush()
         return;
     }
 
+    if (m_isWaitingForComposition && m_isCommitSceneStatePending)
+        return;
+
     if (!m_layerFlushTimer.isActive())
         m_layerFlushTimer.startOneShot(0_s);
 }
@@ -180,6 +183,9 @@ void LayerTreeHost::flushLayers()
 {
     RELEASE_ASSERT(!m_isFlushingLayers);
     if (m_layerTreeStateIsFrozen)
+        return;
+
+    if (m_isCommitSceneStatePending)
         return;
 
     SetForScope<bool> reentrancyProtector(m_isFlushingLayers, true);
@@ -250,7 +256,7 @@ void LayerTreeHost::flushLayers()
 
 void LayerTreeHost::layerFlushTimerFired()
 {
-    WTFBeginSignpost(this, LayerFlushTimerFired, "isWaitingForRenderer %i", m_isWaitingForRenderer);
+    WTFBeginSignpost(this, LayerFlushTimerFired, "isWaitingForRenderer %i isWaitingForComposition %i", m_isWaitingForRenderer, m_isWaitingForComposition);
 
     if (m_isSuspended) {
         WTFEndSignpost(this, LayerFlushTimerFired);
@@ -319,7 +325,7 @@ void LayerTreeHost::forceRepaint()
     if (!m_isWaitingForRenderer)
         flushLayers();
 #else
-    if (m_isWaitingForRenderer) {
+    if (m_isWaitingForRenderer || m_isWaitingForComposition || m_isCommitSceneStatePending) {
         if (m_forceRepaintAsync.callback)
             m_pendingForceRepaint = true;
         return;
@@ -526,6 +532,18 @@ void LayerTreeHost::didRenderFrame()
 }
 
 #if HAVE(DISPLAY_LINK)
+void LayerTreeHost::didUpdateSceneState()
+{
+    WTFBeginSignpost(this, DidUpdateScene);
+
+    m_isWaitingForRenderer = false;
+    bool scheduledWhileWaitingForRenderer = std::exchange(m_scheduledWhileWaitingForRenderer, false);
+    if (!m_isSuspended && !m_layerTreeStateIsFrozen && (scheduledWhileWaitingForRenderer && !m_layerFlushTimer.isActive()))
+        scheduleLayerFlush();
+
+    WTFEndSignpost(this, DidUpdateScene);
+}
+
 void LayerTreeHost::didComposite(uint32_t compositionResponseID)
 {
     WTFBeginSignpost(this, DidComposite, "compositionRequestID %i, compositionResponseID %i", m_compositionRequestID, compositionResponseID);
@@ -535,9 +553,8 @@ void LayerTreeHost::didComposite(uint32_t compositionResponseID)
         m_forceRepaintAsync.compositionRequestID = std::nullopt;
     }
 
-    if (!m_isWaitingForRenderer || m_compositionRequestID == compositionResponseID) {
-        m_isWaitingForRenderer = false;
-        bool scheduledWhileWaitingForRenderer = std::exchange(m_scheduledWhileWaitingForRenderer, false);
+    if (m_compositionRequestID == compositionResponseID) {
+        m_isWaitingForComposition = false;
         if (m_pendingForceRepaint) {
             if (m_layerTreeStateIsFrozen) {
                 if (m_forceRepaintAsync.callback) {
@@ -549,18 +566,31 @@ void LayerTreeHost::didComposite(uint32_t compositionResponseID)
                 if (m_forceRepaintAsync.callback)
                     m_forceRepaintAsync.compositionRequestID = m_compositionRequestID;
             }
-        } else if (!m_isSuspended && !m_layerTreeStateIsFrozen && (scheduledWhileWaitingForRenderer || m_layerFlushTimer.isActive())) {
-            cancelPendingLayerFlush();
-            flushLayers();
         }
     }
+
+    bool isCommitSceneStatePending = std::exchange(m_isCommitSceneStatePending, false);
+    if (!m_isSuspended && !m_layerTreeStateIsFrozen && isCommitSceneStatePending) {
+        commitSceneState();
+        if (!m_layerFlushTimer.isActive())
+            scheduleLayerFlush();
+    }
+
     WTFEndSignpost(this, DidComposite);
 }
 #endif
 
 void LayerTreeHost::commitSceneState()
 {
+    ASSERT(!m_isWaitingForRenderer);
+    if (m_isWaitingForComposition) {
+        m_isCommitSceneStatePending = true;
+        return;
+    }
+
+    m_isCommitSceneStatePending = false;
     m_isWaitingForRenderer = true;
+    m_isWaitingForComposition = true;
     m_compositionRequestID = m_compositor->requestComposition();
     WTFEmitSignpost(this, CommitSceneState, "compositionRequestID %i", m_compositionRequestID);
 }

@@ -88,7 +88,8 @@ ThreadedCompositor::ThreadedCompositor(LayerTreeHost& layerTreeHost, ThreadedDis
     , m_flipY(m_surface->shouldPaintMirrored())
     , m_compositingRunLoop(makeUnique<CompositingRunLoop>([this] { renderLayerTree(); }))
 #if HAVE(DISPLAY_LINK)
-    , m_didRenderFrameTimer(RunLoop::mainSingleton(), "ThreadedCompositor::DidRenderFrameTimer"_s, this, &ThreadedCompositor::didRenderFrameTimerFired)
+    , m_didUpdateSceneStateTimer(RunLoop::mainSingleton(), "ThreadedCompositor::DidUpdateSceneStateTimer"_s, this, &ThreadedCompositor::didUpdateSceneStateTimerFired)
+    , m_didCompositeTimer(RunLoop::mainSingleton(), "ThreadedCompositor::DidCompositeTimer"_s, this, &ThreadedCompositor::didCompositeTimerFired)
 #else
     , m_displayRefreshMonitor(ThreadedDisplayRefreshMonitor::create(displayID, displayRefreshMonitorClient, WebCore::DisplayUpdate { 0, c_defaultRefreshRate / 1000 }))
 #endif
@@ -107,7 +108,8 @@ ThreadedCompositor::ThreadedCompositor(LayerTreeHost& layerTreeHost, ThreadedDis
 
 #if HAVE(DISPLAY_LINK)
 #if USE(GLIB_EVENT_LOOP)
-    m_didRenderFrameTimer.setPriority(RunLoopSourcePriority::RunLoopTimer - 1);
+    m_didUpdateSceneStateTimer.setPriority(RunLoopSourcePriority::RunLoopTimer - 1);
+    m_didCompositeTimer.setPriority(RunLoopSourcePriority::RunLoopTimer - 1);
 #endif
 #else
     m_display.displayID = displayID;
@@ -150,7 +152,8 @@ void ThreadedCompositor::invalidate()
     ASSERT(RunLoop::isMain());
     m_compositingRunLoop->stopUpdates();
 #if HAVE(DISPLAY_LINK)
-    m_didRenderFrameTimer.stop();
+    m_didUpdateSceneStateTimer.stop();
+    m_didCompositeTimer.stop();
 #else
     m_displayRefreshMonitor->invalidate();
 #endif
@@ -248,9 +251,23 @@ void ThreadedCompositor::updateSceneState()
     if (!m_textureMapper)
         m_textureMapper = TextureMapper::create();
 
-    m_sceneState->rootLayer().flushCompositingState(*m_textureMapper);
-    for (auto& layer : m_sceneState->committedLayers())
-        layer->flushCompositingState(*m_textureMapper);
+    m_sceneState->rootLayer().flushCompositingState();
+    ASSERT(!m_sceneState->rootLayer().hasPendingBackingStoreUpdates()); // rootLayer() doesn't have a backing store.
+
+    Vector<Ref<CoordinatedPlatformLayer>, 16> layersWithPendingBackingStoreUpdates;
+    for (auto& layer : m_sceneState->committedLayers()) {
+        layer->flushCompositingState();
+        if (layer->hasPendingBackingStoreUpdates())
+            layersWithPendingBackingStoreUpdates.append(layer);
+    }
+
+#if HAVE(DISPLAY_LINK)
+    if (!m_didUpdateSceneStateTimer.isActive())
+        m_didUpdateSceneStateTimer.startOneShot(0_s);
+#endif
+
+    for (auto& layer : layersWithPendingBackingStoreUpdates)
+        layer->processPendingBackingStoreUpdates(*m_textureMapper);
 }
 
 void ThreadedCompositor::paintToCurrentGLContext(const TransformationMatrix& matrix, const IntSize& size)
@@ -374,8 +391,8 @@ void ThreadedCompositor::renderLayerTree()
     uint32_t compositionRequestID = m_compositionRequestID.load();
 #if HAVE(DISPLAY_LINK)
     m_compositionResponseID = compositionRequestID;
-    if (!m_didRenderFrameTimer.isActive())
-        m_didRenderFrameTimer.startOneShot(0_s);
+    if (!m_didCompositeTimer.isActive())
+        m_didCompositeTimer.startOneShot(0_s);
 #elif !HAVE(OS_SIGNPOST) && !USE(SYSPROF_CAPTURE)
     UNUSED_VARIABLE(compositionRequestID);
 #endif
@@ -428,7 +445,13 @@ void ThreadedCompositor::frameComplete()
 }
 
 #if HAVE(DISPLAY_LINK)
-void ThreadedCompositor::didRenderFrameTimerFired()
+void ThreadedCompositor::didUpdateSceneStateTimerFired()
+{
+    if (m_layerTreeHost)
+        m_layerTreeHost->didUpdateSceneState();
+}
+
+void ThreadedCompositor::didCompositeTimerFired()
 {
     if (m_layerTreeHost)
         m_layerTreeHost->didComposite(m_compositionResponseID);

@@ -860,9 +860,10 @@ void CoordinatedPlatformLayer::waitUntilPaintingComplete()
         m_backingStoreProxy->waitUntilPaintingComplete();
 }
 
-void CoordinatedPlatformLayer::flushCompositingState(TextureMapper& textureMapper)
+void CoordinatedPlatformLayer::flushCompositingState()
 {
     ASSERT(!isMainThread());
+    ASSERT(!m_pendingBackingStoreUpdate);
     Locker locker { m_lock };
     if (m_pendingChanges.isEmpty() && !m_backingStoreProxy)
         return;
@@ -993,7 +994,7 @@ void CoordinatedPlatformLayer::flushCompositingState(TextureMapper& textureMappe
         for (const auto& tileUpdate : update.tilesToUpdate())
             m_backingStore->updateTile(tileUpdate.tileID, tileUpdate.dirtyRect, tileUpdate.tileRect, tileUpdate.buffer.copyRef(), { });
 
-        m_backingStore->processPendingUpdates(textureMapper);
+        m_pendingBackingStoreUpdate = m_backingStore->hasPendingUpdates();
     }
 
     if (m_contentsBuffer.committed)
@@ -1004,6 +1005,15 @@ void CoordinatedPlatformLayer::flushCompositingState(TextureMapper& textureMappe
         layer.setContentsLayer(nullptr);
 
     m_pendingChanges = { };
+}
+
+void CoordinatedPlatformLayer::processPendingBackingStoreUpdates(TextureMapper& textureMapper)
+{
+    ASSERT(!isMainThread());
+    ASSERT(m_backingStore);
+    ASSERT(m_pendingBackingStoreUpdate);
+    m_backingStore->processPendingUpdates(textureMapper);
+    m_pendingBackingStoreUpdate = false;
 }
 
 } // namespace WebCore
