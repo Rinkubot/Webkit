@@ -77,6 +77,7 @@ enum class SDKAlignedBehavior {
     NoExpandoIndexedPropertiesOnWindow,
     NoPokerBrosBuiltInTagQuirk,
     NoShowModalDialog,
+    NoTextValueForCSSColor,
     NoTypedArrayAPIQuirk,
     NoUnconditionalUniversalSandboxExtension,
     NoUNIQLOLazyIframeLoadingQuirk,

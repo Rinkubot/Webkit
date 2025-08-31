@@ -1873,10 +1873,6 @@ Color RenderTheme::systemColor(CSSValueID cssValueId, OptionSet<StyleColorOption
         return Color::black;
 
     // Non-standard addition.
-    case CSSValueText:
-        return Color::black;
-
-    // Non-standard addition.
     case CSSValueWebkitLink: {
         if (forVisitedLink)
             return defaultVisitedLinkColor(useDarkAppearance);
