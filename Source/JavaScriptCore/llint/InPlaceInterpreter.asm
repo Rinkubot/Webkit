@@ -924,10 +924,8 @@ defineWasmBuiltinTrampoline(jsstring, compare, a2)
 # 5. Instruction implementation #
 #################################
 
-if JSVALUE64 and (ARM64 or ARM64E or X86_64)
+if JSVALUE64 and (ARM64 or ARM64E or X86_64 or ARMv7)
     include InPlaceInterpreter64
-elsif ARMv7
-    include InPlaceInterpreter32_64
 else
 # For unimplemented architectures: make sure that the assertions can still find the labels
 # See https://webassembly.github.io/spec/core/appendix/index-instructions.html for the list of instructions.

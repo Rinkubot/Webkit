@@ -783,7 +783,6 @@ class Sequence
             }
 
             for o in operands
-                $jsrMapping[o] => { gpr:, fpr:, spills: }
                 gpr, fpr, spills = $jsrMapping[o][:grp], $jsrMapping[o][:fpr], $jsrMapping[o][:spills] 
                 if spills then
                     newInstrs << Instruction.new(node.codeOrigin, "ci2f",
