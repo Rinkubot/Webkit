@@ -784,6 +784,7 @@ class Sequence
 
             for o in operands
                 $jsrMapping[o] => { gpr:, fpr:, spills: }
+                gpr, fpr, spills = $jsrMapping[o][:grp], $jsrMapping[o][:fpr], $jsrMapping[o][:spills] 
                 if spills then
                     newInstrs << Instruction.new(node.codeOrigin, "ci2f",
                         [RegisterID.new(node.codeOrigin, gpr), FPRegisterID.new(node.codeOrigin, fpr)])
@@ -794,7 +795,7 @@ class Sequence
             end
             newInstrs << node.assertClobberedJSRs
             for o in operands
-                $jsrMapping[o] => { gpr:, fpr:, spills: }
+                gpr, fpr, spills = $jsrMapping[o][:grp], $jsrMapping[o][:fpr], $jsrMapping[o][:spills] 
                 next unless spills
                 newInstrs << Instruction.new(node.codeOrigin, "cf2i",
                     [FPRegisterID.new(node.codeOrigin, fpr), RegisterID.new(node.codeOrigin, gpr)])
