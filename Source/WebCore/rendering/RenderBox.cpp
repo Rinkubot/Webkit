@@ -1027,6 +1027,34 @@ int RenderBox::intrinsicScrollbarLogicalWidthIncludingGutter() const
     return 0;
 }
 
+// Determines whether to reserve space for the vertical scrollbar gutter.
+// This addresses a bug where toggling overflow from 'auto' to 'hidden' with
+// scrollbar-gutter: stable causes the scrollbar to be destroyed, making its width zero,
+// which would otherwise result in losing the reserved gutter space.
+// This behavior fixes that issue while adhering to the spec:
+// https://developer.mozilla.org/en-US/docs/Web/CSS/scrollbar-gutter#example_3
+bool RenderBox::shouldReserveVerticalScrollbarGutterSpace() const
+{
+    CheckedPtr<RenderLayerScrollableArea> scrollableArea = layer() ? layer()->scrollableArea() : nullptr;
+    if (style().scrollbarWidth() != ScrollbarWidth::None
+        && style().scrollbarGutter().isStable()
+        && (scrollableArea && scrollableArea->verticalScrollbar() == nullptr && !verticalScrollbarWidth())
+        && hasNonVisibleOverflow() && layer() && !layer()->hasOverlayScrollbars())
+        return true;
+    return false;
+}
+
+// Returns the effective width of the vertical scrollbar gutter.
+// Called during content width calculation to subtract the gutter area if reserved.
+int RenderBox::effectiveScrollbarGutterWidth() const
+{
+    if (shouldReserveVerticalScrollbarGutterSpace()) {
+        CheckedPtr<RenderLayerScrollableArea> scrollableArea = layer() ? layer()->scrollableArea() : nullptr;
+        return scrollableArea ? scrollableArea->computeVerticalScrollbarGutterWidth() : 0;
+    }
+    return 0;
+}
+
 bool RenderBox::scrollLayer(ScrollDirection direction, ScrollGranularity granularity, unsigned stepCount, Element** stopElement)
 {
     CheckedPtr scrollableArea = layer() ? layer()->scrollableArea() : nullptr;
