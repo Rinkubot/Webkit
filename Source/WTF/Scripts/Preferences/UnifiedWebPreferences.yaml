@@ -1826,6 +1826,20 @@ CloseWatcherEnabled:
     WebCore:
       default: false
 
+ClosedbyAttributeEnabled:
+  type: bool
+  status: testable
+  category: html
+  humanReadableName: "HTML closedby attribute"
+  humanReadableDescription: "Enable HTML closedby attribute support"
+  defaultValue:
+    WebKitLegacy:
+      default: false
+    WebKit:
+      default: false
+    WebCore:
+      default: false
+
 ColorFilterEnabled:
   type: bool
   status: embedder

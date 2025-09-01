@@ -1822,11 +1822,15 @@ public:
 
     const ListHashSet<Ref<HTMLElement>>& autoPopoverList() const { return m_autoPopoverList; }
 
+    ListHashSet<Ref<HTMLDialogElement>>& openDialogsList() { return m_openDialogsList; }
+
     HTMLDialogElement* activeModalDialog() const;
     HTMLElement* topmostAutoPopover() const;
+    HTMLDialogElement* nearestClickedDialog(const PointerEvent&, Node&) const;
 
     void hideAllPopoversUntil(HTMLElement*, FocusPreviousElement, FireEvents);
     void handlePopoverLightDismiss(const PointerEvent&, Node&);
+    void handleDialogLightDismiss(const PointerEvent&, Node&);
     bool needsPointerEventHandlingForPopover() const { return !m_autoPopoverList.isEmpty(); }
 
 #if ENABLE(ATTACHMENT_ELEMENT)
@@ -2522,8 +2526,10 @@ private:
 
     ListHashSet<Ref<Element>> m_topLayerElements;
     ListHashSet<Ref<HTMLElement>> m_autoPopoverList;
+    ListHashSet<Ref<HTMLDialogElement>> m_openDialogsList;
 
     WeakPtr<HTMLElement, WeakPtrImplWithEventTargetData> m_popoverPointerDownTarget;
+    WeakPtr<HTMLDialogElement, WeakPtrImplWithEventTargetData> m_dialogPointerDownTarget;
 
 #if ENABLE(WEB_RTC)
     RefPtr<RTCNetworkManager> m_rtcNetworkManager;
