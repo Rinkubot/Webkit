@@ -125,7 +125,6 @@ public:
     void dumpEditingCallbacks() { m_dumpEditingCallbacks = true; }
     void dumpSelectionRect() { m_dumpSelectionRect = true; }
     void dumpTitleChanges() { m_dumpTitleChanges = true; }
-    void dumpFullScreenCallbacks();
     void dumpFrameLoadCallbacks() { setShouldDumpFrameLoadCallbacks(true); }
     void dumpProgressFinishedCallback() { setShouldDumpProgressFinishedCallback(true); }
     void dumpResourceLoadCallbacks() { m_dumpResourceLoadCallbacks = true; }
@@ -380,7 +379,6 @@ public:
     void setUseDarkAppearanceForTesting(bool);
     void setShouldDownloadUndisplayableMIMETypes(bool);
     void setShouldAllowDeviceOrientationAndMotionAccess(bool);
-    void stopLoading();
 
     bool didCancelClientRedirect() const { return m_didCancelClientRedirect; }
     void setDidCancelClientRedirect(bool value) { m_didCancelClientRedirect = value; }

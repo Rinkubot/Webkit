@@ -62,7 +62,6 @@ interface TestRunner {
     undefined dumpEditingCallbacks();
     undefined dumpSelectionRect();
     undefined dumpTitleChanges();
-    undefined dumpFullScreenCallbacks();
     undefined dumpFrameLoadCallbacks();
     undefined dumpProgressFinishedCallback();
     undefined dumpResourceLoadCallbacks();
@@ -106,7 +105,6 @@ interface TestRunner {
     undefined setIgnoresViewportScaleLimits(boolean value);
     undefined setUseDarkAppearanceForTesting(boolean useDarkAppearance);
     undefined setShouldDownloadUndisplayableMIMETypes(boolean value);
-    undefined stopLoading();
 
     // Special DOM functions.
     Promise<undefined> clearBackForwardList();
