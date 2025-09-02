@@ -82,7 +82,6 @@
 #import "_WKWebExtensionDeclarativeNetRequestRule.h"
 #import "_WKWebExtensionDeclarativeNetRequestSQLiteStore.h"
 #import "_WKWebExtensionDeclarativeNetRequestTranslator.h"
-#import "_WKWebExtensionRegisteredScriptsSQLiteStore.h"
 #import <UniformTypeIdentifiers/UTType.h>
 #import <WebCore/LocalizedStrings.h>
 #import <WebCore/TextResourceDecoder.h>
@@ -4857,13 +4856,6 @@ bool WebExtensionContext::purgeMatchedRulesFromBefore(const WallTime& startTime)
 
     m_matchedRules = WTFMove(filteredMatchedRules);
     return !m_matchedRules.isEmpty();
-}
-
-_WKWebExtensionRegisteredScriptsSQLiteStore *WebExtensionContext::registeredContentScriptsStore()
-{
-    if (!m_registeredContentScriptsStorage)
-        m_registeredContentScriptsStorage = [[_WKWebExtensionRegisteredScriptsSQLiteStore alloc] initWithUniqueIdentifier:m_uniqueIdentifier.createNSString().get() directory:storageDirectory().createNSString().get() usesInMemoryDatabase:!storageIsPersistent()];
-    return m_registeredContentScriptsStorage.get();
 }
 
 void WebExtensionContext::setSessionStorageAllowedInContentScripts(bool allowed)
