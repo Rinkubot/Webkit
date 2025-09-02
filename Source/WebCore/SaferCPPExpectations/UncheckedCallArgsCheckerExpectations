@@ -52,7 +52,6 @@ accessibility/AccessibilityObject.cpp
 accessibility/AccessibilityObject.h
 accessibility/AccessibilityProgressIndicator.cpp
 accessibility/AccessibilityRenderObject.cpp
-accessibility/AccessibilityScrollView.cpp
 accessibility/AccessibilityScrollbar.cpp
 accessibility/AccessibilitySlider.cpp
 accessibility/AccessibilitySpinButton.cpp
