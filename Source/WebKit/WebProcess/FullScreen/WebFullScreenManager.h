@@ -122,6 +122,9 @@ private:
     void setElement(WebCore::Element&);
     void clearElement();
 
+    static bool needsAsyncCoordinateTransformation(WebCore::Element&);
+    void requestAsyncCoordinateTransformation(WebCore::Element&, CompletionHandler<void(WebCore::IntRect)>&&) const;
+
 #if !RELEASE_LOG_DISABLED
     const Logger& logger() const { return m_logger; }
     uint64_t logIdentifier() const { return m_logIdentifier; }

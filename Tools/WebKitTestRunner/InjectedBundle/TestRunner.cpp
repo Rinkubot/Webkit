@@ -927,6 +927,11 @@ void TestRunner::dumpFullScreenCallbacks()
     postPageMessage("DumpFullScreenCallbacks");
 }
 
+void TestRunner::dumpFullScreenOrigin()
+{
+    postPageMessage("DumpFullScreenOrigin");
+}
+
 void TestRunner::queueReload()
 {
     InjectedBundle::singleton().queueReload();

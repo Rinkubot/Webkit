@@ -63,6 +63,7 @@ interface TestRunner {
     undefined dumpSelectionRect();
     undefined dumpTitleChanges();
     undefined dumpFullScreenCallbacks();
+    undefined dumpFullScreenOrigin();
     undefined dumpFrameLoadCallbacks();
     undefined dumpProgressFinishedCallback();
     undefined dumpResourceLoadCallbacks();

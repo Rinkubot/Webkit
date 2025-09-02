@@ -403,6 +403,27 @@ void WebFullScreenManagerProxy::unlockFullscreenOrientation()
         client->unlockFullscreenOrientation();
 }
 
+void WebFullScreenManagerProxy::getFramePositionInMainFrameCoordinates(WebCore::FrameIdentifier childFrameID, WebCore::FloatRect childFrameRect, CompletionHandler<void(WebCore::FloatRect)>&& completionHandler)
+{
+    RefPtr page = m_page.get();
+    if (!page) {
+        completionHandler(childFrameRect);
+        return;
+    }
+    RefPtr mainFrame = page->mainFrame();
+    if (!mainFrame) {
+        completionHandler(childFrameRect);
+        return;
+    }
+    RefPtr mainFrameProcess = mainFrame->process();
+    if (!mainFrameProcess) {
+        completionHandler(childFrameRect);
+        return;
+    }
+    mainFrameProcess->sendWithAsyncReply(Messages::WebPage::GetFramePositionInMainFrameCoordinates(childFrameID, childFrameRect),
+        WTFMove(completionHandler), page->webPageIDInProcess(*mainFrameProcess));
+}
+
 #if !RELEASE_LOG_DISABLED
 WTFLogChannel& WebFullScreenManagerProxy::logChannel() const
 {

@@ -122,6 +122,7 @@ public:
     void closeWithCallback(CompletionHandler<void()>&&);
     bool lockFullscreenOrientation(WebCore::ScreenOrientationType);
     void unlockFullscreenOrientation();
+    void getFramePositionInMainFrameCoordinates(WebCore::FrameIdentifier, WebCore::FloatRect, CompletionHandler<void(WebCore::FloatRect)>&&);
 
     void didReceiveMessage(IPC::Connection&, IPC::Decoder&) override;
 

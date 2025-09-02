@@ -620,6 +620,20 @@ void TestController::beganEnterFullScreen(WKPageRef page, WKRect initialFrame, W
             "}\n"_s
         ));
     }
+
+    if (m_dumpFullScreenOrigin) {
+        protectedCurrentInvocation()->outputText(makeString(
+            "beganEnterFullScreen() - initialRect.origin: {"_s,
+            (initialFrame.origin.x - finalFrame.origin.x),
+            ", "_s,
+            (initialFrame.origin.y - finalFrame.origin.y),
+            "}, finalRect.origin: {"_s,
+            (finalFrame.origin.x - initialFrame.origin.x),
+            ", "_s,
+            (finalFrame.origin.y - initialFrame.origin.y),
+            "}\n"_s
+        ));
+    }
 }
 
 void TestController::exitFullScreen(WKPageRef page, const void* clientInfo)
@@ -650,6 +664,20 @@ void TestController::beganExitFullScreen(WKPageRef, WKRect initialFrame, WKRect 
         finalFrame.size.width,
         ", "_s,
         finalFrame.size.height,
+        "}\n"_s
+        ));
+    }
+
+    if (m_dumpFullScreenOrigin) {
+        protectedCurrentInvocation()->outputText(makeString(
+        "beganExitFullScreen() - initialRect.origin: {"_s,
+        (initialFrame.origin.x - finalFrame.origin.x),
+        ", "_s,
+        (initialFrame.origin.y - finalFrame.origin.y),
+        "}, finalRect.origin: {"_s,
+        (finalFrame.origin.x - initialFrame.origin.x),
+        ", "_s,
+        (finalFrame.origin.y - initialFrame.origin.y),
         "}\n"_s
         ));
     }
@@ -1591,6 +1619,7 @@ bool TestController::resetStateToConsistentValues(const TestOptions& options, Re
     m_shouldDownloadContentDispositionAttachments = true;
     m_dumpPolicyDelegateCallbacks = false;
     m_dumpFullScreenCallbacks = false;
+    m_dumpFullScreenOrigin = false;
     m_waitBeforeFinishingFullscreenExit = false;
     m_scrollDuringEnterFullscreen = false;
     if (m_finishExitFullscreenHandler)
