@@ -1624,6 +1624,23 @@ MediaTime MediaPlayerPrivateGStreamer::playbackPosition() const
     return playbackPosition;
 }
 
+void MediaPlayerPrivateGStreamer::mirrorEnabledVideoTrackIfNeeded(const VideoTrackPrivateGStreamer& originalVideoTrackPrivate)
+{
+    if (!isMediaSource())
+        return;
+
+    for (auto& pair : m_videoTracks) {
+        auto& track = pair.value.get();
+        if (track.id() == originalVideoTrackPrivate.id() && &track != &originalVideoTrackPrivate) {
+            GST_DEBUG_OBJECT(m_pipeline.get(), "Mirrored selected state (%s) from element track %p %" PRIu64
+                " to player track %p %" PRIu64, boolForPrinting(track.selected()), &originalVideoTrackPrivate,
+                originalVideoTrackPrivate.id(), &track, track.id());
+            track.setSelected(originalVideoTrackPrivate.selected());
+            break;
+        }
+    }
+}
+
 void MediaPlayerPrivateGStreamer::updateEnabledVideoTrack()
 {
     VideoTrackPrivateGStreamer* wantedTrack = nullptr;
