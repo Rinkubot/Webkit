@@ -365,8 +365,11 @@ void FileInputType::setFiles(RefPtr<FileList>&& files, RequestIcon shouldRequest
     if (shouldRequestIcon == RequestIcon::Yes)
         requestIcon(protectedFiles()->paths());
 
-    if (CheckedPtr renderer = element->renderer())
+    if (CheckedPtr renderer = element->renderer()) {
+        if (renderer->style().fieldSizing() == FieldSizing::Content)
+            renderer->setNeedsLayoutAndPrefWidthsRecalc();
         renderer->repaint();
+    }
 
     if (wasSetByJavaScript == WasSetByJavaScript::Yes)
         return;
