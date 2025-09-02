@@ -72,7 +72,7 @@ void RemoteResourceCacheProxy::recordFilterUse(Filter& filter)
     }
 }
 
-void RemoteResourceCacheProxy::recordNativeImageUse(NativeImage& image, const DestinationColorSpace& colorSpace)
+void RemoteResourceCacheProxy::recordNativeImageUse(NativeImage& image, const DestinationColorSpace& fallbackColorSpace)
 {
     if (isMainRunLoop())
         WebProcess::singleton().deferNonVisibleProcessEarlyMemoryCleanupTimer();
@@ -83,7 +83,7 @@ void RemoteResourceCacheProxy::recordNativeImageUse(NativeImage& image, const De
     RemoteNativeImageBackendProxy* backend = dynamicDowncast<RemoteNativeImageBackendProxy>(image.backend());
     std::unique_ptr<RemoteNativeImageBackendProxy> newBackend;
     if (!backend) {
-        newBackend = RemoteNativeImageBackendProxy::create(image, colorSpace);
+        newBackend = RemoteNativeImageBackendProxy::create(image, fallbackColorSpace);
         backend = newBackend.get();
     }
     std::optional<ShareableBitmap::Handle> handle;

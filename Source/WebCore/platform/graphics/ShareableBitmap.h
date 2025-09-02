@@ -142,12 +142,10 @@ public:
     WEBCORE_EXPORT static RefPtr<ShareableBitmap> create(const ShareableBitmapConfiguration&, Ref<SharedMemory>&&);
 
     // Create a shareable bitmap from a NativeImage.
-#if USE(CG)
-    WEBCORE_EXPORT static RefPtr<ShareableBitmap> createFromImagePixels(NativeImage&);
-#endif
-    WEBCORE_EXPORT static RefPtr<ShareableBitmap> createFromImageDraw(NativeImage&, const DestinationColorSpace&);
-    WEBCORE_EXPORT static RefPtr<ShareableBitmap> createFromImageDraw(NativeImage&, const DestinationColorSpace&, const IntSize&);
-    WEBCORE_EXPORT static RefPtr<ShareableBitmap> createFromImageDraw(NativeImage&, const DestinationColorSpace&, const IntSize& destinationSize, const IntSize& sourceSize);
+    // By default, the returned ShareableBitmap color space is the source image color space.
+    // Uses fallbackColorSpace if the transfer must be done by a draw and the source image color space is not
+    // a output color space.
+    WEBCORE_EXPORT static RefPtr<ShareableBitmap> createFromNativeImage(NativeImage&, const DestinationColorSpace& fallbackColorSpace, std::optional<IntSize> overrideDestinationSize = std::nullopt, std::optional<IntSize> overrideSourceSize = std::nullopt);
 
     // Create a shareable bitmap from a handle.
     WEBCORE_EXPORT static RefPtr<ShareableBitmap> create(Handle&&, SharedMemory::Protection = SharedMemory::Protection::ReadWrite);
@@ -195,6 +193,7 @@ private:
     ShareableBitmap(ShareableBitmapConfiguration, Ref<SharedMemory>&&);
 
 #if USE(CG)
+    static RefPtr<ShareableBitmap> createFromImagePixels(NativeImage&);
     static void releaseBitmapContextData(void* typelessBitmap, void* typelessData);
 #endif
 

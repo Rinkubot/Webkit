@@ -53,7 +53,7 @@ public:
     RemoteResourceCacheProxy(RemoteRenderingBackendProxy&);
     ~RemoteResourceCacheProxy();
 
-    void recordNativeImageUse(WebCore::NativeImage&, const WebCore::DestinationColorSpace&);
+    void recordNativeImageUse(WebCore::NativeImage&, const WebCore::DestinationColorSpace& fallbackColorSpace);
     void recordFontUse(WebCore::Font&);
     void recordDecomposedGlyphsUse(WebCore::DecomposedGlyphs&);
     void recordGradientUse(WebCore::Gradient&);
