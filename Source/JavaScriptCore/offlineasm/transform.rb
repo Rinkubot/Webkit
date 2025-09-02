@@ -747,3 +747,70 @@ class Skip
     def validate
     end
 end
+
+# AssertClobberedJSRs
+
+class Node
+    def assertClobberedJSRs()
+        mapChildren { | node | node.assertClobberedJSRs }
+    end
+end
+
+$jsrMapping = {
+    'j0': { gpr: 'r0', fpr: 'ft0' },
+    'jxcsr0': { gpr: 'r15', fpr: 'csfr0', spills: true },
+}
+
+class Sequence
+    def assertClobberedJSRs()
+        newInstrs = []
+        children.each {
+            | node |
+            unless node.is_a? Instruction then
+                newInstrs << node.assertClobberedJSRs
+                next
+            end
+
+            operands = []
+            node.descendants.each {
+                | node |
+                operands << node.dump if node.is_a? RegisterID
+            }
+
+            operands = operands.filter {
+                | o |
+                $jsrMapping.include? o
+            }
+
+            for o in operands
+                gpr, fpr, spills = $jsrMapping[o][:grp], $jsrMapping[o][:fpr], $jsrMapping[o][:spills] 
+                if spills then
+                    newInstrs << Instruction.new(node.codeOrigin, "ci2f",
+                        [RegisterID.new(node.codeOrigin, gpr), FPRegisterID.new(node.codeOrigin, fpr)])
+                else
+                    newInstrs << Instruction.new(node.codeOrigin, "fmov",
+                        [Immediate.new(node.codeOrigin, 4), FPRegisterID.new(node.codeOrigin, fpr)])
+                end
+            end
+            newInstrs << node.assertClobberedJSRs
+            for o in operands
+                gpr, fpr, spills = $jsrMapping[o][:grp], $jsrMapping[o][:fpr], $jsrMapping[o][:spills] 
+                next unless spills
+                newInstrs << Instruction.new(node.codeOrigin, "cf2i",
+                    [FPRegisterID.new(node.codeOrigin, fpr), RegisterID.new(node.codeOrigin, gpr)])
+            end
+
+        }
+        Sequence.new(codeOrigin, newInstrs)
+    end
+end
+
+class RegisterID
+    def assertClobberedJSRs()
+        if $jsrMapping.has_key? dump then
+            $jsrMapping[dump]
+        else
+            self
+        end
+    end
+end

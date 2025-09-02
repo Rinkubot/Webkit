@@ -111,6 +111,7 @@ File.open(tempFlnm, "w") {
             | concreteSettings, lowLevelAST, backend |
 
             lowLevelAST = lowLevelAST.demacroify({})
+            lowLevelAST = lowLevelAST.assertClobberedJSRs()
             offsetsList = offsetsList(lowLevelAST)
             sizesList = sizesList(lowLevelAST)
             constsList = constsList(lowLevelAST)

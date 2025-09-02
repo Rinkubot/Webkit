@@ -64,6 +64,9 @@ GPRS =
      "csr8",
      "csr9",
      "csr10",
+     # Meta registers
+     "jxcsr0",
+     "j0",
      "invalidGPR"
     ]
 
