@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 Igalia S.L.
+ * Copyright (C) 2025 Igalia, S.L. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -23,27 +23,36 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#pragma once
+#include "config.h"
+#include "WebExtensionUtilities.h"
 
-#include "WebKitNavigationAction.h"
-#include "WebMouseEvent.h"
-#include <WebCore/FrameLoaderTypes.h>
-
-unsigned toPlatformModifiers(OptionSet<WebKit::WebEventModifier>);
-WebKitNavigationType toWebKitNavigationType(WebCore::NavigationType);
-unsigned toWebKitMouseButton(WebKit::WebMouseEventButton);
-unsigned toWebKitError(unsigned webCoreError);
 #if ENABLE(WK_WEB_EXTENSIONS)
-#if ENABLE(2022_GLIB_API)
-unsigned toWebKitWebExtensionError(unsigned apiError);
-#endif // ENABLE(2022_GLIB_API)
-unsigned toWebKitWebExtensionMatchPatternError(unsigned apiError);
+
+#include "WPEToplevelPrivate.h"
+#include <wtf/glib/GUniquePtr.h>
+#include <wtf/glib/WTFGType.h>
+
+namespace WebKit {
+
+Vector<double> availableScreenScales()
+{
+    Vector<double> screenScales;
+
+    GUniquePtr<GList> toplevels(wpe_toplevel_list());
+    for (GList* iter = toplevels.get(); iter; iter = g_list_next(iter)) {
+        auto* display = WPE_DISPLAY_DRM(wpe_toplevel_get_display(toplevel));
+        auto* screen = wpeDisplayDRMGetScreen(display);
+        auto* mode = wpeScreenDRMGetMode(WPE_SCREEN_DRM(screen));
+        screenScales.append(wpe_screen_get_scale(screen));
+    }
+
+    if (!screenScales.isEmpty())
+        return screenScales;
+
+    // Assume 1x if we got no results. This can happen on headless devices (bots).
+    return { 1.0 };
+}
+
+} // namespace WebKit
+
 #endif // ENABLE(WK_WEB_EXTENSIONS)
-unsigned toWebCoreError(unsigned webKitError);
-
-enum SnapshotRegion {
-    SnapshotRegionVisible,
-    SnapshotRegionFullDocument
-};
-
-static constexpr auto networkCacheSubdirectory = "WebKitCache"_s;

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011 Igalia S.L.
+ * Copyright (C) 2024 Igalia S.L.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -25,25 +25,22 @@
 
 #pragma once
 
-#include "WebKitNavigationAction.h"
-#include "WebMouseEvent.h"
-#include <WebCore/FrameLoaderTypes.h>
+#include "Utilities.h"
+#include "WTFTestUtilities.h"
 
-unsigned toPlatformModifiers(OptionSet<WebKit::WebEventModifier>);
-WebKitNavigationType toWebKitNavigationType(WebCore::NavigationType);
-unsigned toWebKitMouseButton(WebKit::WebMouseEventButton);
-unsigned toWebKitError(unsigned webCoreError);
+#include <wtf/Vector.h>
+#include <wtf/glib/GRefPtr.h>
+
 #if ENABLE(WK_WEB_EXTENSIONS)
-#if ENABLE(2022_GLIB_API)
-unsigned toWebKitWebExtensionError(unsigned apiError);
-#endif // ENABLE(2022_GLIB_API)
-unsigned toWebKitWebExtensionMatchPatternError(unsigned apiError);
+
+namespace TestWebKitAPI {
+
+namespace Util {
+
+GRefPtr<GBytes> makePNGData(int width, int height, int color);
+
+} // namespace Util
+
+} // namespace TestWebKitAPI
+
 #endif // ENABLE(WK_WEB_EXTENSIONS)
-unsigned toWebCoreError(unsigned webKitError);
-
-enum SnapshotRegion {
-    SnapshotRegionVisible,
-    SnapshotRegionFullDocument
-};
-
-static constexpr auto networkCacheSubdirectory = "WebKitCache"_s;
