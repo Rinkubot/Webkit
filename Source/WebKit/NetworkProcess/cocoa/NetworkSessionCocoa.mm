@@ -73,6 +73,7 @@
 #import <wtf/cocoa/SpanCocoa.h>
 #import <wtf/cocoa/TypeCastsCocoa.h>
 #import <wtf/cocoa/VectorCocoa.h>
+#import <wtf/darwin/TypeCastsOSObject.h>
 #import <wtf/darwin/WeakLinking.h>
 #import <wtf/text/MakeString.h>
 #import <wtf/text/WTFString.h>
@@ -873,18 +874,18 @@ static NSString *description(nw_dns_failure_reason_t reason)
 
 static NSDictionary<NSString *, id> *extractResolutionReport(NSError *error)
 {
-    RetainPtr reportValue = (__bridge CFTypeRef)error.userInfo[@"_NSURLErrorNWResolutionReportKey"];
-    if (!reportValue)
+    OSObjectPtr report = dynamicOSObjectCast<nw_resolution_report_t>(error.userInfo[@"_NSURLErrorNWResolutionReportKey"]);
+    if (!report)
         return nil;
 
-    RetainPtr pathValue = (__bridge CFTypeRef)error.userInfo[@"_NSURLErrorNWPathKey"];
-    if (!pathValue)
+    OSObjectPtr path = dynamicOSObjectCast<nw_path_t>(error.userInfo[@"_NSURLErrorNWPathKey"]);
+    if (!path)
         return nil;
 
     auto interfaces = adoptNS([[NSMutableArray alloc] initWithCapacity:1]);
     if (!interfaces.get())
         return nil;
-    nw_path_enumerate_interfaces(static_cast<nw_path_t>(pathValue.get()), ^bool(nw_interface_t interface) {
+    nw_path_enumerate_interfaces(path.get(), ^bool(nw_interface_t interface) {
         String name = String::fromUTF8(nw_interface_get_name(interface));
         [interfaces addObject:@{
             @"type" : description(nw_interface_get_type(interface)),
@@ -893,12 +894,11 @@ static NSDictionary<NSString *, id> *extractResolutionReport(NSError *error)
         return true;
     });
 
-    auto report = static_cast<nw_resolution_report_t>(reportValue.get());
-    String provider = String::fromUTF8(nw_resolution_report_get_provider_name(report));
-    String extraText = String::fromUTF8(nw_resolution_report_get_extended_dns_error_extra_text(report));
+    String provider = String::fromUTF8(nw_resolution_report_get_provider_name(report.get()));
+    String extraText = String::fromUTF8(nw_resolution_report_get_extended_dns_error_extra_text(report.get()));
     return @{
         @"provider" : provider.createNSString().get() ?: @"",
-        @"dnsFailureReason" : description(nw_resolution_report_get_dns_failure_reason(report)),
+        @"dnsFailureReason" : description(nw_resolution_report_get_dns_failure_reason(report.get())),
         @"extendedDNSErrorExtraText" : extraText.createNSString().get() ?: @"",
         @"interfaces" : interfaces.get(),
     };

@@ -1,6 +1,6 @@
 /*
  * Copyright (C) 2008 Collin Jackson  <collinj@webkit.org>
- * Copyright (C) 2009-2023 Apple Inc. All rights reserved.
+ * Copyright (C) 2009-2025 Apple Inc. All rights reserved.
  * Copyright (C) 2012 Igalia S.L.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -41,6 +41,7 @@
 #include <wtf/URL.h>
 #include <wtf/cf/VectorCF.h>
 #include <wtf/cocoa/RuntimeApplicationChecksCocoa.h>
+#include <wtf/darwin/TypeCastsOSObject.h>
 #include <wtf/posix/SocketPOSIX.h>
 #include <wtf/text/StringHash.h>
 
@@ -158,9 +159,10 @@ void DNSResolveQueueCFNet::performDNSLookup(const String& hostname, Ref<Completi
         Vector<IPAddress> result;
         result.reserveInitialCapacity(count);
         for (size_t i = 0; i < count; i++) {
-            nw_endpoint_t resolvedEndpoint = reinterpret_cast<nw_endpoint_t>(nw_array_get_object_at_index(resolvedEndpoints, i));
-            if (auto address = extractIPAddress(nw_endpoint_get_address(resolvedEndpoint)))
-                result.append(WTFMove(*address));
+            if (OSObjectPtr resolvedEndpoint = dynamicOSObjectCast<nw_endpoint_t>(nw_array_get_object_at_index(resolvedEndpoints, i))) {
+                if (auto address = extractIPAddress(nw_endpoint_get_address(resolvedEndpoint.get())))
+                    result.append(WTFMove(*address));
+            }
         }
         result.shrinkToFit();
 

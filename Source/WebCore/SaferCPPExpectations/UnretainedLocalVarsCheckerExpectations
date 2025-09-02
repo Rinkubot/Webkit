@@ -20,7 +20,6 @@ editing/cocoa/EditingHTMLConverter.mm
 editing/cocoa/NodeHTMLConverter.mm
 loader/archive/cf/LegacyWebArchive.cpp
 page/CaptionUserPreferencesMediaAF.cpp
-page/cocoa/ResourceUsageThreadCocoa.mm
 page/mac/ChromeMac.mm
 page/mac/EventHandlerMac.mm
 page/scrolling/mac/ScrollingStateScrollingNodeMac.mm

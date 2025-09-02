@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2015-2018 Apple Inc. All rights reserved.
+ * Copyright (C) 2015-2025 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -37,6 +37,7 @@
 #import <mach/vm_statistics.h>
 #import <wtf/MachSendRight.h>
 #import <wtf/ResourceUsage.h>
+#import <wtf/darwin/TypeCastsOSObject.h>
 #import <wtf/spi/cocoa/MachVMSPI.h>
 
 namespace WebCore {
@@ -127,8 +128,8 @@ static Vector<ThreadInfo> threadInfos()
         auto threadName = String::fromLatin1(threadExtendedInfo.pth_name);
         String dispatchQueueName;
         if (threadIdentifierInfo.dispatch_qaddr) {
-            dispatch_queue_t queue = *reinterpret_cast<dispatch_queue_t*>(threadIdentifierInfo.dispatch_qaddr);
-            dispatchQueueName = String::fromLatin1(dispatch_queue_get_label(queue));
+            RetainPtr queue = *reinterpret_cast<CFTypeRef*>(threadIdentifierInfo.dispatch_qaddr);
+            dispatchQueueName = String::fromLatin1(dispatch_queue_get_label(osObjectCast<dispatch_queue_t>(queue.get())));
         }
 
         infos.append(ThreadInfo { WTFMove(sendRight), usage, threadName, dispatchQueueName });
