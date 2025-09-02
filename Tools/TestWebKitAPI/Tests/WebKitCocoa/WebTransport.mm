@@ -470,6 +470,46 @@ TEST(WebTransport, Worker)
     EXPECT_WK_STREQ([webView _test_waitForAlert], "message from worker: successfully read abc");
 }
 
+// FIXME: Enable when rdar://158191390 is available in OS builds.
+TEST(WebTransport, DISABLED_CreateStreamsBeforeReady)
+{
+    WebTransportServer datagramServer([](ConnectionGroup group) -> ConnectionTask {
+        auto datagramConnection = group.createWebTransportConnection(ConnectionGroup::ConnectionType::Datagram);
+        auto request = co_await datagramConnection.awaitableReceiveBytes();
+        co_await datagramConnection.awaitableSend(WTFMove(request));
+    });
+
+    WebTransportServer streamServer([](ConnectionGroup group) -> ConnectionTask {
+        auto connection = co_await group.receiveIncomingConnection();
+        auto request = co_await connection.awaitableReceiveBytes();
+        co_await connection.awaitableSend(WTFMove(request));
+    });
+
+    RetainPtr configuration = adoptNS([WKWebViewConfiguration new]);
+    enableWebTransport(configuration.get());
+    RetainPtr webView = adoptNS([[WKWebView alloc] initWithFrame:CGRectZero configuration:configuration.get()]);
+    auto delegate = adoptNS([TestNavigationDelegate new]);
+    [delegate allowAnyTLSCertificate];
+    [webView setNavigationDelegate:delegate.get()];
+
+    NSString *html = [NSString stringWithFormat:@"<script>"
+    "async function test() {"
+    "  try {"
+    "    const w = new WebTransport('https://127.0.0.1:%d/');"
+    "    const writer = w.datagrams.writable.getWriter();"
+    "    const reader = w.datagrams.readable.getReader();"
+    "    await writer.write(new TextEncoder().encode('abc'));"
+    "    const { value, done } = await reader.read();"
+    "    alert('successfully read ' + new TextDecoder().decode(value));"
+    "  } catch (e) { alert('caught ' + e); }"
+    "}; test()"
+    "</script>", datagramServer.port()];
+    [webView loadHTMLString:html baseURL:[NSURL URLWithString:@"https://webkit.org/"]];
+    EXPECT_WK_STREQ([webView _test_waitForAlert], "successfully read abc");
+
+    // FIXME: Test outgoing streams.
+}
+
 } // namespace TestWebKitAPI
 
 #endif // HAVE(WEB_TRANSPORT)
