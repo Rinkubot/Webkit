@@ -131,7 +131,7 @@ public:
     bool canGoBack() const;
     bool canGoForward() const;
 
-    void initializeForNewWindow(std::optional<NavigationNavigationType>, LocalDOMWindow* previousWindow);
+    void initializeForNewWindow(std::optional<NavigationNavigationType>, LocalDOMWindow* previousWindow, Vector<Ref<HistoryItem>>);
 
     Result navigate(const String& url, NavigateOptions&&, Ref<DeferredPromise>&&, Ref<DeferredPromise>&&);
 

@@ -76,6 +76,7 @@ class FrameLoader;
 class FrameSelection;
 class HTMLFrameOwnerElement;
 class HTMLTableCellElement;
+class HistoryItem;
 class HitTestResult;
 class ImageBuffer;
 class IntPoint;
@@ -344,6 +345,10 @@ public:
 
     bool frameCanCreatePaymentSession() const final;
 
+    WEBCORE_EXPORT Vector<Ref<HistoryItem>> backForwardList() const;
+    WEBCORE_EXPORT void setBackForwardList(Vector<Ref<HistoryItem>>&&);
+    void addItemToBackForwardList(Ref<HistoryItem>&&);
+
 protected:
     void frameWasDisconnectedFromOwner() const final;
 
@@ -375,6 +380,8 @@ private:
     RefPtr<Document> m_doc;
 
     UniqueRef<ScriptController> m_script;
+
+    Vector<Ref<HistoryItem>> m_backForwardList;
 
 #if ENABLE(DATA_DETECTION)
     std::unique_ptr<DataDetectionResultsStorage> m_dataDetectionResults;

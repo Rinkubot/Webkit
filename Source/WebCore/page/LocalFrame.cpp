@@ -1599,6 +1599,21 @@ RefPtr<SecurityOrigin> LocalFrame::frameDocumentSecurityOrigin() const
     return nullptr;
 }
 
+Vector<Ref<HistoryItem>> LocalFrame::backForwardList() const
+{
+    return m_backForwardList;
+}
+
+void LocalFrame::setBackForwardList(Vector<Ref<HistoryItem>>&& list)
+{
+    m_backForwardList = WTFMove(list);
+}
+
+void LocalFrame::addItemToBackForwardList(Ref<HistoryItem>&& item)
+{
+    m_backForwardList.append(WTFMove(item));
+}
+
 } // namespace WebCore
 
 #undef FRAME_RELEASE_LOG_ERROR

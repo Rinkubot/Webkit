@@ -42,6 +42,8 @@
 #include "NetworkProcessConnection.h"
 #include "PluginView.h"
 #include "ProvisionalFrameCreationParameters.h"
+#include "SessionState.h"
+#include "SessionStateConversion.h"
 #include "WKAPICast.h"
 #include "WKBundleAPICast.h"
 #include "WebChromeClient.h"
@@ -49,6 +51,7 @@
 #include "WebEventConversion.h"
 #include "WebEventFactory.h"
 #include "WebFrameProxyMessages.h"
+#include "WebHistoryItemClient.h"
 #include "WebImage.h"
 #include "WebPage.h"
 #include "WebPageProxyMessages.h"
@@ -1557,6 +1560,28 @@ void WebFrame::findFocusableElementDescendingIntoRemoteFrame(WebCore::FocusDirec
     }
 
     completionHandler(foundElementInRemoteFrame);
+}
+
+void WebFrame::setBackForwardList(Vector<Ref<FrameState>>&& backForwardFrameStates)
+{
+    if (!m_coreFrame)
+        return;
+
+    RefPtr localFrame = dynamicDowncast<LocalFrame>(m_coreFrame.get());
+    if (!localFrame)
+        return;
+
+    if (!page())
+        return;
+
+    Ref historyItemClient = page()->historyItemClient();
+    auto ignoreHistoryItemChangesForScope = historyItemClient->ignoreChangesForScope();
+
+    Vector<Ref<HistoryItem>> backForwardList;
+    for (Ref frameState : backForwardFrameStates)
+        backForwardList.append(toHistoryItem(historyItemClient, WTFMove(frameState)));
+
+    localFrame->setBackForwardList(WTFMove(backForwardList));
 }
 
 } // namespace WebKit
