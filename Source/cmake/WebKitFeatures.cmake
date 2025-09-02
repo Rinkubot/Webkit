@@ -439,6 +439,17 @@ macro(CREATE_CONFIGURATION_HEADER)
     file(REMOVE "${CMAKE_BINARY_DIR}/cmakeconfig.h.tmp")
 endmacro()
 
+macro(ADD_CONFIG_FLAGS_TO_SWIFTC _target)
+    list(SORT _WEBKIT_CONFIG_FILE_VARIABLES)
+    foreach (_variable_name ${_WEBKIT_CONFIG_FILE_VARIABLES})
+        target_compile_definitions(${_target} PUBLIC $<$<COMPILE_LANGUAGE:Swift>:-D${_variable_name}>)
+    endforeach ()
+endmacro()
+
+macro(GET_WEBKIT_COMPILE_DEFINITIONS _var_name)
+    set(${_var_name} ${_WEBKIT_CONFIG_FILE_VARIABLES})
+endmacro()
+
 macro(WEBKIT_CHECK_HAVE_INCLUDE _variable _header)
     check_include_file(${_header} ${_variable}_value)
     SET_AND_EXPOSE_TO_BUILD(${_variable} ${${_variable}_value})

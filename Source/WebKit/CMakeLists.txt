@@ -1,5 +1,8 @@
 set_property(DIRECTORY . PROPERTY FOLDER "WebKit")
 
+include(InitializeSwift)
+include(AddSwift)
+
 set(WebKit_PRIVATE_INCLUDE_DIRECTORIES
     "${CMAKE_BINARY_DIR}"
     "${PAL_FRAMEWORK_HEADERS_DIR}"
@@ -768,11 +771,7 @@ endif ()
 
 macro(ADD_WEBKIT_PREFIX_HEADER _target)
     if (WebKit_USE_PREFIX_HEADER)
-        get_target_property(OLD_COMPILE_FLAGS ${_target} COMPILE_FLAGS)
-        if (${OLD_COMPILE_FLAGS} STREQUAL "OLD_COMPILE_FLAGS-NOTFOUND")
-            set(OLD_COMPILE_FLAGS "")
-        endif ()
-        set_target_properties(${_target} PROPERTIES COMPILE_FLAGS "${OLD_COMPILE_FLAGS} -include ${WEBKIT_DIR}/WebKit2Prefix.h")
+        target_compile_options(${_target} PRIVATE "$<$<COMPILE_LANGUAGE:C,CXX,OBJC,OBJCXX>:-include>" "$<$<COMPILE_LANGUAGE:C,CXX,OBJC,OBJCXX>:${WEBKIT_DIR}/WebKit2Prefix.h>")
     else ()
         target_precompile_headers(${_target} PRIVATE WebKit2Prefix.h)
     endif ()
@@ -802,6 +801,41 @@ set(WebKit_GENERATED_SERIALIZERS_SUFFIX cpp)
 
 WEBKIT_FRAMEWORK_DECLARE(WebKit)
 WEBKIT_INCLUDE_CONFIG_FILES_IF_EXISTS()
+
+# Various bits of Swift-related setup.
+# First, when we include the generated WebKit-Swift.h file, that may include headers
+# from the Swift SDK include path. We will add that path.
+target_include_directories(WebKit SYSTEM AFTER PRIVATE "${SWIFT_RUNTIME_RESOURCE_PATH}")
+# Add WebKit's various feature flags as -D directives to the Swift compiles.
+ADD_CONFIG_FLAGS_TO_SWIFTC(WebKit)
+# Include the modulemap and header for the WebKit internal "APIs" which we make
+# available from C++ to Swift.
+target_compile_options(WebKit PRIVATE "$<$<COMPILE_LANGUAGE:Swift>:-I${WEBKIT_DIR}/Modules/Internal>")
+# And, add all of WebKit's transitive dependencies as include paths for Swift.
+set(_all_includes "$<LIST:TRANSFORM,$<TARGET_PROPERTY:WebKit,INCLUDE_DIRECTORIES>,PREPEND,-I>")
+target_compile_options(WebKit PRIVATE "$<$<COMPILE_LANGUAGE:Swift>:${_all_includes}>")
+# Set some Swift-specific flags.
+target_compile_options(WebKit PUBLIC
+  "$<$<COMPILE_LANGUAGE:Swift>:-cxx-interoperability-mode=default>")
+target_compile_options(WebKit PUBLIC
+  "$<$<COMPILE_LANGUAGE:Swift>:-Xcc>")
+target_compile_options(WebKit PUBLIC
+  "$<$<COMPILE_LANGUAGE:Swift>:-std=c++2b>")
+# cmake's Swift interop does not respect CMAKE_SHARED_LINKER_FLAGS, so let's pass
+# on those that we can.
+# rdar://155519819
+string(REPLACE " " ";" CMAKE_SHARED_LINKER_FLAGS_SPLIT "${CMAKE_SHARED_LINKER_FLAGS}")
+foreach (_flag IN ITEMS ${CMAKE_SHARED_LINKER_FLAGS_SPLIT})
+    # We can only pass on -Wl flags.
+    string(SUBSTRING ${_flag} 0 4 _prefix)
+    if (${_prefix} STREQUAL "-Wl,")
+        string(SUBSTRING ${_flag} 4 -1 _shorter_flag)
+        message("Using ${_shorter_flag}")
+        # The following unfortunately deduplicates the -Xlinker
+        # target_compile_options(WebKit PUBLIC "$<$<COMPILE_LANGUAGE:Swift>:-Xlinker>")
+        target_compile_options(WebKit PUBLIC "$<$<COMPILE_LANGUAGE:Swift>:SHELL:-Xlinker ${_shorter_flag}>")
+    endif ()
+endforeach ()
 
 if (PORT STREQUAL GTK OR PORT STREQUAL WPE)
     WEBKIT_ADD_TARGET_CXX_FLAGS(WebKit
@@ -1061,6 +1095,7 @@ list(APPEND WebKit_SOURCES
     ${WebKit_DERIVED_SOURCES_DIR}/WebPreferencesGetterSetters.cpp
     ${WebKit_DERIVED_SOURCES_DIR}/WebPreferencesKeys.cpp
     ${WebKit_DERIVED_SOURCES_DIR}/WebPreferencesStoreDefaultsMap.cpp
+    ${WEBKIT_DIR}/UIProcess/SwiftDemoLogo.swift
 )
 
 list(APPEND WebKit_SOURCES ${WebKit_DERIVED_SOURCES})
