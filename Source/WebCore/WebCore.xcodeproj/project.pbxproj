@@ -977,7 +977,6 @@
 		297BE3D616C03C0B003316BD /* PlatformSpeechSynthesisVoice.h in Headers */ = {isa = PBXBuildFile; fileRef = 2527CC9216BF90B4009DDAC0 /* PlatformSpeechSynthesisVoice.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		297BE3D716C03C0E003316BD /* PlatformSpeechSynthesizer.h in Headers */ = {isa = PBXBuildFile; fileRef = 29E4D8DF16B0940F00C84704 /* PlatformSpeechSynthesizer.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		29A8122C0FBB9C1D00510293 /* AXListHelpers.h in Headers */ = {isa = PBXBuildFile; fileRef = 29A8120E0FBB9C1D00510293 /* AXListHelpers.h */; };
-		29A812310FBB9C1D00510293 /* AccessibilityTableRow.h in Headers */ = {isa = PBXBuildFile; fileRef = 29A812130FBB9C1D00510293 /* AccessibilityTableRow.h */; };
 		29A812320FBB9C1D00510293 /* AccessibilityTableCell.h in Headers */ = {isa = PBXBuildFile; fileRef = 29A812140FBB9C1D00510293 /* AccessibilityTableCell.h */; };
 		29A812360FBB9C1D00510293 /* AccessibilityObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 29A812180FBB9C1D00510293 /* AccessibilityObject.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		29A812380FBB9C1D00510293 /* AXObjectCache.h in Headers */ = {isa = PBXBuildFile; fileRef = 29A8121A0FBB9C1D00510293 /* AXObjectCache.h */; settings = {ATTRIBUTES = (Private, ); }; };
@@ -9509,12 +9508,10 @@
 		2981CAAB131822EC00D12F2A /* AccessibilityTableCell.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = AccessibilityTableCell.cpp; sourceTree = "<group>"; };
 		2981CAAC131822EC00D12F2A /* AccessibilityTableColumn.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = AccessibilityTableColumn.cpp; sourceTree = "<group>"; };
 		2981CAAD131822EC00D12F2A /* AccessibilityTableHeaderContainer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = AccessibilityTableHeaderContainer.cpp; sourceTree = "<group>"; };
-		2981CAAE131822EC00D12F2A /* AccessibilityTableRow.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = AccessibilityTableRow.cpp; sourceTree = "<group>"; };
 		2981CAAF131822EC00D12F2A /* AXObjectCache.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = AXObjectCache.cpp; sourceTree = "<group>"; };
 		2985709215CC532D006355CD /* AccessibilityNodeObject.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = AccessibilityNodeObject.cpp; sourceTree = "<group>"; };
 		2985709315CC532D006355CD /* AccessibilityNodeObject.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AccessibilityNodeObject.h; sourceTree = "<group>"; };
 		29A8120E0FBB9C1D00510293 /* AXListHelpers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AXListHelpers.h; sourceTree = "<group>"; };
-		29A812130FBB9C1D00510293 /* AccessibilityTableRow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AccessibilityTableRow.h; sourceTree = "<group>"; };
 		29A812140FBB9C1D00510293 /* AccessibilityTableCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AccessibilityTableCell.h; sourceTree = "<group>"; };
 		29A812180FBB9C1D00510293 /* AccessibilityObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AccessibilityObject.h; sourceTree = "<group>"; };
 		29A8121A0FBB9C1D00510293 /* AXObjectCache.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AXObjectCache.h; sourceTree = "<group>"; };
@@ -25077,8 +25074,6 @@
 				29A812230FBB9C1D00510293 /* AccessibilityTableColumn.h */,
 				2981CAAD131822EC00D12F2A /* AccessibilityTableHeaderContainer.cpp */,
 				29A812210FBB9C1D00510293 /* AccessibilityTableHeaderContainer.h */,
-				2981CAAE131822EC00D12F2A /* AccessibilityTableRow.cpp */,
-				29A812130FBB9C1D00510293 /* AccessibilityTableRow.h */,
 				A91C9FBC1B6586DE00AFFD54 /* AccessibilityTree.cpp */,
 				A91C9FBD1B6586DE00AFFD54 /* AccessibilityTree.h */,
 				A91C9FC01B659A6700AFFD54 /* AccessibilityTreeItem.cpp */,
@@ -41041,7 +41036,6 @@
 				29A812320FBB9C1D00510293 /* AccessibilityTableCell.h in Headers */,
 				29A812410FBB9C1D00510293 /* AccessibilityTableColumn.h in Headers */,
 				29A8123F0FBB9C1D00510293 /* AccessibilityTableHeaderContainer.h in Headers */,
-				29A812310FBB9C1D00510293 /* AccessibilityTableRow.h in Headers */,
 				A91C9FBF1B6586DE00AFFD54 /* AccessibilityTree.h in Headers */,
 				A91C9FC31B659A6700AFFD54 /* AccessibilityTreeItem.h in Headers */,
 				7C5222991E1DAE1C002CB8F7 /* ActiveDOMCallback.h in Headers */,

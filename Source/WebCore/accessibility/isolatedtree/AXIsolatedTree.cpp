@@ -38,7 +38,6 @@
 #include "AXUtilities.h"
 #include "AccessibilityImageMapLink.h"
 #include "AccessibilityTableCell.h"
-#include "AccessibilityTableRow.h"
 #include "DocumentInlines.h"
 #include "FrameSelection.h"
 #include "HTMLNames.h"
@@ -926,7 +925,7 @@ void AXIsolatedTree::updateDependentProperties(AccessibilityObject& axObject)
     updateRelatedObjects(axObject);
 
     // When a row gains or loses cells, or a table changes rows in a row group, the column count of the table can change.
-    bool updateTableAncestorColumns = is<AccessibilityTableRow>(axObject);
+    bool updateTableAncestorColumns = axObject.isExposedTableRow();
 #if ENABLE(INCLUDE_IGNORED_IN_CORE_AX_TREE)
     updateTableAncestorColumns = updateTableAncestorColumns || isRowGroup(axObject.node());
 #endif
@@ -1688,8 +1687,8 @@ std::optional<AXPropertyFlag> convertToPropertyFlag(AXProperty property)
         return AXPropertyFlag::IsKeyboardFocusable;
     case AXProperty::IsNonLayerSVGObject:
         return AXPropertyFlag::IsNonLayerSVGObject;
-    case AXProperty::IsTableRow:
-        return AXPropertyFlag::IsTableRow;
+    case AXProperty::IsExposedTableRow:
+        return AXPropertyFlag::IsExposedTableRow;
     case AXProperty::IsVisited:
         return AXPropertyFlag::IsVisited;
     case AXProperty::SupportsCheckedState:
@@ -2019,9 +2018,9 @@ IsolatedObjectData createIsolatedObjectData(const Ref<AccessibilityObject>& axOb
             setProperty(AXProperty::Abbreviation, object.abbreviation().isolatedCopy());
         }
 
-        bool isTableRow = object.isTableRow();
-        if (isTableRow) {
-            setProperty(AXProperty::IsTableRow, true);
+        bool isExposedTableRow = object.isExposedTableRow();
+        if (isExposedTableRow) {
+            setProperty(AXProperty::IsExposedTableRow, true);
             setProperty(AXProperty::RowIndex, object.rowIndex());
         } else if (object.isTableColumn())
             setProperty(AXProperty::ColumnIndex, object.columnIndex());
@@ -2147,7 +2146,7 @@ IsolatedObjectData createIsolatedObjectData(const Ref<AccessibilityObject>& axOb
             setProperty(AXProperty::CanBeMultilineTextField, canBeMultilineTextField(object));
         }
 
-        if (object.isHeading() || isTableRow || isTreeItem)
+        if (object.isHeading() || isExposedTableRow || isTreeItem)
             setProperty(AXProperty::ARIALevel, object.ariaLevel());
 
         // These properties are only needed on the AXCoreObject interface due to their use in ATSPI,

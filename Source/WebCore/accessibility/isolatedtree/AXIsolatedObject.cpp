@@ -1193,6 +1193,12 @@ void AXIsolatedObject::decrement()
     });
 }
 
+bool AXIsolatedObject::isAccessibilityNodeObject() const
+{
+    ASSERT_NOT_REACHED();
+    return false;
+}
+
 bool AXIsolatedObject::isAccessibilityRenderObject() const
 {
     ASSERT_NOT_REACHED();
@@ -1631,6 +1637,18 @@ bool AXIsolatedObject::isTableCell() const
 {
     ASSERT_NOT_REACHED();
     return false;
+}
+
+bool AXIsolatedObject::isTableRow() const
+{
+    ASSERT_NOT_REACHED();
+    return false;
+}
+
+AXCoreObject* AXIsolatedObject::parentTableIfExposedTableRow() const
+{
+    ASSERT_NOT_REACHED();
+    return nullptr;
 }
 
 bool AXIsolatedObject::isDescendantOfRole(AccessibilityRole) const
