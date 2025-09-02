@@ -156,7 +156,7 @@ class WPTRunner(object):
             test_downloader = self._downloader_class(WPTPaths.checkout_directory(self._finder),
                 self._host, self._downloader_class.default_options())
             test_downloader.clone_tests()
-            self._options.wpt_checkout = WPTPaths.wpt_checkout_path(self._finder)
+            self._options.wpt_checkout = WPTPaths.default_wpt_checkout_path(self._finder)
 
         if not self._options.wpt_checkout or not self._host.filesystem.exists(self._options.wpt_checkout):
             _log.error("Valid web-platform-tests directory required")

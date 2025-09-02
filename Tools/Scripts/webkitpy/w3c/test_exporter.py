@@ -31,7 +31,7 @@ import sys
 
 from webkitcorepy import string_utils, run
 from webkitbugspy import Tracker, bugzilla
-from webkitscmpy import local, remote
+from webkitscmpy import local
 
 from webkitpy.common.host import Host
 from webkitpy.common.net.bugzilla import Bugzilla
@@ -208,15 +208,13 @@ class WebPlatformTestExporter(object):
         self._filesystem.write_binary_file(patch_file, patch_data)
         return patch_file
 
-    def _ensure_wpt_repository(self):
-        if not self._options.repository_directory:
-            webkit_finder = WebKitFinder(self._filesystem)
-            self._options.repository_directory = WPTPaths.wpt_checkout_path(webkit_finder)
+    def _get_wpt_repository(self):
+        webkit_finder = WebKitFinder(self._filesystem)
+        repository_directory = WPTPaths.ensure_wpt_repository(webkit_finder, self._options.repository_directory, non_interactive=self._options.non_interactive)
+        if not repository_directory:
+            return
 
-        if not self._filesystem.exists(self._options.repository_directory):
-            run([local.Git.executable(), 'clone', f'{WPT_GH_URL}.git', os.path.abspath(self._options.repository_directory)])
-        self._wpt_repo = local.Git(self._options.repository_directory)
-
+        self._wpt_repo = local.Git(repository_directory)
         self._remote = self._init_wpt_remote()
         if not self._remote:
             return 1
@@ -327,7 +325,7 @@ class WebPlatformTestExporter(object):
             _log.error("Unable to create a patch to apply to web-platform-tests repository")
             return 1
 
-        if not self._ensure_wpt_repository():
+        if not self._get_wpt_repository():
             _log.error(f'Could not find WPT repository')
             return 1
 

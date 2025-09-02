@@ -33,6 +33,7 @@ import unittest
 from webkitcorepy import OutputCapture
 from webkitscmpy.mocks.local import Git as Git_mock
 
+from webkitpy.common.checkout.scm.scm_mock import MockSCM
 from webkitpy.common.host_mock import MockHost
 from webkitpy.common.system.executive_mock import MockExecutive2, ScriptError
 from webkitpy.common.system.filesystem_mock import MockFileSystem
@@ -41,19 +42,22 @@ from webkitpy.w3c.test_importer import TestImporter, parse_args
 
 FAKE_SOURCE_DIR = '/tests/csswg'
 FAKE_TEST_PATH = 'css-fake-1'
+FAKE_WPT_DIR = '/home/web-platform-tests'
 
 FAKE_FILES = {
     '/tests/csswg/css-fake-1/empty_dir/README.txt': '',
-    '/mock-checkout/LayoutTests/w3c/css-fake-1/README.txt': '',
+    '/home/mock-checkout/LayoutTests/w3c/css-fake-1/README.txt': '',
 }
 
 FAKE_RESOURCES = {
-    '/mock-checkout/LayoutTests/imported/w3c/resources/import-expectations.json': '''
+    '/home/mock-checkout/LayoutTests/imported/w3c/resources/import-expectations.json': '''
 {
     "test1": "import",
     "test2": "skip"
 }''',
-    '/mock-checkout/LayoutTests/imported/w3c/resources/resource-files.json': '{"directories": [], "files": []}',
+    '/home/mock-checkout/LayoutTests/imported/w3c/resources/resource-files.json': '{"directories": [], "files": []}',
+    '/home/web-platform-tests/wpt': '',
+    '/home/web-platform-tests/resources/testharness.js': '',
 }
 
 FAKE_FILES.update(FAKE_RESOURCES)
@@ -67,6 +71,11 @@ MINIMAL_TESTHARNESS = '''
 
 
 class TestImporterTest(unittest.TestCase):
+    def setUp(self):
+        MockFileSystem.symlink = lambda self, src, dst: self.copytree(src, dst)
+        self.addCleanup(lambda: delattr(MockFileSystem, "symlink"))
+        return super().setUp()
+
     def _parse_options(self, args):
         options, args = parse_args(args)
         return options
@@ -103,24 +112,23 @@ class TestImporterTest(unittest.TestCase):
         }
         FAKE_FILES.update(FAKE_RESOURCES)
 
-        host = MockHost()
+        host = MockHost(initialize_scm_by_default=False)
+        host._scm = MockSCM(filesystem=host.filesystem, executive=host.executive, checkout_root='/home/mock-checkout')
+        host.filesystem.module_path = "/home/mock-checkout/Tools/Scripts/"
         port = host.port_factory.get()
         fs = host.filesystem
         for path, contents in FAKE_FILES.items():
             fs.write_binary_file(path, contents)
 
         importer = TestImporter(port, ['web-platform-tests/test1', 'web-platform-tests/test2'], self._parse_options(['-n', '-d', 'w3c', '-s', FAKE_SOURCE_DIR]))
-        importer.do_import()
+        with OutputCapture():
+            importer.do_import()
 
-        self.assertTrue(host.filesystem.exists("/mock-checkout/LayoutTests/w3c/web-platform-tests/test1/__init__.py"))
-        self.assertTrue(host.filesystem.exists("/mock-checkout/LayoutTests/w3c/web-platform-tests/test2/__init__.py"))
-        self.assertTrue(host.filesystem.getsize("/mock-checkout/LayoutTests/w3c/web-platform-tests/test1/__init__.py") > 0)
+        self.assertTrue(host.filesystem.exists("/home/mock-checkout/LayoutTests/w3c/web-platform-tests/test1/__init__.py"))
+        self.assertTrue(host.filesystem.exists("/home/mock-checkout/LayoutTests/w3c/web-platform-tests/test2/__init__.py"))
+        self.assertTrue(host.filesystem.getsize("/home/mock-checkout/LayoutTests/w3c/web-platform-tests/test1/__init__.py") > 0)
 
     def test_import_dir_not_web_platform_tests(self):
-        # This is a horrible hack so we don't actually need to support symlinks in the MockFileSystem.
-        MockFileSystem.symlink = lambda self, src, dst: self.copytree(src, dst)
-        self.addCleanup(lambda: delattr(MockFileSystem, "symlink"))
-
         FAKE_FILES = {}
         FAKE_FILES.update(FAKE_RESOURCES)
         FAKE_FILES.update({
@@ -130,15 +138,16 @@ class TestImporterTest(unittest.TestCase):
         })
 
         fs = self.import_downloaded_tests(['--no-fetch', '-s', '/t/wpt', '-d', 'w3c'], FAKE_FILES)
-        print(fs.files_under("/mock-checkout/LayoutTests/w3c/web-platform-tests"))
 
-        self.assertTrue(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/test1/test.html'))
+        self.assertTrue(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/test1/test.html'))
 
     def import_directory(self, args, files, test_paths):
         return self.import_downloaded_tests(args + test_paths, files)
 
     def import_downloaded_tests(self, args, files, test_port=False):
-        host = MockHost()
+        host = MockHost(initialize_scm_by_default=False)
+        host._scm = MockSCM(filesystem=host.filesystem, executive=host.executive, checkout_root='/home/mock-checkout')
+        host.filesystem.module_path = "/home/mock-checkout/Tools/Scripts/"
         if test_port:
             port = TestPort(host)
         else:
@@ -149,57 +158,60 @@ class TestImporterTest(unittest.TestCase):
 
         options, test_paths = parse_args(args)
         importer = TestImporter(port, test_paths, options)
-        with Git_mock(fs.join(importer.tests_download_path, "web-platform-tests")):
+        fs.maybe_make_directory(fs.join(importer.tests_download_path, "web-platform-tests"))
+        with OutputCapture(), Git_mock(fs.join(importer.tests_download_path, "web-platform-tests")):
             importer.do_import()
         return host.filesystem
 
     def test_harnesslinks_conversion(self):
         FAKE_FILES = {
-            '/mock-checkout/WebKitBuild/w3c-tests/csswg-tests/t/test.html': MINIMAL_TESTHARNESS,
-            '/mock-checkout/WebKitBuild/w3c-tests/web-platform-tests/css/t/test.html': MINIMAL_TESTHARNESS,
-            '/mock-checkout/WebKitBuild/w3c-tests/web-platform-tests/t/test.html': MINIMAL_TESTHARNESS,
-            '/mock-checkout/Source/WebCore/css/CSSProperties.json': '',
-            '/mock-checkout/Source/WebCore/css/CSSValueKeywords.in': '',
+            '/home/mock-checkout/w3c-tests/csswg-tests/t/test.html': MINIMAL_TESTHARNESS,
+            f'{FAKE_WPT_DIR}/css/t/test.html': MINIMAL_TESTHARNESS,
+            f'{FAKE_WPT_DIR}/t/test.html': MINIMAL_TESTHARNESS,
+            '/home/mock-checkout/Source/WebCore/css/CSSProperties.json': '',
+            '/home/mock-checkout/Source/WebCore/css/CSSValueKeywords.in': '',
         }
         FAKE_FILES.update(FAKE_RESOURCES)
 
-        fs = self.import_downloaded_tests(['--no-fetch', '--import-all', '--no-clean-dest-dir', '-d', 'w3c'], FAKE_FILES)
+        with OutputCapture():
+            fs = self.import_downloaded_tests(['--no-fetch', '--import-all', '--no-clean-dest-dir', '-d', 'w3c'], FAKE_FILES)
 
-        self.assertTrue(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/css/t/test.html'))
-        self.assertTrue(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/t/test.html'))
-        self.assertTrue('src="/resources/testharness.js"' in fs.read_text_file('/mock-checkout/LayoutTests/w3c/web-platform-tests/t/test.html'))
-        self.assertTrue('src="/resources/testharness.js"' in fs.read_text_file('/mock-checkout/LayoutTests/w3c/web-platform-tests/css/t/test.html'))
+        self.assertTrue(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/css/t/test.html'))
+        self.assertTrue(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/t/test.html'))
+        self.assertTrue('src="/resources/testharness.js"' in fs.read_text_file('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/t/test.html'))
+        self.assertTrue('src="/resources/testharness.js"' in fs.read_text_file('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/css/t/test.html'))
 
     def test_skip_test_import_download(self):
         FAKE_FILES = {}
         FAKE_FILES.update(FAKE_RESOURCES)
         FAKE_FILES.update({
-            '/mock-checkout/WebKitBuild/w3c-tests/streams-api/reference-implementation/web-platform-tests/test.html': MINIMAL_TESTHARNESS,
-            '/mock-checkout/LayoutTests/imported/w3c/resources/import-expectations.json': '''
+            '/w3c-tests/streams-api/reference-implementation/web-platform-tests/test.html': MINIMAL_TESTHARNESS,
+            '/home/mock-checkout/LayoutTests/imported/w3c/resources/import-expectations.json': '''
 {
 "web-platform-tests/dir-to-skip": "skip",
 "web-platform-tests/dir-to-skip/dir-to-import": "import",
 "web-platform-tests/dir-to-skip/file-to-import.html": "import"
 }''',
-            '/mock-checkout/WebKitBuild/w3c-tests/web-platform-tests/dir-to-skip/test-to-skip.html': 'to be skipped',
-            '/mock-checkout/WebKitBuild/w3c-tests/web-platform-tests/dir-to-skip/dir-to-import/test-to-import.html': 'to be imported',
-            '/mock-checkout/WebKitBuild/w3c-tests/web-platform-tests/dir-to-skip/dir-to-not-import/test-to-not-import.html': 'to be skipped',
-            '/mock-checkout/WebKitBuild/w3c-tests/web-platform-tests/dir-to-skip/file-to-import.html': 'to be imported',
+            f'{FAKE_WPT_DIR}/dir-to-skip/test-to-skip.html': 'to be skipped',
+            f'{FAKE_WPT_DIR}/dir-to-skip/dir-to-import/test-to-import.html': 'to be imported',
+            f'{FAKE_WPT_DIR}/dir-to-skip/dir-to-not-import/test-to-not-import.html': 'to be skipped',
+            f'{FAKE_WPT_DIR}/dir-to-skip/file-to-import.html': 'to be imported',
         })
 
-        fs = self.import_downloaded_tests(['--no-fetch', '--no-clean-dest-dir', '-d', 'w3c'], FAKE_FILES)
+        with OutputCapture():
+            fs = self.import_downloaded_tests(['--no-fetch', '--no-clean-dest-dir', '-d', 'w3c'], FAKE_FILES)
 
-        self.assertTrue(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/dir-to-skip/file-to-import.html'))
-        self.assertTrue(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/dir-to-skip/dir-to-import/test-to-import.html'))
-        self.assertFalse(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/dir-to-skip/dir-to-not-import/test-to-not-import.html'))
-        self.assertFalse(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/dir-to-skip/test-to-skip.html'))
+        self.assertTrue(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/dir-to-skip/file-to-import.html'))
+        self.assertTrue(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/dir-to-skip/dir-to-import/test-to-import.html'))
+        self.assertFalse(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/dir-to-skip/dir-to-not-import/test-to-not-import.html'))
+        self.assertFalse(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/dir-to-skip/test-to-skip.html'))
 
     def test_skip_test_import_source(self):
         FAKE_FILES = {}
         FAKE_FILES.update(FAKE_RESOURCES)
         FAKE_FILES.update({
             '/home/user/wpt/streams-api/reference-implementation/web-platform-tests/test.html': MINIMAL_TESTHARNESS,
-            '/mock-checkout/LayoutTests/imported/w3c/resources/import-expectations.json': '''
+            '/home/mock-checkout/LayoutTests/imported/w3c/resources/import-expectations.json': '''
 {
 "web-platform-tests/dir-to-skip": "skip",
 "web-platform-tests/dir-to-skip/dir-to-import": "import",
@@ -211,25 +223,26 @@ class TestImporterTest(unittest.TestCase):
             '/home/user/wpt/web-platform-tests/dir-to-skip/file-to-import.html': 'to be imported',
         })
 
-        fs = self.import_downloaded_tests(['-s', '/home/user/wpt', '--no-fetch', '--no-clean-dest-dir', '-d', 'w3c'], FAKE_FILES)
+        with OutputCapture():
+            fs = self.import_downloaded_tests(['-s', '/home/user/wpt', '--no-fetch', '--no-clean-dest-dir', '-d', 'w3c'], FAKE_FILES)
 
-        self.assertTrue(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/dir-to-skip/file-to-import.html'))
-        self.assertTrue(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/dir-to-skip/dir-to-import/test-to-import.html'))
-        self.assertFalse(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/dir-to-skip/dir-to-not-import/test-to-not-import.html'))
-        self.assertFalse(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/dir-to-skip/test-to-skip.html'))
+        self.assertTrue(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/dir-to-skip/file-to-import.html'))
+        self.assertTrue(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/dir-to-skip/dir-to-import/test-to-import.html'))
+        self.assertFalse(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/dir-to-skip/dir-to-not-import/test-to-not-import.html'))
+        self.assertFalse(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/dir-to-skip/test-to-skip.html'))
 
     def test_no_implicit_skip_with_download(self):
         FAKE_FILES = {
-            '/mock-checkout/WebKitBuild/w3c-tests/web-platform-tests/css/css-images/tools/test1.html': MINIMAL_TESTHARNESS,
-            '/mock-checkout/WebKitBuild/w3c-tests/web-platform-tests/css/css-images/support/test2.html': MINIMAL_TESTHARNESS,
-            '/mock-checkout/WebKitBuild/w3c-tests/web-platform-tests/css/css-images/work-in-progress/test3.html': MINIMAL_TESTHARNESS,
+            f'{FAKE_WPT_DIR}/css/css-images/tools/test1.html': MINIMAL_TESTHARNESS,
+            f'{FAKE_WPT_DIR}/css/css-images/support/test2.html': MINIMAL_TESTHARNESS,
+            f'{FAKE_WPT_DIR}/css/css-images/work-in-progress/test3.html': MINIMAL_TESTHARNESS,
         }
         FAKE_FILES.update(FAKE_RESOURCES)
 
-        fs = self.import_directory(['-d', '/mock-checkout/LayoutTests/w3c/web-platform-tests'], FAKE_FILES, ['web-platform-tests/css/css-images'])
-        self.assertTrue(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/web-platform-tests/css/css-images/tools/test1.html'))
-        self.assertTrue(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/web-platform-tests/css/css-images/support/test2.html'))
-        self.assertTrue(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/web-platform-tests/css/css-images/work-in-progress/test3.html'))
+        fs = self.import_directory(['-d', '/home/mock-checkout/LayoutTests/w3c/web-platform-tests'], FAKE_FILES, ['web-platform-tests/css/css-images'])
+        self.assertTrue(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/web-platform-tests/css/css-images/tools/test1.html'))
+        self.assertTrue(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/web-platform-tests/css/css-images/support/test2.html'))
+        self.assertTrue(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/web-platform-tests/css/css-images/work-in-progress/test3.html'))
 
     def test_no_implicit_skip_with_source(self):
         FAKE_FILES = {
@@ -239,30 +252,32 @@ class TestImporterTest(unittest.TestCase):
         }
         FAKE_FILES.update(FAKE_RESOURCES)
 
-        fs = self.import_directory(['-s', '/home/user/wpt', '-d', '/mock-checkout/LayoutTests/w3c/web-platform-tests'], FAKE_FILES, ['web-platform-tests/css/css-images'])
-        self.assertTrue(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/web-platform-tests/css/css-images/tools/test1.html'))
-        self.assertTrue(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/web-platform-tests/css/css-images/support/test2.html'))
-        self.assertTrue(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/web-platform-tests/css/css-images/work-in-progress/test3.html'))
+        with OutputCapture():
+            fs = self.import_directory(['-s', '/home/user/wpt', '-d', '/home/mock-checkout/LayoutTests/w3c/web-platform-tests'], FAKE_FILES, ['web-platform-tests/css/css-images'])
+        self.assertTrue(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/web-platform-tests/css/css-images/tools/test1.html'))
+        self.assertTrue(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/web-platform-tests/css/css-images/support/test2.html'))
+        self.assertTrue(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/web-platform-tests/css/css-images/work-in-progress/test3.html'))
 
     def test_skip_new_directories(self):
         FAKE_FILES = {}
         FAKE_FILES.update(FAKE_RESOURCES)
         FAKE_FILES.update(
             {
-                "/mock-checkout/LayoutTests/imported/w3c/resources/import-expectations.json": """
+                "/home/mock-checkout/LayoutTests/imported/w3c/resources/import-expectations.json": """
 {
 "web-platform-tests/css": "skip-new-directories"
 }""",
-                "/mock-checkout/WebKitBuild/w3c-tests/web-platform-tests/css/css-viewport/computedStyle-zoom.html": MINIMAL_TESTHARNESS,
-                "/mock-checkout/WebKitBuild/w3c-tests/web-platform-tests/css/css-viewport/zoom/scroll-top-test-with-zoom.html": MINIMAL_TESTHARNESS,
+                f"{FAKE_WPT_DIR}/css/css-viewport/computedStyle-zoom.html": MINIMAL_TESTHARNESS,
+                f"{FAKE_WPT_DIR}/css/css-viewport/zoom/scroll-top-test-with-zoom.html": MINIMAL_TESTHARNESS,
             }
         )
 
-        fs = self.import_downloaded_tests(["--no-fetch", "--no-clean-dest-dir", "-d", "w3c"], FAKE_FILES)
+        with OutputCapture():
+            fs = self.import_downloaded_tests(["--no-fetch", "--no-clean-dest-dir", "-d", "w3c"], FAKE_FILES)
 
         import_expectations = json.loads(
             fs.read_text_file(
-                "/mock-checkout/LayoutTests/imported/w3c/resources/import-expectations.json"
+                "/home/mock-checkout/LayoutTests/imported/w3c/resources/import-expectations.json"
             )
         )
         self.assertEqual(
@@ -271,55 +286,39 @@ class TestImporterTest(unittest.TestCase):
 
         self.assertFalse(
             fs.exists(
-                "/mock-checkout/LayoutTests/w3c/web-platform-tests/css/css-viewport/computedStyle-zoom.html"
+                "/home/mock-checkout/LayoutTests/w3c/web-platform-tests/css/css-viewport/computedStyle-zoom.html"
             )
         )
         self.assertFalse(
             fs.exists(
-                "/mock-checkout/LayoutTests/w3c/web-platform-tests/css/css-viewport/zoom/scroll-top-test-with-zoom.html"
+                "/home/mock-checkout/LayoutTests/w3c/web-platform-tests/css/css-viewport/zoom/scroll-top-test-with-zoom.html"
             )
         )
 
-    def test_checkout_directory(self):
-        FAKE_FILES = {
-            '/mock-checkout/WebKitBuild2/w3c-tests/web-platform-tests/existing-test.html': '',
-            '/mock-checkout/WebKitBuild2/w3c-tests/csswg-tests/test.html': '1',
-        }
-
-        FAKE_FILES.update(FAKE_RESOURCES)
-
-        os.environ['WEBKIT_OUTPUTDIR'] = '/mock-checkout/WebKitBuild2'
-        try:
-            fs = self.import_downloaded_tests(['--no-fetch', '--import-all', '--no-clean-dest-dir', '-d', 'w3c'], FAKE_FILES)
-        finally:
-            del os.environ['WEBKIT_OUTPUTDIR']
-
-        self.assertTrue(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/existing-test.html'))
-
     def test_clean_directory_option(self):
         FAKE_FILES = {
-            '/mock-checkout/LayoutTests/w3c/web-platform-tests/.gitattributes': '-1',
-            '/mock-checkout/LayoutTests/w3c/web-platform-tests/.gitignore': '-1',
-            '/mock-checkout/LayoutTests/w3c/web-platform-tests/.svn/wc.db': '0',
-            '/mock-checkout/LayoutTests/w3c/web-platform-tests/old-test.html': '1',
-            '/mock-checkout/LayoutTests/w3c/web-platform-tests/old-test-expected.txt': '2',
-            '/mock-checkout/LayoutTests/w3c/web-platform-tests/existing-test.html': '3',
-            '/mock-checkout/LayoutTests/w3c/web-platform-tests/existing-test-expected.txt': '4',
-            '/mock-checkout/WebKitBuild/w3c-tests/web-platform-tests/existing-test.html': '5',
-            '/mock-checkout/WebKitBuild/w3c-tests/csswg-tests/test.html': '1',
+            '/home/mock-checkout/LayoutTests/w3c/web-platform-tests/.gitattributes': '-1',
+            '/home/mock-checkout/LayoutTests/w3c/web-platform-tests/.gitignore': '-1',
+            '/home/mock-checkout/LayoutTests/w3c/web-platform-tests/.svn/wc.db': '0',
+            '/home/mock-checkout/LayoutTests/w3c/web-platform-tests/old-test.html': '1',
+            '/home/mock-checkout/LayoutTests/w3c/web-platform-tests/old-test-expected.txt': '2',
+            '/home/mock-checkout/LayoutTests/w3c/web-platform-tests/existing-test.html': '3',
+            '/home/mock-checkout/LayoutTests/w3c/web-platform-tests/existing-test-expected.txt': '4',
+            f'{FAKE_WPT_DIR}/existing-test.html': '5',
+            '/home/mock-checkout/w3c-tests/csswg-tests/test.html': '1',
         }
 
         FAKE_FILES.update(FAKE_RESOURCES)
 
         fs = self.import_downloaded_tests(['--no-fetch', '--import-all', '-d', 'w3c'], FAKE_FILES)
 
-        self.assertFalse(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/old-test.html'))
-        self.assertFalse(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/old-test-expected.txt'))
-        self.assertTrue(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/existing-test.html'))
-        self.assertTrue(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/existing-test-expected.txt'))
-        self.assertTrue(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/.gitattributes'))
-        self.assertTrue(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/.gitignore'))
-        self.assertTrue(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/.svn'))
+        self.assertFalse(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/old-test.html'))
+        self.assertFalse(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/old-test-expected.txt'))
+        self.assertTrue(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/existing-test.html'))
+        self.assertTrue(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/existing-test-expected.txt'))
+        self.assertTrue(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/.gitattributes'))
+        self.assertTrue(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/.gitignore'))
+        self.assertTrue(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/.svn'))
 
     def test_update_slow_test(self):
         existing_resource_files = {
@@ -332,20 +331,21 @@ class TestImporterTest(unittest.TestCase):
 
         # Note that neither old/new copies of existing-test.html are marked as long timeout.
         FAKE_FILES = {
-            '/mock-checkout/LayoutTests/imported/w3c/web-platform-tests/a/existing-test.html': MINIMAL_TESTHARNESS + '1',
-            '/mock-checkout/LayoutTests/imported/w3c/web-platform-tests/a/existing-test-expected.txt': '2',
-            '/mock-checkout/LayoutTests/imported/w3c/resources/resource-files.json': json.dumps(existing_resource_files),
-            '/mock-checkout/LayoutTests/tests-options.json': json.dumps(existing_tests_options),
-            '/mock-checkout/WebKitBuild/w3c-tests/web-platform-tests/a/existing-test.html': MINIMAL_TESTHARNESS,
-            '/mock-checkout/WebKitBuild/w3c-tests/csswg-tests/test.html': '-1',
+            '/home/mock-checkout/LayoutTests/imported/w3c/web-platform-tests/a/existing-test.html': MINIMAL_TESTHARNESS + '1',
+            '/home/mock-checkout/LayoutTests/imported/w3c/web-platform-tests/a/existing-test-expected.txt': '2',
+            '/home/mock-checkout/LayoutTests/imported/w3c/resources/resource-files.json': json.dumps(existing_resource_files),
+            '/home/mock-checkout/LayoutTests/tests-options.json': json.dumps(existing_tests_options),
+            f'{FAKE_WPT_DIR}/a/existing-test.html': MINIMAL_TESTHARNESS,
+            '/home/mock-checkout/w3c-tests/csswg-tests/test.html': '-1',
         }
 
         FAKE_FILES.update(FAKE_RESOURCES)
 
-        fs = self.import_downloaded_tests(['--no-fetch', '--import-all', '--no-clean-dest-dir'], FAKE_FILES)
+        with OutputCapture():
+            fs = self.import_downloaded_tests(['--no-fetch', '--import-all', '--no-clean-dest-dir'], FAKE_FILES)
 
         # 'slow' should remain in tests-options.json.
-        tests_options = json.loads(fs.read_text_file('/mock-checkout/LayoutTests/tests-options.json'))
+        tests_options = json.loads(fs.read_text_file('/home/mock-checkout/LayoutTests/tests-options.json'))
         self.assertIn("slow", tests_options["imported/w3c/web-platform-tests/a/existing-test.html"])
 
     def test_clean_directory_option_partial_import(self):
@@ -366,34 +366,35 @@ class TestImporterTest(unittest.TestCase):
         FAKE_FILES = {}
         FAKE_FILES.update(FAKE_RESOURCES)
         FAKE_FILES.update({
-            '/mock-checkout/LayoutTests/imported/w3c/web-platform-tests/a/old-test.html': '1',
-            '/mock-checkout/LayoutTests/imported/w3c/web-platform-tests/a/old-test-expected.txt': '2',
-            '/mock-checkout/LayoutTests/imported/w3c/web-platform-tests/a/old-support.html': '3',
-            '/mock-checkout/LayoutTests/imported/w3c/web-platform-tests/b/old-test.html': '4',
-            '/mock-checkout/LayoutTests/imported/w3c/web-platform-tests/b/old-test-expected.txt': '5',
-            '/mock-checkout/LayoutTests/imported/w3c/web-platform-tests/b/old-support.html': '6',
-            '/mock-checkout/LayoutTests/imported/w3c/web-platform-tests/b/existing-test.html': '4',
-            '/mock-checkout/LayoutTests/imported/w3c/web-platform-tests/b/existing-test-expected.txt': '5',
-            '/mock-checkout/LayoutTests/imported/w3c/resources/resource-files.json': json.dumps(existing_resource_files),
-            '/mock-checkout/LayoutTests/tests-options.json': json.dumps(existing_tests_options),
-            '/mock-checkout/WebKitBuild/w3c-tests/web-platform-tests/b/existing-test.html': MINIMAL_TESTHARNESS,
-            '/mock-checkout/WebKitBuild/w3c-tests/csswg-tests/test.html': '-1',
+            '/home/mock-checkout/LayoutTests/imported/w3c/web-platform-tests/a/old-test.html': '1',
+            '/home/mock-checkout/LayoutTests/imported/w3c/web-platform-tests/a/old-test-expected.txt': '2',
+            '/home/mock-checkout/LayoutTests/imported/w3c/web-platform-tests/a/old-support.html': '3',
+            '/home/mock-checkout/LayoutTests/imported/w3c/web-platform-tests/b/old-test.html': '4',
+            '/home/mock-checkout/LayoutTests/imported/w3c/web-platform-tests/b/old-test-expected.txt': '5',
+            '/home/mock-checkout/LayoutTests/imported/w3c/web-platform-tests/b/old-support.html': '6',
+            '/home/mock-checkout/LayoutTests/imported/w3c/web-platform-tests/b/existing-test.html': '4',
+            '/home/mock-checkout/LayoutTests/imported/w3c/web-platform-tests/b/existing-test-expected.txt': '5',
+            '/home/mock-checkout/LayoutTests/imported/w3c/resources/resource-files.json': json.dumps(existing_resource_files),
+            '/home/mock-checkout/LayoutTests/tests-options.json': json.dumps(existing_tests_options),
+            f'{FAKE_WPT_DIR}/b/existing-test.html': MINIMAL_TESTHARNESS,
+            '/home/mock-checkout/w3c-tests/csswg-tests/test.html': '-1',
         })
 
-        fs = self.import_downloaded_tests(['--no-fetch', '--import-all', 'web-platform-tests/b'], FAKE_FILES)
+        with OutputCapture():
+            fs = self.import_downloaded_tests(['--no-fetch', '--import-all', 'web-platform-tests/b'], FAKE_FILES)
 
-        self.assertTrue(fs.exists('/mock-checkout/LayoutTests/imported/w3c/web-platform-tests/a/old-test.html'))
-        self.assertTrue(fs.exists('/mock-checkout/LayoutTests/imported/w3c/web-platform-tests/a/old-test-expected.txt'))
-        self.assertFalse(fs.exists('/mock-checkout/LayoutTests/imported/w3c/web-platform-tests/b/old-test.html'))
-        self.assertFalse(fs.exists('/mock-checkout/LayoutTests/imported/w3c/web-platform-tests/b/old-test-expected.txt'))
-        self.assertTrue(fs.exists('/mock-checkout/LayoutTests/imported/w3c/web-platform-tests/b/existing-test.html'))
-        self.assertTrue(fs.exists('/mock-checkout/LayoutTests/imported/w3c/web-platform-tests/b/existing-test-expected.txt'))
+        self.assertTrue(fs.exists('/home/mock-checkout/LayoutTests/imported/w3c/web-platform-tests/a/old-test.html'))
+        self.assertTrue(fs.exists('/home/mock-checkout/LayoutTests/imported/w3c/web-platform-tests/a/old-test-expected.txt'))
+        self.assertFalse(fs.exists('/home/mock-checkout/LayoutTests/imported/w3c/web-platform-tests/b/old-test.html'))
+        self.assertFalse(fs.exists('/home/mock-checkout/LayoutTests/imported/w3c/web-platform-tests/b/old-test-expected.txt'))
+        self.assertTrue(fs.exists('/home/mock-checkout/LayoutTests/imported/w3c/web-platform-tests/b/existing-test.html'))
+        self.assertTrue(fs.exists('/home/mock-checkout/LayoutTests/imported/w3c/web-platform-tests/b/existing-test-expected.txt'))
 
-        resource_files = json.loads(fs.read_text_file('/mock-checkout/LayoutTests/imported/w3c/resources/resource-files.json'))
+        resource_files = json.loads(fs.read_text_file('/home/mock-checkout/LayoutTests/imported/w3c/resources/resource-files.json'))
         self.assertIn("web-platform-tests/a/old-support.html", resource_files["files"])
         self.assertNotIn("web-platform-tests/b/old-support.html", resource_files["files"])
 
-        tests_options = json.loads(fs.read_text_file('/mock-checkout/LayoutTests/tests-options.json'))
+        tests_options = json.loads(fs.read_text_file('/home/mock-checkout/LayoutTests/tests-options.json'))
         self.assertIn("imported/w3c/web-platform-tests/a/old-test.html", tests_options)
         self.assertNotIn("imported/w3c/web-platform-tests/b/old-test.html", tests_options)
 
@@ -415,41 +416,42 @@ class TestImporterTest(unittest.TestCase):
         FAKE_FILES = {}
         FAKE_FILES.update(FAKE_RESOURCES)
         FAKE_FILES.update({
-            '/mock-checkout/LayoutTests/imported/w3c/web-platform-tests/cssom-view/old-test.html': '1',
-            '/mock-checkout/LayoutTests/imported/w3c/web-platform-tests/cssom-view/old-test-expected.txt': '2',
-            '/mock-checkout/LayoutTests/imported/w3c/web-platform-tests/cssom-view/old-support.html': '3',
-            '/mock-checkout/LayoutTests/imported/w3c/web-platform-tests/cssom/old-test.html': '4',
-            '/mock-checkout/LayoutTests/imported/w3c/web-platform-tests/cssom/old-test-expected.txt': '5',
-            '/mock-checkout/LayoutTests/imported/w3c/web-platform-tests/cssom/old-support.html': '6',
-            '/mock-checkout/LayoutTests/imported/w3c/web-platform-tests/cssom/existing-test.html': '4',
-            '/mock-checkout/LayoutTests/imported/w3c/web-platform-tests/cssom/existing-test-expected.txt': '5',
-            '/mock-checkout/LayoutTests/imported/w3c/resources/resource-files.json': json.dumps(existing_resource_files),
-            '/mock-checkout/LayoutTests/tests-options.json': json.dumps(existing_tests_options),
-            '/mock-checkout/WebKitBuild/w3c-tests/web-platform-tests/cssom/existing-test.html': MINIMAL_TESTHARNESS,
-            '/mock-checkout/WebKitBuild/w3c-tests/csswg-tests/test.html': '-1',
+            '/home/mock-checkout/LayoutTests/imported/w3c/web-platform-tests/cssom-view/old-test.html': '1',
+            '/home/mock-checkout/LayoutTests/imported/w3c/web-platform-tests/cssom-view/old-test-expected.txt': '2',
+            '/home/mock-checkout/LayoutTests/imported/w3c/web-platform-tests/cssom-view/old-support.html': '3',
+            '/home/mock-checkout/LayoutTests/imported/w3c/web-platform-tests/cssom/old-test.html': '4',
+            '/home/mock-checkout/LayoutTests/imported/w3c/web-platform-tests/cssom/old-test-expected.txt': '5',
+            '/home/mock-checkout/LayoutTests/imported/w3c/web-platform-tests/cssom/old-support.html': '6',
+            '/home/mock-checkout/LayoutTests/imported/w3c/web-platform-tests/cssom/existing-test.html': '4',
+            '/home/mock-checkout/LayoutTests/imported/w3c/web-platform-tests/cssom/existing-test-expected.txt': '5',
+            '/home/mock-checkout/LayoutTests/imported/w3c/resources/resource-files.json': json.dumps(existing_resource_files),
+            '/home/mock-checkout/LayoutTests/tests-options.json': json.dumps(existing_tests_options),
+            f'{FAKE_WPT_DIR}/cssom/existing-test.html': MINIMAL_TESTHARNESS,
+            '/home/mock-checkout/w3c-tests/csswg-tests/test.html': '-1',
         })
 
-        fs = self.import_downloaded_tests(['--no-fetch', '--import-all', 'web-platform-tests/cssom'], FAKE_FILES)
+        with OutputCapture():
+            fs = self.import_downloaded_tests(['--no-fetch', '--import-all', 'web-platform-tests/cssom'], FAKE_FILES)
 
-        self.assertTrue(fs.exists('/mock-checkout/LayoutTests/imported/w3c/web-platform-tests/cssom-view/old-test.html'))
-        self.assertTrue(fs.exists('/mock-checkout/LayoutTests/imported/w3c/web-platform-tests/cssom-view/old-test-expected.txt'))
-        self.assertFalse(fs.exists('/mock-checkout/LayoutTests/imported/w3c/web-platform-tests/cssom/old-test.html'))
-        self.assertFalse(fs.exists('/mock-checkout/LayoutTests/imported/w3c/web-platform-tests/cssom/old-test-expected.txt'))
-        self.assertTrue(fs.exists('/mock-checkout/LayoutTests/imported/w3c/web-platform-tests/cssom/existing-test.html'))
-        self.assertTrue(fs.exists('/mock-checkout/LayoutTests/imported/w3c/web-platform-tests/cssom/existing-test-expected.txt'))
+        self.assertTrue(fs.exists('/home/mock-checkout/LayoutTests/imported/w3c/web-platform-tests/cssom-view/old-test.html'))
+        self.assertTrue(fs.exists('/home/mock-checkout/LayoutTests/imported/w3c/web-platform-tests/cssom-view/old-test-expected.txt'))
+        self.assertFalse(fs.exists('/home/mock-checkout/LayoutTests/imported/w3c/web-platform-tests/cssom/old-test.html'))
+        self.assertFalse(fs.exists('/home/mock-checkout/LayoutTests/imported/w3c/web-platform-tests/cssom/old-test-expected.txt'))
+        self.assertTrue(fs.exists('/home/mock-checkout/LayoutTests/imported/w3c/web-platform-tests/cssom/existing-test.html'))
+        self.assertTrue(fs.exists('/home/mock-checkout/LayoutTests/imported/w3c/web-platform-tests/cssom/existing-test-expected.txt'))
 
-        resource_files = json.loads(fs.read_text_file('/mock-checkout/LayoutTests/imported/w3c/resources/resource-files.json'))
+        resource_files = json.loads(fs.read_text_file('/home/mock-checkout/LayoutTests/imported/w3c/resources/resource-files.json'))
         self.assertIn("web-platform-tests/cssom-view/old-support.html", resource_files["files"])
         self.assertNotIn("web-platform-tests/cssom/old-support.html", resource_files["files"])
 
-        tests_options = json.loads(fs.read_text_file('/mock-checkout/LayoutTests/tests-options.json'))
+        tests_options = json.loads(fs.read_text_file('/home/mock-checkout/LayoutTests/tests-options.json'))
         self.assertIn("imported/w3c/web-platform-tests/cssom-view/old-test.html", tests_options)
         self.assertNotIn("imported/w3c/web-platform-tests/cssom/old-test.html", tests_options)
 
     def test_initpy_generation(self):
         FAKE_FILES = {
-            '/mock-checkout/WebKitBuild/w3c-tests/csswg-tests/.gitmodules': '[submodule "tools/resources"]\n	path = tools/resources\n	url = https://github.com/w3c/testharness.js.git\n  ignore = dirty\n',
-            '/mock-checkout/WebKitBuild/w3c-tests/web-platform-tests/.gitmodules': '[submodule "tools/resources"]\n	path = tools/resources\n	url = https://github.com/w3c/testharness.js.git\n  ignore = dirty\n',
+            '/home/mock-checkout/w3c-tests/csswg-tests/.gitmodules': '[submodule "tools/resources"]\n	path = tools/resources\n	url = https://github.com/w3c/testharness.js.git\n  ignore = dirty\n',
+            f'{FAKE_WPT_DIR}/.gitmodules': '[submodule "tools/resources"]\n	path = tools/resources\n	url = https://github.com/w3c/testharness.js.git\n  ignore = dirty\n',
         }
 
         FAKE_FILES.update(FAKE_RESOURCES)
@@ -460,17 +462,17 @@ class TestImporterTest(unittest.TestCase):
 
         fs = self.import_downloaded_tests(['--no-fetch', '--import-all', '--no-clean-dest-dir', '-d', 'w3c'], FAKE_FILES)
 
-        self.assertFalse(fs.exists('/mock-checkout/LayoutTests/w3c/csswg-tests/__init__.py'))
-        self.assertTrue(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/__init__.py'))
-        self.assertTrue(fs.getsize('/mock-checkout/LayoutTests/w3c/web-platform-tests/__init__.py') > 0)
+        self.assertFalse(fs.exists('/home/mock-checkout/LayoutTests/w3c/csswg-tests/__init__.py'))
+        self.assertTrue(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/__init__.py'))
+        self.assertTrue(fs.getsize('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/__init__.py') > 0)
 
     def test_remove_obsolete_content(self):
         FAKE_FILES = {
-            '/mock-checkout/WebKitBuild/w3c-tests/csswg-tests/temp': '',
-            '/mock-checkout/WebKitBuild/w3c-tests/web-platform-tests/t/new.html': MINIMAL_TESTHARNESS,
-            '/mock-checkout/WebKitBuild/w3c-tests/web-platform-tests/t/w3c-import.log': 'List of files:\n/LayoutTests/w3c/web-platform-tests/t/obsolete.html',
-            '/mock-checkout/LayoutTests/w3c/web-platform-tests/t/obsolete.html': 'obsoleted content',
-            '/mock-checkout/LayoutTests/w3c/web-platform-tests/t/obsolete-expected.txt': 'PASS',
+            '/home/mock-checkout/w3c-tests/csswg-tests/temp': '',
+            f'{FAKE_WPT_DIR}/t/new.html': MINIMAL_TESTHARNESS,
+            f'{FAKE_WPT_DIR}/t/w3c-import.log': 'List of files:\n/LayoutTests/w3c/web-platform-tests/t/obsolete.html',
+            '/home/mock-checkout/LayoutTests/w3c/web-platform-tests/t/obsolete.html': 'obsoleted content',
+            '/home/mock-checkout/LayoutTests/w3c/web-platform-tests/t/obsolete-expected.txt': 'PASS',
         }
 
         FAKE_FILES.update(FAKE_RESOURCES)
@@ -479,43 +481,45 @@ class TestImporterTest(unittest.TestCase):
         host.executive = MockExecutive2()
         host.filesystem = MockFileSystem(files=FAKE_FILES)
 
-        fs = self.import_downloaded_tests(['--no-fetch', '--import-all', '--no-clean-dest-dir', '-d', 'w3c'], FAKE_FILES)
+        with OutputCapture():
+            fs = self.import_downloaded_tests(['--no-fetch', '--import-all', '--no-clean-dest-dir', '-d', 'w3c'], FAKE_FILES)
 
-        self.assertFalse(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/t/obsolete.html'))
-        self.assertFalse(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/t/obsolete-expected.txt'))
-        self.assertTrue(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/t/new.html'))
+        self.assertFalse(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/t/obsolete.html'))
+        self.assertFalse(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/t/obsolete-expected.txt'))
+        self.assertTrue(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/t/new.html'))
 
     def test_manual_slow_test(self):
         tests_options = '{"a": ["slow"]}'
         FAKE_FILES = {
-            '/mock-checkout/WebKitBuild/w3c-tests/csswg-tests/temp': '',
-            '/mock-checkout/WebKitBuild/w3c-tests/web-platform-tests/t/new-manual.html': '<!doctype html><meta name="timeout" content="long"><script src="/resources/testharness.js"></script><script src="/resources/testharnessreport.js"></script>',
-            '/mock-checkout/LayoutTests/tests-options.json': tests_options}
+            '/home/mock-checkout/w3c-tests/csswg-tests/temp': '',
+            f'{FAKE_WPT_DIR}/t/new-manual.html': '<!doctype html><meta name="timeout" content="long"><script src="/resources/testharness.js"></script><script src="/resources/testharnessreport.js"></script>',
+            '/home/mock-checkout/LayoutTests/tests-options.json': tests_options}
         FAKE_FILES.update(FAKE_RESOURCES)
 
         host = MockHost()
         host.executive = MockExecutive2()
         host.filesystem = MockFileSystem(files=FAKE_FILES)
 
-        fs = self.import_downloaded_tests(['--no-fetch', '--import-all', '--no-clean-dest-dir', '-d', 'w3c'], FAKE_FILES)
-        self.assertFalse(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/t/new-manual.html'))
-        self.assertEqual(tests_options, fs.read_text_file('/mock-checkout/LayoutTests/tests-options.json'))
+        with OutputCapture():
+            fs = self.import_downloaded_tests(['--no-fetch', '--import-all', '--no-clean-dest-dir', '-d', 'w3c'], FAKE_FILES)
+        self.assertFalse(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/t/new-manual.html'))
+        self.assertEqual(tests_options, fs.read_text_file('/home/mock-checkout/LayoutTests/tests-options.json'))
 
     def test_crash_test_with_resource_file(self):
         FAKE_FILES = {
             '/home/user/wpt/web-platform-tests/css/css-images/test-crash.html': '<!DOCTYPE html>',
             '/home/user/wpt/web-platform-tests/css/css-images/some-file.html': '<!DOCTYPE html>',
             '/home/user/wpt/web-platform-tests/css/css-images/resources/some-file.html': '<!DOCTYPE html>',
-            '/mock-checkout/LayoutTests/imported/w3c/resources/resource-files.json': '{"directories": [], "files": []}',
+            '/home/mock-checkout/LayoutTests/imported/w3c/resources/resource-files.json': '{"directories": [], "files": []}',
         }
         FAKE_FILES.update(FAKE_RESOURCES)
 
-        fs = self.import_directory(['-s', '/home/user/wpt', '-d', '/mock-checkout/LayoutTests/imported/w3c/web-platform-tests'], FAKE_FILES, ['web-platform-tests/css/css-images'])
-        self.assertTrue(fs.exists('/mock-checkout/LayoutTests/imported/w3c/web-platform-tests/web-platform-tests/css/css-images/test-crash.html'))
-        self.assertTrue(fs.exists('/mock-checkout/LayoutTests/imported/w3c/web-platform-tests/web-platform-tests/css/css-images/some-file.html'))
-        self.assertTrue(fs.exists('/mock-checkout/LayoutTests/imported/w3c/web-platform-tests/web-platform-tests/css/css-images/resources/some-file.html'))
+        fs = self.import_directory(['-s', '/home/user/wpt', '-d', '/home/mock-checkout/LayoutTests/imported/w3c/web-platform-tests'], FAKE_FILES, ['web-platform-tests/css/css-images'])
+        self.assertTrue(fs.exists('/home/mock-checkout/LayoutTests/imported/w3c/web-platform-tests/web-platform-tests/css/css-images/test-crash.html'))
+        self.assertTrue(fs.exists('/home/mock-checkout/LayoutTests/imported/w3c/web-platform-tests/web-platform-tests/css/css-images/some-file.html'))
+        self.assertTrue(fs.exists('/home/mock-checkout/LayoutTests/imported/w3c/web-platform-tests/web-platform-tests/css/css-images/resources/some-file.html'))
 
-        self.assertEqual(fs.read_text_file('/mock-checkout/LayoutTests/imported/w3c/resources/resource-files.json'), """{
+        self.assertEqual(fs.read_text_file('/home/mock-checkout/LayoutTests/imported/w3c/resources/resource-files.json'), """{
     "directories": [],
     "files": [
         "web-platform-tests/css/css-images/some-file.html"
@@ -524,52 +528,54 @@ class TestImporterTest(unittest.TestCase):
 
     def test_webkit_test_runner_options(self):
         FAKE_FILES = {
-            '/mock-checkout/WebKitBuild/w3c-tests/csswg-tests/t/test.html': '<!doctype html><script src="/resources/testharness.js"></script><script src="/resources/testharnessreport.js"></script>',
-            '/mock-checkout/WebKitBuild/w3c-tests/web-platform-tests/css/test.html': '<!doctype html>\n<script src="/resources/testharness.js"></script><script src="/resources/testharnessreport.js"></script>',
-            '/mock-checkout/LayoutTests/w3c/web-platform-tests/css/test.html': '<!-- doctype html --><!-- webkit-test-runner [ dummy ] -->',
-            '/mock-checkout/WebKitBuild/w3c-tests/web-platform-tests/t/test.html': '<!doctype html><script src="/resources/testharness.js"></script><script src="/resources/testharnessreport.js"></script>',
-            '/mock-checkout/LayoutTests/w3c/web-platform-tests/t/test.html': '<!-- doctype html --><!-- webkit-test-runner [ dummy ] -->',
-            '/mock-checkout/WebKitBuild/w3c-tests/web-platform-tests/t/test.any.js': 'test(() => {}, "empty")',
-            '/mock-checkout/LayoutTests/w3c/web-platform-tests/t/test.any.html': '<!-- This file is required for WebKit test infrastructure to run the templated test --><!-- webkit-test-runner [ dummy ] -->',
-            '/mock-checkout/Source/WebCore/css/CSSProperties.json': '',
-            '/mock-checkout/Source/WebCore/css/CSSValueKeywords.in': '',
+            '/home/mock-checkout/w3c-tests/csswg-tests/t/test.html': '<!doctype html><script src="/resources/testharness.js"></script><script src="/resources/testharnessreport.js"></script>',
+            f'{FAKE_WPT_DIR}/css/test.html': '<!doctype html>\n<script src="/resources/testharness.js"></script><script src="/resources/testharnessreport.js"></script>',
+            '/home/mock-checkout/LayoutTests/w3c/web-platform-tests/css/test.html': '<!-- doctype html --><!-- webkit-test-runner [ dummy ] -->',
+            f'{FAKE_WPT_DIR}/t/test.html': '<!doctype html><script src="/resources/testharness.js"></script><script src="/resources/testharnessreport.js"></script>',
+            '/home/mock-checkout/LayoutTests/w3c/web-platform-tests/t/test.html': '<!-- doctype html --><!-- webkit-test-runner [ dummy ] -->',
+            f'{FAKE_WPT_DIR}/t/test.any.js': 'test(() => {}, "empty")',
+            '/home/mock-checkout/LayoutTests/w3c/web-platform-tests/t/test.any.html': '<!-- This file is required for WebKit test infrastructure to run the templated test --><!-- webkit-test-runner [ dummy ] -->',
+            '/home/mock-checkout/Source/WebCore/css/CSSProperties.json': '',
+            '/home/mock-checkout/Source/WebCore/css/CSSValueKeywords.in': '',
         }
         FAKE_FILES.update(FAKE_RESOURCES)
 
-        fs = self.import_downloaded_tests(['--no-fetch', '--import-all', '--no-clean-dest-dir', '-d', 'w3c'], FAKE_FILES)
+        with OutputCapture():
+            fs = self.import_downloaded_tests(['--no-fetch', '--import-all', '--no-clean-dest-dir', '-d', 'w3c'], FAKE_FILES)
 
-        self.assertTrue(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/css/test.html'))
-        self.assertTrue(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/t/test.html'))
-        self.assertTrue(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/t/test.any.html'))
-        self.assertTrue(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/t/test.any.worker.html'))
-        self.assertFalse(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/t/test.any.serviceworker.html'))
-        self.assertFalse(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/t/test.any.sharedworker.html'))
-        self.assertTrue('<!-- webkit-test-runner [ dummy ] -->' in fs.read_text_file('/mock-checkout/LayoutTests/w3c/web-platform-tests/css/test.html').split('\n')[0])
-        self.assertTrue('<!-- webkit-test-runner [ dummy ] -->' in fs.read_text_file('/mock-checkout/LayoutTests/w3c/web-platform-tests/t/test.html').split('\n')[0])
-        self.assertTrue('<!-- webkit-test-runner [ dummy ] -->' in fs.read_text_file('/mock-checkout/LayoutTests/w3c/web-platform-tests/t/test.any.html').split('\n')[0])
-        self.assertFalse('<!-- webkit-test-runner [ dummy ] -->' in fs.read_text_file('/mock-checkout/LayoutTests/w3c/web-platform-tests/t/test.any.worker.html').split('\n')[0])
+        self.assertTrue(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/css/test.html'))
+        self.assertTrue(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/t/test.html'))
+        self.assertTrue(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/t/test.any.html'))
+        self.assertTrue(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/t/test.any.worker.html'))
+        self.assertFalse(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/t/test.any.serviceworker.html'))
+        self.assertFalse(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/t/test.any.sharedworker.html'))
+        self.assertTrue('<!-- webkit-test-runner [ dummy ] -->' in fs.read_text_file('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/css/test.html').split('\n')[0])
+        self.assertTrue('<!-- webkit-test-runner [ dummy ] -->' in fs.read_text_file('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/t/test.html').split('\n')[0])
+        self.assertTrue('<!-- webkit-test-runner [ dummy ] -->' in fs.read_text_file('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/t/test.any.html').split('\n')[0])
+        self.assertFalse('<!-- webkit-test-runner [ dummy ] -->' in fs.read_text_file('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/t/test.any.worker.html').split('\n')[0])
 
     def test_webkit_test_runner_import_reftests_with_absolute_paths_download(self):
         FAKE_FILES = {
-            '/mock-checkout/WebKitBuild/w3c-tests/web-platform-tests/css/css-images/test3.html': '<html><head><link rel=match href=/css/css-images/test3-ref.html></head></html>',
-            '/mock-checkout/WebKitBuild/w3c-tests/web-platform-tests/css/css-images/test3-ref.html': '<html></html>',
-            '/mock-checkout/WebKitBuild/w3c-tests/web-platform-tests/css/css-images/test4.html': '<html><head><link rel=match href=/some/directory/in/wpt-root/test4-ref.html></head></html>',
-            '/mock-checkout/WebKitBuild/w3c-tests/web-platform-tests/some/directory/in/wpt-root/test4-ref.html': '<html></html>',
-            '/mock-checkout/WebKitBuild/w3c-tests/web-platform-tests/css/css-images/test5.html': '<html><head><link rel=match href="     /some/directory/in/wpt-root/test5-ref.html    "></head></html>',
-            '/mock-checkout/WebKitBuild/w3c-tests/web-platform-tests/some/directory/in/wpt-root/test5-ref.html': '<html></html>',
+            f'{FAKE_WPT_DIR}/css/css-images/test3.html': '<html><head><link rel=match href=/css/css-images/test3-ref.html></head></html>',
+            f'{FAKE_WPT_DIR}/css/css-images/test3-ref.html': '<html></html>',
+            f'{FAKE_WPT_DIR}/css/css-images/test4.html': '<html><head><link rel=match href=/some/directory/in/wpt-root/test4-ref.html></head></html>',
+            f'{FAKE_WPT_DIR}/some/directory/in/wpt-root/test4-ref.html': '<html></html>',
+            f'{FAKE_WPT_DIR}/css/css-images/test5.html': '<html><head><link rel=match href="     /some/directory/in/wpt-root/test5-ref.html    "></head></html>',
+            f'{FAKE_WPT_DIR}/some/directory/in/wpt-root/test5-ref.html': '<html></html>',
         }
         FAKE_FILES.update(FAKE_RESOURCES)
 
-        fs = self.import_downloaded_tests(['--no-fetch', '--import-all', '--no-clean-dest-dir', '-d', 'w3c'], FAKE_FILES)
+        with OutputCapture():
+            fs = self.import_downloaded_tests(['--no-fetch', '--import-all', '--no-clean-dest-dir', '-d', 'w3c'], FAKE_FILES)
         # test3
-        self.assertTrue(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/css/css-images/test3.html'))
-        self.assertTrue(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/css/css-images/test3-expected.html'))
+        self.assertTrue(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/css/css-images/test3.html'))
+        self.assertTrue(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/css/css-images/test3-expected.html'))
         # test4
-        self.assertTrue(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/css/css-images/test4.html'))
-        self.assertTrue(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/css/css-images/test4-expected.html'))
+        self.assertTrue(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/css/css-images/test4.html'))
+        self.assertTrue(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/css/css-images/test4-expected.html'))
         # test5
-        self.assertTrue(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/css/css-images/test5.html'))
-        self.assertTrue(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/css/css-images/test5-expected.html'))
+        self.assertTrue(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/css/css-images/test5.html'))
+        self.assertTrue(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/css/css-images/test5-expected.html'))
 
     def test_webkit_test_runner_import_reftests_with_absolute_paths_from_source_dir(self):
         FAKE_FILES = {
@@ -585,19 +591,19 @@ class TestImporterTest(unittest.TestCase):
         }
         FAKE_FILES.update(FAKE_RESOURCES)
 
-        fs = self.import_directory(['-s', '/home/user/wpt', '-d', '/mock-checkout/LayoutTests/w3c/web-platform-tests'], FAKE_FILES, ['web-platform-tests/css/css-images'])
+        fs = self.import_directory(['-s', '/home/user/wpt', '-d', '/home/mock-checkout/LayoutTests/w3c/web-platform-tests'], FAKE_FILES, ['web-platform-tests/css/css-images'])
         # test1
-        self.assertTrue(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/web-platform-tests/css/css-images/test1.html'))
-        self.assertTrue(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/web-platform-tests/css/css-images/test1-expected.html'))
+        self.assertTrue(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/web-platform-tests/css/css-images/test1.html'))
+        self.assertTrue(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/web-platform-tests/css/css-images/test1-expected.html'))
         # test2
-        self.assertTrue(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/web-platform-tests/css/css-images/test2.html'))
-        self.assertFalse(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/web-platform-tests/css/css-images/test2-expected.html'))
+        self.assertTrue(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/web-platform-tests/css/css-images/test2.html'))
+        self.assertFalse(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/web-platform-tests/css/css-images/test2-expected.html'))
         # test3
-        self.assertTrue(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/web-platform-tests/css/css-images/test3.html'))
-        self.assertFalse(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/web-platform-tests/css/css-images/test3-expected.html'))
+        self.assertTrue(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/web-platform-tests/css/css-images/test3.html'))
+        self.assertFalse(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/web-platform-tests/css/css-images/test3-expected.html'))
         # test4
-        self.assertTrue(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/web-platform-tests/css/css-images/test4.html'))
-        self.assertFalse(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/web-platform-tests/css/css-images/test4-expected.html'))
+        self.assertTrue(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/web-platform-tests/css/css-images/test4.html'))
+        self.assertFalse(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/web-platform-tests/css/css-images/test4-expected.html'))
 
     def test_keep_original_reftest_reference(self):
         FAKE_FILES = {
@@ -608,87 +614,90 @@ class TestImporterTest(unittest.TestCase):
         }
         FAKE_FILES.update(FAKE_RESOURCES)
 
-        fs = self.import_directory(['-s', '/home/user/wpt', '-d', '/mock-checkout/LayoutTests/w3c/web-platform-tests'], FAKE_FILES, ['web-platform-tests/css/css-images'])
+        fs = self.import_directory(['-s', '/home/user/wpt', '-d', '/home/mock-checkout/LayoutTests/w3c/web-platform-tests'], FAKE_FILES, ['web-platform-tests/css/css-images'])
 
         # test1
-        self.assertTrue(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/web-platform-tests/css/css-images/test1.html'))
-        self.assertTrue(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/web-platform-tests/css/css-images/test1-ref.html'))
-        self.assertTrue(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/web-platform-tests/css/css-images/test1-expected.html'))
+        self.assertTrue(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/web-platform-tests/css/css-images/test1.html'))
+        self.assertTrue(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/web-platform-tests/css/css-images/test1-ref.html'))
+        self.assertTrue(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/web-platform-tests/css/css-images/test1-expected.html'))
 
         # test2
-        self.assertTrue(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/web-platform-tests/css/css-images/test2.html'))
-        self.assertTrue(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/web-platform-tests/css/css-images/test2-notref.html'))
-        self.assertTrue(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/web-platform-tests/css/css-images/test2-expected-mismatch.html'))
+        self.assertTrue(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/web-platform-tests/css/css-images/test2.html'))
+        self.assertTrue(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/web-platform-tests/css/css-images/test2-notref.html'))
+        self.assertTrue(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/web-platform-tests/css/css-images/test2-expected-mismatch.html'))
 
     def test_template_test(self):
         FAKE_FILES = {
-            '/mock-checkout/WebKitBuild/w3c-tests/web-platform-tests/t/test.any.js': '// META: global=window,dedicatedworker,sharedworker,serviceworker\n',
-            '/mock-checkout/WebKitBuild/w3c-tests/web-platform-tests/t/test2.any.js': '\n// META: global=dedicatedworker,serviceworker\n',
-            '/mock-checkout/WebKitBuild/w3c-tests/web-platform-tests/t/test3.any.js': '\n// META: global=worker\n',
-            '/mock-checkout/WebKitBuild/w3c-tests/web-platform-tests/t/test4.any.js': '\n// META: global=dedicatedworker\n',
-            '/mock-checkout/WebKitBuild/w3c-tests/web-platform-tests/t/test5.any.js': '\n// META: global=window,worker\n',
+            f'{FAKE_WPT_DIR}/t/test.any.js': '// META: global=window,dedicatedworker,sharedworker,serviceworker\n',
+            f'{FAKE_WPT_DIR}/t/test2.any.js': '\n// META: global=dedicatedworker,serviceworker\n',
+            f'{FAKE_WPT_DIR}/t/test3.any.js': '\n// META: global=worker\n',
+            f'{FAKE_WPT_DIR}/t/test4.any.js': '\n// META: global=dedicatedworker\n',
+            f'{FAKE_WPT_DIR}/t/test5.any.js': '\n// META: global=window,worker\n',
         }
         FAKE_FILES.update(FAKE_RESOURCES)
 
-        fs = self.import_downloaded_tests(['--no-fetch', '--import-all', '--no-clean-dest-dir', '-d', 'w3c'], FAKE_FILES)
+        with OutputCapture():
+            fs = self.import_downloaded_tests(['--no-fetch', '--import-all', '--no-clean-dest-dir', '-d', 'w3c'], FAKE_FILES)
 
-        self.assertTrue(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/t/test.any.html'))
-        self.assertTrue(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/t/test.any.worker.html'))
-        self.assertTrue(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/t/test.any.serviceworker.html'))
-        self.assertTrue(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/t/test.any.sharedworker.html'))
+        self.assertTrue(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/t/test.any.html'))
+        self.assertTrue(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/t/test.any.worker.html'))
+        self.assertTrue(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/t/test.any.serviceworker.html'))
+        self.assertTrue(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/t/test.any.sharedworker.html'))
 
-        self.assertFalse(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/t/test2.any.html'))
-        self.assertTrue(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/t/test2.any.worker.html'))
-        self.assertTrue(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/t/test2.any.serviceworker.html'))
-        self.assertFalse(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/t/test2.any.sharedworker.html'))
+        self.assertFalse(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/t/test2.any.html'))
+        self.assertTrue(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/t/test2.any.worker.html'))
+        self.assertTrue(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/t/test2.any.serviceworker.html'))
+        self.assertFalse(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/t/test2.any.sharedworker.html'))
 
-        self.assertTrue(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/t/test3.any.worker.html'))
-        self.assertTrue(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/t/test3.any.serviceworker.html'))
-        self.assertTrue(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/t/test3.any.sharedworker.html'))
-        self.assertFalse(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/t/test3.any.html'))
+        self.assertTrue(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/t/test3.any.worker.html'))
+        self.assertTrue(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/t/test3.any.serviceworker.html'))
+        self.assertTrue(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/t/test3.any.sharedworker.html'))
+        self.assertFalse(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/t/test3.any.html'))
 
-        self.assertTrue(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/t/test4.any.worker.html'))
-        self.assertFalse(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/t/test4.any.sharedworker.html'))
-        self.assertFalse(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/t/test4.any.serviceworker.html'))
-        self.assertFalse(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/t/test4.any.html'))
+        self.assertTrue(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/t/test4.any.worker.html'))
+        self.assertFalse(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/t/test4.any.sharedworker.html'))
+        self.assertFalse(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/t/test4.any.serviceworker.html'))
+        self.assertFalse(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/t/test4.any.html'))
 
-        self.assertTrue(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/t/test5.any.html'))
-        self.assertTrue(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/t/test5.any.worker.html'))
-        self.assertTrue(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/t/test5.any.serviceworker.html'))
-        self.assertTrue(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/t/test5.any.sharedworker.html'))
+        self.assertTrue(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/t/test5.any.html'))
+        self.assertTrue(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/t/test5.any.worker.html'))
+        self.assertTrue(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/t/test5.any.serviceworker.html'))
+        self.assertTrue(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/t/test5.any.sharedworker.html'))
 
     def test_template_test_variant(self):
         FAKE_FILES = {
-            '/mock-checkout/WebKitBuild/w3c-tests/web-platform-tests/t/variant.any.js': '// META: variant=?1-10\n// META: variant=?11-20',
+            f'{FAKE_WPT_DIR}/t/variant.any.js': '// META: variant=?1-10\n// META: variant=?11-20',
         }
         FAKE_FILES.update(FAKE_RESOURCES)
 
-        fs = self.import_downloaded_tests(['--no-fetch', '--import-all', '--no-clean-dest-dir', '-d', 'w3c'], FAKE_FILES)
+        with OutputCapture():
+            fs = self.import_downloaded_tests(['--no-fetch', '--import-all', '--no-clean-dest-dir', '-d', 'w3c'], FAKE_FILES)
 
-        self.assertTrue(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/t/variant.any.html'))
-        self.assertTrue('<!-- META: variant=?1-10 -->' in fs.read_text_file('/mock-checkout/LayoutTests/w3c/web-platform-tests/t/variant.any.html'))
-        self.assertTrue('<!-- META: variant=?11-20 -->' in fs.read_text_file('/mock-checkout/LayoutTests/w3c/web-platform-tests/t/variant.any.html'))
+        self.assertTrue(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/t/variant.any.html'))
+        self.assertTrue('<!-- META: variant=?1-10 -->' in fs.read_text_file('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/t/variant.any.html'))
+        self.assertTrue('<!-- META: variant=?11-20 -->' in fs.read_text_file('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/t/variant.any.html'))
 
     def test_template_test_variant_dangling(self):
         FAKE_FILES = {
-            '/mock-checkout/WebKitBuild/w3c-tests/web-platform-tests/t/variant.any.js': '// META: variant=?1-10\n// META: variant=?11-20',
-            '/mock-checkout/LayoutTests/w3c/web-platform-tests/t/variant.any.js': '// META: variant=?1-10\n// META: variant=?11-20',
-            '/mock-checkout/LayoutTests/w3c/web-platform-tests/t/variant.any_1-10-expected.txt': '1',
-            '/mock-checkout/LayoutTests/w3c/web-platform-tests/t/variant.any_11-20-expected.txt': '2',
-            '/mock-checkout/LayoutTests/w3c/web-platform-tests/t/variant.any_21-30-expected.txt': '3',
+            f'{FAKE_WPT_DIR}/t/variant.any.js': '// META: variant=?1-10\n// META: variant=?11-20',
+            '/home/mock-checkout/LayoutTests/w3c/web-platform-tests/t/variant.any.js': '// META: variant=?1-10\n// META: variant=?11-20',
+            '/home/mock-checkout/LayoutTests/w3c/web-platform-tests/t/variant.any_1-10-expected.txt': '1',
+            '/home/mock-checkout/LayoutTests/w3c/web-platform-tests/t/variant.any_11-20-expected.txt': '2',
+            '/home/mock-checkout/LayoutTests/w3c/web-platform-tests/t/variant.any_21-30-expected.txt': '3',
         }
         FAKE_FILES.update(FAKE_RESOURCES)
 
-        fs = self.import_downloaded_tests(['--no-fetch', '--import-all', '--no-clean-dest-dir', '-d', 'w3c'], FAKE_FILES)
+        with OutputCapture():
+            fs = self.import_downloaded_tests(['--no-fetch', '--import-all', '--no-clean-dest-dir', '-d', 'w3c'], FAKE_FILES)
 
-        self.assertTrue(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/t/variant.any.html'))
-        self.assertTrue(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/t/variant.any_1-10-expected.txt'))
-        self.assertTrue(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/t/variant.any_11-20-expected.txt'))
-        self.assertFalse(fs.exists('/mock-checkout/LayoutTests/w3c/web-platform-tests/t/variant.any_21-30-expected.txt'))
+        self.assertTrue(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/t/variant.any.html'))
+        self.assertTrue(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/t/variant.any_1-10-expected.txt'))
+        self.assertTrue(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/t/variant.any_11-20-expected.txt'))
+        self.assertFalse(fs.exists('/home/mock-checkout/LayoutTests/w3c/web-platform-tests/t/variant.any_21-30-expected.txt'))
 
     def test_non_dangling_platform(self):
         FAKE_FILES = {
-            '/mock-checkout/WebKitBuild/w3c-tests/web-platform-tests/t/test.html': MINIMAL_TESTHARNESS,
+            f'{FAKE_WPT_DIR}/t/test.html': MINIMAL_TESTHARNESS,
             '/test.checkout/LayoutTests/imported/w3c/resources/import-expectations.json': '{}',
             '/test.checkout/LayoutTests/w3c/web-platform-tests/t/test.html': MINIMAL_TESTHARNESS,
             '/test.checkout/LayoutTests/w3c/web-platform-tests/t/test-expected.txt': '1',
@@ -696,8 +705,10 @@ class TestImporterTest(unittest.TestCase):
             '/test.checkout/LayoutTests/platform/test-linux-x86_64/w3c/web-platform-tests/t/test-expected.txt': '3',
             '/test.checkout/LayoutTests/platform/unknown-platform/w3c/web-platform-tests/t/test-expected.txt': '4',
         }
+        FAKE_FILES.update(FAKE_RESOURCES)
 
-        fs = self.import_downloaded_tests(['--no-fetch', '--import-all', '-d', 'w3c'], FAKE_FILES, test_port=True)
+        with OutputCapture():
+            fs = self.import_downloaded_tests(['--no-fetch', '--import-all', '-d', 'w3c'], FAKE_FILES, test_port=True)
 
         self.assertTrue(fs.exists('/test.checkout/LayoutTests/w3c/web-platform-tests/t/test.html'))
         self.assertTrue(fs.exists('/test.checkout/LayoutTests/w3c/web-platform-tests/t/test-expected.txt'))

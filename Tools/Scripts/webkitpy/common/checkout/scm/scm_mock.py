@@ -33,8 +33,8 @@ from webkitpy.common.system.executive_mock import MockExecutive
 
 
 class MockSCM(object):
-    def __init__(self, filesystem=None, executive=None):
-        self.checkout_root = "/mock-checkout"
+    def __init__(self, filesystem=None, executive=None, checkout_root='/mock-checkout'):
+        self.checkout_root = checkout_root
         self.added_paths = set()
         self._filesystem = filesystem or MockFileSystem()
         self._executive = executive or MockExecutive()
