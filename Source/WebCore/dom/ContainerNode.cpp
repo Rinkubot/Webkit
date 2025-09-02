@@ -40,6 +40,7 @@
 #include "GenericCachedHTMLCollection.h"
 #include "HTMLFormControlsCollection.h"
 #include "HTMLOptionsCollection.h"
+#include "HTMLScriptElement.h"
 #include "HTMLSlotElement.h"
 #include "HTMLTableRowsCollection.h"
 #include "InspectorInstrumentation.h"
@@ -50,6 +51,7 @@
 #include "NodeInlines.h"
 #include "NodeRareData.h"
 #include "NodeRenderStyle.h"
+#include "Quirks.h"
 #include "RadioNodeList.h"
 #include "RenderBox.h"
 #include "RenderTheme.h"
@@ -1146,6 +1148,29 @@ ExceptionOr<Element*> ContainerNode::querySelector(const String& selectors)
     return query.releaseReturnValue().queryFirst(*this);
 }
 
+#if ENABLE(MEDIA_STREAM)
+static Ref<Element> createFlagElement(Document& document, ASCIILiteral value)
+{
+    Ref text = Text::create(document, makeString("{\"require\":[[\"HasteSupportData\",\"handle\",null,[{\"gkxData\":{\""_s, value, "\":{\"result\":true,\"hash\":null}}}]]]}"_s));
+
+    Ref script = HTMLScriptElement::create(HTMLNames::scriptTag, document, false);
+    script->dataset().setNamedItem("contentLen"_s, AtomString { makeString(text->length()) });
+    script->appendChild(text);
+
+    return script;
+}
+
+static Vector<Ref<Element>> copyElements(NodeList& nodeList)
+{
+    Vector<Ref<Element>> elements;
+    for (size_t cptr = 0; cptr < nodeList.length(); ++cptr) {
+        if (RefPtr element = dynamicDowncast<Element>(nodeList.item(cptr)))
+            elements.append(element.releaseNonNull());
+    }
+    return elements;
+}
+#endif
+
 ExceptionOr<Ref<NodeList>> ContainerNode::querySelectorAll(const String& selectors)
 {
     Ref document = this->document();
@@ -1159,6 +1184,17 @@ ExceptionOr<Ref<NodeList>> ContainerNode::querySelectorAll(const String& selecto
     auto nodeList = query.releaseReturnValue().queryAll(*this);
     if (isCacheable)
         document->addResultForSelectorAll(*this, selectors, nodeList, classNameToMatch);
+
+#if ENABLE(MEDIA_STREAM)
+    if (document->quirks().shouldEnableLiveRecordingFlagQuirk() && nodeList->length() && selectors == "script[data-sjs]:not([data-processed])"_s) {
+        document->quirks().disableEnableLiveRecordingFlagQuirk();
+
+        auto elements = copyElements(nodeList);
+        elements.append(createFlagElement(document, "23460"_s));
+        nodeList = StaticElementList::create(WTFMove(elements));
+    }
+#endif
+
     return nodeList;
 }
 
