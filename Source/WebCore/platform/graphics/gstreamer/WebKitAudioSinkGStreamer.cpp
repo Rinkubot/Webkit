@@ -24,6 +24,8 @@
 
 #include "GStreamerAudioMixer.h"
 #include "GStreamerCommon.h"
+#include <wtf/FileSystem.h>
+#include <wtf/Scope.h>
 #include <wtf/glib/WTFGType.h>
 
 using namespace WebCore;
@@ -31,6 +33,11 @@ using namespace WebCore;
 struct _WebKitAudioSinkPrivate {
     GRefPtr<GstElement> interAudioSink;
     GRefPtr<GstPad> mixerPad;
+    GRefPtr<GstElement> volumeElement;
+    GRefPtr<GstElement> unixfdsink;
+    String socketPath;
+    AudioSinkStartedCallback audioSinkStartedCallback;
+    AudioSinkStoppedCallback audioSinkStoppedCallback;
 };
 
 enum {
@@ -50,8 +57,37 @@ WEBKIT_DEFINE_TYPE_WITH_CODE(WebKitAudioSink, webkit_audio_sink, GST_TYPE_BIN,
     GST_DEBUG_CATEGORY_INIT(webkit_audio_sink_debug, "webkitaudiosink", 0, "webkit audio sink element")
 )
 
-static bool webKitAudioSinkConfigure(WebKitAudioSink* sink)
+static bool webKitAudioSinkConfigure(WebKitAudioSink* sink, String&& socketPath)
 {
+    if (!socketPath.isEmpty()) {
+        FileSystem::makeAllDirectories(FileSystem::parentPath(socketPath));
+
+        if (!webkitGstCheckVersion(1, 27, 0)) {
+            gst_printerrln("GStreamer 1.28 with unixfd plugin is required");
+            return false;
+        }
+
+        sink->priv->unixfdsink = makeGStreamerElement("unixfdsink"_s);
+        if (!sink->priv->unixfdsink) {
+            gst_printerrln("Unable to find unixfdsink element, please install gst-plugins-bad.");
+            return false;
+        }
+
+        sink->priv->volumeElement = gst_element_factory_make("volume", nullptr);
+        auto queue = gst_element_factory_make("queue", nullptr);
+
+        g_object_set(sink->priv->unixfdsink.get(), "socket-path", socketPath.utf8().data(), "wait-for-connection", TRUE, nullptr);
+        sink->priv->socketPath = WTFMove(socketPath);
+        gst_bin_add_many(GST_BIN_CAST(sink), sink->priv->volumeElement.get(), queue, sink->priv->unixfdsink.get(), nullptr);
+        gst_element_link_many(sink->priv->volumeElement.get(), queue, sink->priv->unixfdsink.get(), nullptr);
+
+        auto targetPad = adoptGRef(gst_element_get_static_pad(sink->priv->volumeElement.get(), "sink"));
+        auto sinkPad = webkitGstGhostPadFromStaticTemplate(&audioSinkTemplate, "sink", targetPad.get());
+        gst_element_add_pad(GST_ELEMENT_CAST(sink), sinkPad);
+        GST_OBJECT_FLAG_SET(sinkPad, GST_PAD_FLAG_NEED_PARENT);
+        return true;
+    }
+
     const char* value = g_getenv("WEBKIT_GST_ENABLE_AUDIO_MIXER");
     if (value && !strcmp(value, "1")) {
         if (!GStreamerAudioMixer::isAvailable()) {
@@ -70,17 +106,28 @@ static bool webKitAudioSinkConfigure(WebKitAudioSink* sink)
     return false;
 }
 
+static GstObject* getInternalVolumeObject(WebKitAudioSink* sink)
+{
+    if (sink->priv->volumeElement)
+        return GST_OBJECT_CAST(sink->priv->volumeElement.get());
+
+    RELEASE_ASSERT(sink->priv->mixerPad);
+    return GST_OBJECT_CAST(sink->priv->mixerPad.get());
+}
+
 static void webKitAudioSinkSetProperty(GObject* object, guint propID, const GValue* value, GParamSpec* pspec)
 {
     WebKitAudioSink* sink = WEBKIT_AUDIO_SINK(object);
 
     switch (propID) {
     case WEBKIT_AUDIO_SINK_PROP_VOLUME: {
-        g_object_set_property(G_OBJECT(sink->priv->mixerPad.get()), "volume", value);
+        GstObject* internalObject = getInternalVolumeObject(sink);
+        g_object_set_property(G_OBJECT(internalObject), "volume", value);
         break;
     }
     case WEBKIT_AUDIO_SINK_PROP_MUTE: {
-        g_object_set_property(G_OBJECT(sink->priv->mixerPad.get()), "mute", value);
+        GstObject* internalObject = getInternalVolumeObject(sink);
+        g_object_set_property(G_OBJECT(internalObject), "mute", value);
         break;
     }
     default:
@@ -95,11 +142,13 @@ static void webKitAudioSinkGetProperty(GObject* object, guint propID, GValue* va
 
     switch (propID) {
     case WEBKIT_AUDIO_SINK_PROP_VOLUME: {
-        g_object_get_property(G_OBJECT(sink->priv->mixerPad.get()), "volume", value);
+        GstObject* internalObject = getInternalVolumeObject(sink);
+        g_object_get_property(G_OBJECT(internalObject), "volume", value);
         break;
     }
     case WEBKIT_AUDIO_SINK_PROP_MUTE: {
-        g_object_get_property(G_OBJECT(sink->priv->mixerPad.get()), "mute", value);
+        GstObject* internalObject = getInternalVolumeObject(sink);
+        g_object_get_property(G_OBJECT(internalObject), "mute", value);
         break;
     }
     default:
@@ -124,21 +173,58 @@ static GstStateChangeReturn webKitAudioSinkChangeState(GstElement* element, GstS
 
     GstStateChangeReturn result = GST_ELEMENT_CLASS(webkit_audio_sink_parent_class)->change_state(element, stateChange);
 
-    if (priv->mixerPad && stateChange == GST_STATE_CHANGE_READY_TO_NULL && result > GST_STATE_CHANGE_FAILURE) {
-        mixer.unregisterProducer(priv->mixerPad);
-        priv->mixerPad = nullptr;
-    }
+    if (result <= GST_STATE_CHANGE_FAILURE)
+        return result;
+
+    switch (stateChange) {
+    case GST_STATE_CHANGE_READY_TO_NULL:
+        if (priv->mixerPad) {
+            mixer.unregisterProducer(priv->mixerPad);
+            priv->mixerPad = nullptr;
+        }
+        break;
+    default:
+        break;
+    };
 
     return result;
+}
+
+static void webKitAudioSinkHandleMessage(GstBin* bin, GstMessage* message)
+{
+    auto self = WEBKIT_AUDIO_SINK(bin);
+    auto scopeExit = makeScopeExit([&] {
+        GST_BIN_CLASS(webkit_audio_sink_parent_class)->handle_message(bin, message);
+    });
+
+    if (self->priv->socketPath.isEmpty())
+        return;
+
+    if (GST_MESSAGE_TYPE(message) != GST_MESSAGE_STATE_CHANGED)
+        return;
+
+    if (GST_MESSAGE_SRC(message) != GST_OBJECT_CAST(self->priv->unixfdsink.get()))
+        return;
+
+    GstState currentState, newState;
+    gst_message_parse_state_changed(message, &currentState, &newState, nullptr);
+
+    if (currentState < GST_STATE_READY && newState == GST_STATE_READY && self->priv->audioSinkStartedCallback) {
+        self->priv->audioSinkStartedCallback(self->priv->socketPath);
+        return;
+    }
+
+    if (currentState == GST_STATE_READY && newState == GST_STATE_NULL && self->priv->audioSinkStoppedCallback)
+        self->priv->audioSinkStoppedCallback(self->priv->socketPath);
 }
 
 static void webKitAudioSinkConstructed(GObject* object)
 {
     G_OBJECT_CLASS(webkit_audio_sink_parent_class)->constructed(object);
-IGNORE_WARNINGS_BEGIN("cast-align")
+    IGNORE_WARNINGS_BEGIN("cast-align");
     GST_OBJECT_FLAG_SET(GST_OBJECT_CAST(object), GST_ELEMENT_FLAG_SINK);
     gst_bin_set_suppressed_flags(GST_BIN_CAST(object), static_cast<GstElementFlags>(GST_ELEMENT_FLAG_SOURCE | GST_ELEMENT_FLAG_SINK));
-IGNORE_WARNINGS_END
+    IGNORE_WARNINGS_END;
 }
 
 static void webkit_audio_sink_class_init(WebKitAudioSinkClass* klass)
@@ -158,16 +244,29 @@ static void webkit_audio_sink_class_init(WebKitAudioSinkClass* klass)
     GstElementClass* eklass = GST_ELEMENT_CLASS(klass);
     gst_element_class_add_static_pad_template(eklass, &audioSinkTemplate);
     gst_element_class_set_metadata(eklass, "WebKit Audio sink element", "Sink/Audio",
-        "Proxies audio data to WebKit's audio mixer",
+        "Proxies audio data to WebKit's audio mixer or to a WPE external audio handler",
         "Philippe Normand <philn@igalia.com>");
 
     eklass->change_state = GST_DEBUG_FUNCPTR(webKitAudioSinkChangeState);
+
+    auto binClass = GST_BIN_CLASS(klass);
+    binClass->handle_message = webKitAudioSinkHandleMessage;
 }
 
-GstElement* /* (transfer floating) */ webkitAudioSinkNew()
+void webkitAudioSinkSetStartedCallback(WebKitAudioSink* sink, AudioSinkStartedCallback&& callback)
+{
+    sink->priv->audioSinkStartedCallback = WTFMove(callback);
+}
+
+void webkitAudioSinkSetStoppedCallback(WebKitAudioSink* sink, AudioSinkStoppedCallback&& callback)
+{
+    sink->priv->audioSinkStoppedCallback = WTFMove(callback);
+}
+
+GstElement* /* (transfer floating) */ webkitAudioSinkNew(String&& socketPath)
 {
     auto* sink = GST_ELEMENT_CAST(g_object_new(WEBKIT_TYPE_AUDIO_SINK, nullptr));
-    if (!webKitAudioSinkConfigure(WEBKIT_AUDIO_SINK(sink))) {
+    if (!webKitAudioSinkConfigure(WEBKIT_AUDIO_SINK(sink), WTFMove(socketPath))) {
         gst_object_unref(sink);
         return nullptr;
     }

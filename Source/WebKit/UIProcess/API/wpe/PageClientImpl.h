@@ -163,6 +163,10 @@ private:
 
     void didRestoreScrollPosition() override;
 
+    void requestAudioSinkSocket(CompletionHandler<void(String)>&&) final;
+    void audioSinkStarted(const String&) final;
+    void audioSinkStopped(const String&) final;
+
 #if ENABLE(FULLSCREEN_API)
     WebFullScreenManagerProxyClient& fullScreenManagerProxyClient() final;
     void setFullScreenClientForTesting(std::unique_ptr<WebFullScreenManagerProxyClient>&&) final;

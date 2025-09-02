@@ -5937,6 +5937,23 @@ MediaSessionManagerInterface* Page::mediaSessionManagerForPageIdentifier(PageIde
     return manager.get();
 }
 
+#if ENABLE(WPE_PLATFORM)
+String Page::requestAudioSinkSocket()
+{
+    return m_chrome->client().requestAudioSinkSocket();
+}
+
+void Page::audioSinkStarted(const String& path)
+{
+    m_chrome->client().audioSinkStarted(path);
+}
+
+void Page::audioSinkStopped(const String& path)
+{
+    m_chrome->client().audioSinkStopped(path);
+}
+#endif
+
 #if HAVE(SUPPORT_HDR_DISPLAY)
 bool Page::drawsHDRContent() const
 {

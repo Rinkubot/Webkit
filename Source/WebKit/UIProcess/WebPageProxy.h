@@ -2602,6 +2602,12 @@ public:
     void preferredBufferFormatsDidChange();
 #endif
 
+#if ENABLE(WPE_PLATFORM)
+    void requestAudioSinkSocket(CompletionHandler<void(String)>&&);
+    void audioSinkStarted(const String &);
+    void audioSinkStopped(const String &);
+#endif
+
     WebPageProxyMessageReceiverRegistration& messageReceiverRegistration();
 
 #if HAVE(ESIM_AUTOFILL_SYSTEM_SUPPORT)
