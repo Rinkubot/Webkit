@@ -68,6 +68,7 @@ class OutlineValue;
 class PositionArea;
 class PseudoIdSet;
 class RenderElement;
+class RenderLayerFilters;
 class RenderStyle;
 class SVGRenderStyle;
 class ScrollTimeline;
@@ -2339,6 +2340,10 @@ public:
     inline bool insideSubmitButton() const;
     inline void setInsideSubmitButton(bool);
 
+    RenderLayerFilters* layerFilters() const { return m_layerFilters.get(); }
+    RenderLayerFilters& ensureLayerFilters();
+    void clearLayerFilters();
+
 private:
     struct NonInheritedFlags {
         bool operator==(const NonInheritedFlags&) const = default;
@@ -2470,6 +2475,9 @@ private:
     std::unique_ptr<PseudoStyleCache> m_cachedPseudoStyles;
 
     DataRef<SVGRenderStyle> m_svgStyle;
+
+    // list of associated pseudo styles
+    std::unique_ptr<RenderLayerFilters> m_layerFilters;
 
 #if ASSERT_ENABLED || ENABLE(SECURITY_ASSERTIONS)
     bool m_deletionHasBegun { false };

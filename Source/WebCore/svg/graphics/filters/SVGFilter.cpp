@@ -2,7 +2,7 @@
  * Copyright (C) 2009 Dirk Schulze <krit@webkit.org>
  * Copyright (C) Research In Motion Limited 2010. All rights reserved.
  * Copyright (C) 2013 Google Inc. All rights reserved.
- * Copyright (C) 2021-2023 Apple Inc. All rights reserved.
+ * Copyright (C) 2021-2025 Apple Inc. All rights reserved.
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Library General Public
@@ -276,19 +276,6 @@ FilterEffectVector SVGFilter::effectsOfType(FilterFunction::Type filterType) con
     }
 
     return effects;
-}
-
-FilterResults& SVGFilter::ensureResults(NOESCAPE const FilterResultsCreator& resultsCreator)
-{
-    if (!m_results)
-        m_results = resultsCreator();
-    return *m_results;
-}
-
-void SVGFilter::clearEffectResult(FilterEffect& effect)
-{
-    if (m_results)
-        m_results->clearEffectResult(effect);
 }
 
 void SVGFilter::mergeEffects(const FilterEffectVector& effects)

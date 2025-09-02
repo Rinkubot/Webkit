@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2011-2023 Apple Inc. All rights reserved.
+ * Copyright (C) 2011-2025 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -38,16 +38,11 @@ class RenderElement;
 class CSSFilter final : public Filter {
     WTF_MAKE_TZONE_ALLOCATED(CSSFilter);
 public:
-    static RefPtr<CSSFilter> create(RenderElement&, const FilterOperations&, OptionSet<FilterRenderingMode> preferredFilterRenderingModes, const FloatSize& filterScale, const FloatRect& targetBoundingBox, const GraphicsContext& destinationContext);
+    static RefPtr<CSSFilter> create(RenderElement&, const FilterOperations&, OptionSet<FilterRenderingMode> preferredFilterRenderingModes, const FloatSize& filterScale, const FloatRect& filterRegion, const FloatRect& targetBoundingBox, const GraphicsContext& destinationContext);
     WEBCORE_EXPORT static Ref<CSSFilter> create(Vector<Ref<FilterFunction>>&&);
     WEBCORE_EXPORT static Ref<CSSFilter> create(Vector<Ref<FilterFunction>>&&, OptionSet<FilterRenderingMode>, const FloatSize& filterScale, const FloatRect& filterRegion);
 
     const Vector<Ref<FilterFunction>>& functions() const { return m_functions; }
-
-    void setFilterRegion(const FloatRect&);
-
-    bool hasFilterThatMovesPixels() const { return m_hasFilterThatMovesPixels; }
-    bool hasFilterThatShouldBeRestrictedBySecurityOrigin() const { return m_hasFilterThatShouldBeRestrictedBySecurityOrigin; }
 
     FilterEffectVector effectsOfType(FilterFunction::Type) const final;
 
@@ -58,7 +53,7 @@ public:
     static IntOutsets calculateOutsets(RenderElement&, const FilterOperations&, const FloatRect& targetBoundingBox);
 
 private:
-    CSSFilter(const FloatSize& filterScale, bool hasFilterThatMovesPixels, bool hasFilterThatShouldBeRestrictedBySecurityOrigin);
+    CSSFilter(const FloatSize& filterScale, const FloatRect& filterRegion);
     CSSFilter(Vector<Ref<FilterFunction>>&&);
     CSSFilter(Vector<Ref<FilterFunction>>&&, const FloatSize& filterScale, const FloatRect& filterRegion);
 
@@ -67,9 +62,6 @@ private:
     OptionSet<FilterRenderingMode> supportedFilterRenderingModes() const final;
 
     WTF::TextStream& externalRepresentation(WTF::TextStream&, FilterRepresentation) const final;
-
-    bool m_hasFilterThatMovesPixels { false };
-    bool m_hasFilterThatShouldBeRestrictedBySecurityOrigin { false };
 
     Vector<Ref<FilterFunction>> m_functions;
 };

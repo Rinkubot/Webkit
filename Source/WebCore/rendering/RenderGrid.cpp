@@ -523,6 +523,7 @@ void RenderGrid::layoutGrid(RelayoutChildren relayoutChildren)
         computeOverflow(layoutOverflowLogicalBottom(*this));
 
         updateDescendantTransformsAfterLayout();
+        updateLayerFiltersAfterLayout();
     }
 
     updateLayerTransform();
@@ -660,6 +661,7 @@ void RenderGrid::layoutMasonry(RelayoutChildren relayoutChildren)
         computeOverflow(layoutOverflowLogicalBottom(*this));
 
         updateDescendantTransformsAfterLayout();
+        updateLayerFiltersAfterLayout();
     }
 
     updateLayerTransform();

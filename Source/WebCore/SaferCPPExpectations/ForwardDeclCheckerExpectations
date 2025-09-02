@@ -97,7 +97,6 @@ platform/PlatformStrategies.h
 platform/Scrollbar.h
 platform/ThreadGlobalData.h
 platform/cocoa/TelephoneNumberDetectorCocoa.cpp
-platform/graphics/ImageBufferContextSwitcher.h
 platform/graphics/StringTruncator.cpp
 platform/graphics/angle/ANGLEUtilities.cpp
 platform/graphics/angle/GraphicsContextGLANGLE.cpp
