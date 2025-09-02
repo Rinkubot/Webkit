@@ -583,22 +583,6 @@ void RemoteGraphicsContextProxy::drawControlPart(ControlPart& part, const FloatR
     send(Messages::RemoteGraphicsContext::DrawControlPart(part, borderRect, deviceScaleFactor, style));
 }
 
-#if USE(CG)
-
-void RemoteGraphicsContextProxy::applyStrokePattern()
-{
-    appendStateChangeItemIfNecessary();
-    send(Messages::RemoteGraphicsContext::ApplyStrokePattern());
-}
-
-void RemoteGraphicsContextProxy::applyFillPattern()
-{
-    appendStateChangeItemIfNecessary();
-    send(Messages::RemoteGraphicsContext::ApplyFillPattern());
-}
-
-#endif // USE(CG)
-
 void RemoteGraphicsContextProxy::applyDeviceScaleFactor(float scaleFactor)
 {
     updateStateForApplyDeviceScaleFactor(scaleFactor);

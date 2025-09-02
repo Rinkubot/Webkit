@@ -136,6 +136,11 @@ void GraphicsContextCairo::restore(GraphicsContextState::Purpose purpose)
     cairo_restore(m_cr.get());
 }
 
+void GraphicsContextCairo::drawGlyphs(const Font& font, std::span<const GlyphBufferGlyph> glyphs, std::span<const GlyphBufferAdvance> advances, const FloatPoint& point, FontSmoothingMode fontSmoothingMode)
+{
+    FontCascade::drawGlyphs(*this, font, glyphs, advances, point, fontSmoothingMode);
+}
+
 // Draws a filled rectangle with a stroked border.
 void GraphicsContextCairo::drawRect(const FloatRect& rect, float borderThickness)
 {

@@ -612,6 +612,18 @@ void SVGTextBoxPainter<TextBoxPath>::paintTextWithShadows(const RenderStyle& sty
                 usedContext->save();
 
             usedContext->scale(1 / scalingFactor);
+            // Skia, Cairo backend does not scale patterns correctly.
+            // https://bugs.webkit.org/show_bug.cgi?id=291897
+#if !USE(SKIA) && !USE(CAIRO)
+            if (paintingResourceMode().contains(RenderSVGResourceMode::ApplyToFill)) {
+                if (RefPtr pattern = usedContext->fillPattern())
+                    usedContext->setFillPattern(pattern->scaled(scalingFactor));
+            }
+            if (paintingResourceMode().contains(RenderSVGResourceMode::ApplyToStroke)) {
+                if (RefPtr pattern = usedContext->strokePattern())
+                    usedContext->setStrokePattern(pattern->scaled(scalingFactor));
+            }
+#endif
             scaledFont.drawText(*usedContext, textRun, textOrigin + shadowApplier.extraOffset(), startPosition, endPosition);
 
             if (!shadowApplier.didSaveContext())
