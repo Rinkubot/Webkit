@@ -73,6 +73,7 @@
 #include <WebCore/StyleViewTimelines.h>
 #include <WebCore/StyleViewTransitionClass.h>
 #include <WebCore/StyleViewTransitionName.h>
+#include <WebCore/StyleWebKitBoxReflect.h>
 #include <WebCore/StyleWebKitLineClamp.h>
 #include <WebCore/TouchAction.h>
 #include <memory>
@@ -97,7 +98,6 @@ class StyleFlexibleBoxData;
 class StyleGridData;
 class StyleGridItemData;
 class StyleMultiColData;
-class StyleReflection;
 class StyleResolver;
 class StyleTransformData;
 class WillChangeData;
@@ -174,8 +174,8 @@ public:
     CounterDirectiveMap counterDirectives;
 
     RefPtr<WillChangeData> willChange; // Null indicates 'auto'.
-    
-    RefPtr<StyleReflection> boxReflect;
+
+    Style::WebkitBoxReflect boxReflect;
 
     Style::MaskBorder maskBorder;
 
