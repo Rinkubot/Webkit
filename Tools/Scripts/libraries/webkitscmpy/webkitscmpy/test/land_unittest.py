@@ -72,7 +72,7 @@ class TestLand(testing.PathTestCase):
     def test_none(self):
         with OutputCapture(level=logging.INFO) as captured, mocks.local.Git(), mocks.local.Svn():
             self.assertEqual(1, program.main(
-                args=('land', '-v'),
+                args=('land', '-v', '--no-wpt-export'),
                 path=self.path,
             ))
         self.assertEqual(captured.stderr.getvalue(), 'No repository provided\n')
@@ -80,7 +80,7 @@ class TestLand(testing.PathTestCase):
     def test_non_editable(self):
         with OutputCapture(level=logging.INFO) as captured, mocks.local.Git(self.path), mocks.local.Svn():
             self.assertEqual(1, program.main(
-                args=('land', '-v'),
+                args=('land', '-v', '--no-wpt-export'),
                 path=self.path,
             ))
             self.assertEqual(str(local.Git(self.path).commit()), '5@main')
@@ -96,7 +96,7 @@ class TestLand(testing.PathTestCase):
     def test_with_oops(self):
         with OutputCapture(level=logging.INFO) as captured, repository(self.path), mocks.local.Svn():
             self.assertEqual(1, program.main(
-                args=('land', '-v'),
+                args=('land', '-v', '--no-wpt-export'),
                 path=self.path,
             ))
             self.assertEqual(str(local.Git(self.path).commit()), '3.1@eng/example')
@@ -117,7 +117,7 @@ class TestLand(testing.PathTestCase):
     def test_default(self):
         with OutputCapture(level=logging.INFO) as captured, repository(self.path, has_oops=False), mocks.local.Svn(), MockTerminal.input('n'):
             self.assertEqual(0, program.main(
-                args=('land', '-v'),
+                args=('land', '-v', '--no-wpt-export'),
                 path=self.path,
             ))
             self.assertEqual(str(local.Git(self.path).commit()), '6@main')
@@ -144,7 +144,7 @@ class TestLand(testing.PathTestCase):
     def test_canonicalize(self):
         with OutputCapture(level=logging.INFO) as captured, repository(self.path, has_oops=False), mocks.local.Svn(), MockTerminal.input('n'):
             self.assertEqual(0, program.main(
-                args=('land', '-v'),
+                args=('land', '-v', '--no-wpt-export'),
                 path=self.path,
                 identifier_template='Canonical link: https://commits.webkit.org/{}',
             ))
@@ -186,7 +186,7 @@ class TestLand(testing.PathTestCase):
     def test_no_svn_canonical_svn(self):
         with OutputCapture(level=logging.INFO) as captured, repository(self.path, has_oops=False), mocks.local.Svn():
             self.assertEqual(1, program.main(
-                args=('land', '-v'),
+                args=('land', '-v', '--no-wpt-export'),
                 path=self.path, canonical_svn=True,
             ))
             self.assertEqual(str(local.Git(self.path).commit()), '3.1@eng/example')
@@ -200,7 +200,7 @@ class TestLand(testing.PathTestCase):
     def test_svn(self):
         with MockTime, OutputCapture(level=logging.INFO) as captured, repository(self.path, has_oops=False, git_svn=True), mocks.local.Svn(), MockTerminal.input('n'):
             self.assertEqual(0, program.main(
-                args=('land', '-v'),
+                args=('land', '-v', '--no-wpt-export'),
                 path=self.path, canonical_svn=True,
             ))
             self.assertEqual(str(local.Git(self.path).commit()), '6@main')
@@ -230,7 +230,7 @@ class TestLand(testing.PathTestCase):
                 patch('webkitbugspy.Tracker._trackers', [radar.Tracker()]):
 
             self.assertEqual(0, program.main(
-                args=('land', '-v'),
+                args=('land', '-v', '--no-wpt-export'),
                 path=self.path,
             ))
             self.assertEqual(str(local.Git(self.path).commit()), '6@main')
@@ -270,7 +270,7 @@ class TestLand(testing.PathTestCase):
                 )), patch('webkitbugspy.Tracker._trackers', [bugzilla.Tracker(self.BUGZILLA)]):
 
             self.assertEqual(0, program.main(
-                args=('land', '-v'),
+                args=('land', '-v', '--no-wpt-export'),
                 path=self.path,
                 identifier_template='Canonical link: https://commits.webkit.org/{}',
             ))
@@ -327,7 +327,7 @@ class TestLand(testing.PathTestCase):
                 )), patch('webkitbugspy.Tracker._trackers', [bugzilla.Tracker(self.BUGZILLA)]):
 
             self.assertEqual(0, program.main(
-                args=('land', '-v'),
+                args=('land', '-v', '--no-wpt-export'),
                 path=self.path, canonical_svn=True,
             ))
             self.assertEqual(str(local.Git(self.path).commit()), '6@main')
@@ -413,7 +413,7 @@ class TestLandGitHub(testing.PathTestCase):
                 repository(self.path, remote='https://{}'.format(remote.remote)), mocks.local.Svn():
 
             self.assertEqual(1, program.main(
-                args=('land', '-v'),
+                args=('land', '-v', '--no-wpt-export'),
                 path=self.path,
             ))
             self.assertEqual(str(local.Git(self.path).commit()), '3.1@eng/example')
@@ -435,7 +435,7 @@ class TestLandGitHub(testing.PathTestCase):
                 repository(self.path, has_oops=False, remote='https://{}'.format(remote.remote)), mocks.local.Svn():
 
             self.assertEqual(1, program.main(
-                args=('land', '-v'),
+                args=('land', '-v', '--no-wpt-export'),
                 path=self.path,
             ))
             self.assertEqual(str(local.Git(self.path).commit()), '3.1@eng/example')
@@ -457,7 +457,7 @@ class TestLandGitHub(testing.PathTestCase):
                 approved=True) as remote, \
                 repository(self.path, has_oops=True, remote='https://{}'.format(remote.remote)), mocks.local.Svn():
             self.assertEqual(0, program.main(
-                args=('land', '-v'),
+                args=('land', '-v', '--no-wpt-export'),
                 path=self.path,
             ))
 
@@ -500,7 +500,7 @@ class TestLandGitHub(testing.PathTestCase):
             remotes=dict(fork='https://{}/Contributor/WebKit'.format(remote.hosts[0])),
         ):
             self.assertEqual(0, program.main(
-                args=('land', '-v'),
+                args=('land', '-v', '--no-wpt-export'),
                 path=self.path,
             ))
 
@@ -551,7 +551,7 @@ class TestLandGitHub(testing.PathTestCase):
             BUGS_EXAMPLE_COM_PASSWORD='password',
         )), patch('webkitbugspy.Tracker._trackers', [bugzilla.Tracker(self.BUGZILLA)]):
             self.assertEqual(0, program.main(
-                args=('land', '-v'),
+                args=('land', '-v', '--no-wpt-export'),
                 path=self.path,
             ))
             self.assertEqual(len(Tracker.instance().issue(1).comments), 2)
@@ -638,7 +638,7 @@ class TestLandBitBucket(testing.PathTestCase):
                 )), mocks.local.Svn():
 
             self.assertEqual(1, program.main(
-                args=('land', '-v'),
+                args=('land', '-v', '--no-wpt-export'),
                 path=self.path,
             ))
             self.assertEqual(str(local.Git(self.path).commit()), '3.1@eng/example')
@@ -662,7 +662,7 @@ class TestLandBitBucket(testing.PathTestCase):
                 )), mocks.local.Svn():
 
             self.assertEqual(1, program.main(
-                args=('land', '-v'),
+                args=('land', '-v', '--no-wpt-export'),
                 path=self.path,
             ))
             self.assertEqual(str(local.Git(self.path).commit()), '3.1@eng/example')
@@ -686,7 +686,7 @@ class TestLandBitBucket(testing.PathTestCase):
                 )), mocks.local.Svn():
 
             self.assertEqual(0, program.main(
-                args=('land', '-v'),
+                args=('land', '-v', '--no-wpt-export'),
                 path=self.path,
             ))
             repo = local.Git(self.path)

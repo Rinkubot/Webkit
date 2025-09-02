@@ -358,7 +358,7 @@ class TestDoPullRequest(testing.PathTestCase):
     def test_no_modified(self):
         with OutputCapture(level=logging.INFO) as captured, mocks.local.Git(self.path), mocks.local.Svn(), patch('webkitbugspy.Tracker._trackers', []):
             self.assertEqual(1, program.main(
-                args=('pull-request', '-i', 'pr-branch', '-v'),
+                args=('pull-request', '-i', 'pr-branch', '-v', '--no-wpt-export'),
                 path=self.path,
             ))
         self.assertEqual(
@@ -371,7 +371,7 @@ class TestDoPullRequest(testing.PathTestCase):
         with OutputCapture(level=logging.INFO) as captured, mocks.local.Git(self.path) as repo, mocks.local.Svn(), patch('webkitbugspy.Tracker._trackers', []):
             repo.staged['added.txt'] = 'added'
             self.assertEqual(1, program.main(
-                args=('pull-request', '-i', 'pr-branch', '-v'),
+                args=('pull-request', '-i', 'pr-branch', '-v', '--no-wpt-export'),
                 path=self.path,
             ))
             self.assertDictEqual(repo.staged, {})
@@ -392,7 +392,7 @@ No pre-PR checks to run""")
         with OutputCapture(level=logging.INFO) as captured, mocks.local.Git(self.path) as repo, mocks.local.Svn(), patch('webkitbugspy.Tracker._trackers', []):
             repo.modified['modified.txt'] = 'diff'
             self.assertEqual(1, program.main(
-                args=('pull-request', '-i', 'pr-branch', '-v'),
+                args=('pull-request', '-i', 'pr-branch', '-v', '--no-wpt-export'),
                 path=self.path,
             ))
             self.assertDictEqual(repo.modified, dict())
@@ -418,7 +418,7 @@ No pre-PR checks to run""")
 
             repo.staged['added.txt'] = 'added'
             self.assertEqual(0, program.main(
-                args=('pull-request', '-i', 'pr-branch', '-v', '--no-history'),
+                args=('pull-request', '-i', 'pr-branch', '-v', '--no-wpt-export', '--no-history'),
                 path=self.path,
             ))
             self.assertEqual(local.Git(self.path).remote().pull_requests.get(1).draft, False)
@@ -455,7 +455,7 @@ No pre-PR checks to run""")
 
             repo.staged['added.txt'] = 'added'
             self.assertEqual(0, program.main(
-                args=('pull-request', '-i', 'pr-branch', '-v', '--no-history', '--draft'),
+                args=('pull-request', '-i', 'pr-branch', '-v', '--no-wpt-export', '--no-history', '--draft'),
                 path=self.path,
             ))
             self.assertEqual(local.Git(self.path).remote().pull_requests.get(1).draft, True)
@@ -494,7 +494,7 @@ No pre-PR checks to run""")
             with OutputCapture():
                 repo.staged['added.txt'] = 'added'
                 self.assertEqual(0, program.main(
-                    args=('pull-request', '-i', 'pr-branch'),
+                    args=('pull-request', '-i', 'pr-branch', '--no-wpt-export'),
                     path=self.path,
                 ))
 
@@ -505,7 +505,7 @@ No pre-PR checks to run""")
             with OutputCapture(level=logging.INFO) as captured:
                 repo.staged['added.txt'] = 'diff'
                 self.assertEqual(0, program.main(
-                    args=('pull-request', '-v', '--no-history'),
+                    args=('pull-request', '-v', '--no-wpt-export', '--no-history'),
                     path=self.path,
                 ))
 
@@ -547,14 +547,14 @@ No pre-PR checks to run""")
             with OutputCapture():
                 repo.staged['added.txt'] = 'added'
                 self.assertEqual(0, program.main(
-                    args=('pull-request', '-i', 'pr-branch', '--remote', 'security'),
+                    args=('pull-request', '-i', 'pr-branch', '--remote', 'security', '--no-wpt-export'),
                     path=self.path,
                 ))
 
             with OutputCapture(level=logging.INFO) as captured:
                 repo.staged['added.txt'] = 'diff'
                 self.assertEqual(1, program.main(
-                    args=('pull-request', '-v', '--no-history', '--defaults'),
+                    args=('pull-request', '-v', '--no-wpt-export', '--no-history', '--defaults'),
                     path=self.path,
                 ))
 
@@ -588,14 +588,14 @@ No pre-PR checks to run""")
             with OutputCapture():
                 repo.staged['added.txt'] = 'added'
                 self.assertEqual(0, program.main(
-                    args=('pull-request', '-i', 'pr-branch', '--remote', 'security'),
+                    args=('pull-request', '-i', 'pr-branch', '--remote', 'security', '--no-wpt-export'),
                     path=self.path,
                 ))
 
             with OutputCapture(level=logging.INFO) as captured, MockTerminal.input('2'):
                 repo.staged['added.txt'] = 'diff'
                 self.assertEqual(0, program.main(
-                    args=('pull-request', '-v', '--no-history'),
+                    args=('pull-request', '-v', '--no-wpt-export', '--no-history'),
                     path=self.path,
                 ))
 
@@ -637,14 +637,14 @@ No pre-PR checks to run""")
             with OutputCapture():
                 repo.staged['added.txt'] = 'added'
                 self.assertEqual(0, program.main(
-                    args=('pull-request', '-i', 'pr-branch'),
+                    args=('pull-request', '-i', 'pr-branch', '--no-wpt-export'),
                     path=self.path,
                 ))
 
             with OutputCapture(level=logging.INFO) as captured:
                 repo.staged['modified.txt'] = 'diff'
                 self.assertEqual(0, program.main(
-                    args=('pull-request', '-v', '--no-history', '--append'),
+                    args=('pull-request', '-v', '--no-wpt-export', '--no-history', '--append'),
                     path=self.path,
                 ))
 
@@ -679,7 +679,7 @@ No pre-PR checks to run""")
             with OutputCapture():
                 repo.staged['added.txt'] = 'added'
                 self.assertEqual(0, program.main(
-                    args=('pull-request', '-i', 'pr-branch'),
+                    args=('pull-request', '-i', 'pr-branch', '--no-wpt-export'),
                     path=self.path,
                 ))
 
@@ -689,7 +689,7 @@ No pre-PR checks to run""")
             with OutputCapture(level=logging.INFO) as captured, MockTerminal.input('n'):
                 repo.staged['added.txt'] = 'diff'
                 self.assertEqual(0, program.main(
-                    args=('pull-request', '-v', '--no-history'),
+                    args=('pull-request', '-v', '--no-wpt-export', '--no-history'),
                     path=self.path,
                 ))
 
@@ -747,7 +747,7 @@ No pre-PR checks to run""")
             ]
             repo.head = repo.commits['eng/pr-branch'][-1]
             self.assertEqual(0, program.main(
-                args=('pull-request', '-v', '--no-history'),
+                args=('pull-request', '-v', '--no-wpt-export', '--no-history'),
                 path=self.path,
             ))
 
@@ -802,7 +802,7 @@ No pre-PR checks to run""")
         ) as repo, mocks.local.Svn():
             repo.staged['added.txt'] = 'added'
             self.assertEqual(0, program.main(
-                args=('pull-request', '-i', 'https://bugs.example.com/show_bug.cgi?id=1', '-v', '--no-history'),
+                args=('pull-request', '-i', 'https://bugs.example.com/show_bug.cgi?id=1', '-v', '--no-wpt-export', '--no-history'),
                 path=self.path,
             ))
 
@@ -859,7 +859,7 @@ No pre-PR checks to run""")
         ) as repo, mocks.local.Svn():
             repo.staged['added.txt'] = 'added'
             self.assertEqual(0, program.main(
-                args=('pull-request', '-i', '1', '-v', '--no-history'),
+                args=('pull-request', '-i', '1', '-v', '--no-wpt-export', '--no-history'),
                 path=self.path,
             ))
 
@@ -929,7 +929,7 @@ No pre-PR checks to run""")
 
             repo.staged['added.txt'] = 'added'
             self.assertEqual(0, program.main(
-                args=('pull-request', '-i', '1', '-v', '--no-history'),
+                args=('pull-request', '-i', '1', '-v', '--no-wpt-export', '--no-history'),
                 path=self.path,
             ))
 
@@ -993,7 +993,7 @@ No pre-PR checks to run""")
             ))
             repo.head = repo.commits['main'][-1]
             self.assertEqual(1, program.main(
-                args=('pull-request', '-v', '--no-history'),
+                args=('pull-request', '-v', '--no-wpt-export', '--no-history'),
                 path=self.path,
             ))
 
@@ -1025,7 +1025,7 @@ No pre-PR checks to run""")
 
             repo.staged['added.txt'] = 'added'
             self.assertEqual(0, program.main(
-                args=('pull-request', '-i', 'https://bugs.example.com/show_bug.cgi?id=1', '-v', '--no-history', '--remote',  'origin'),
+                args=('pull-request', '-i', 'https://bugs.example.com/show_bug.cgi?id=1', '-v', '--no-wpt-export', '--no-history', '--remote',  'origin'),
                 path=self.path,
             ))
 
@@ -1082,7 +1082,7 @@ No pre-PR checks to run""")
 
             repo.staged['added.txt'] = 'added'
             self.assertEqual(1, program.main(
-                args=('pull-request', '-i', 'https://bugs.example.com/show_bug.cgi?id=1', '-v', '--no-history'),
+                args=('pull-request', '-i', 'https://bugs.example.com/show_bug.cgi?id=1', '-v', '--no-wpt-export', '--no-history'),
                 path=self.path,
             ))
 
@@ -1139,7 +1139,7 @@ No pre-PR checks to run""")
             repo.head = repo.commits['eng/pr-branch'][-1]
 
             self.assertEqual(1, program.main(
-                args=('pull-request', '-v', '--no-history'),
+                args=('pull-request', '-v', '--no-wpt-export', '--no-history'),
                 path=self.path,
             ))
 
@@ -1198,7 +1198,7 @@ No pre-PR checks to run""")
             repo.head = repo.commits['eng/pr-branch'][-1]
 
             self.assertEqual(0, program.main(
-                args=('pull-request', '-v', '--no-history'),
+                args=('pull-request', '-v', '--no-wpt-export', '--no-history'),
                 path=self.path,
             ))
 
@@ -1271,7 +1271,7 @@ No pre-PR checks to run""")
             ]
             repo.head = repo.commits['eng/pr-branch'][-1]
             self.assertEqual(0, program.main(
-                args=('pull-request', '-v', '--no-history'),
+                args=('pull-request', '-v', '--no-wpt-export', '--no-history'),
                 path=self.path,
             ))
 
@@ -1338,7 +1338,7 @@ No pre-PR checks to run""")
             ]
             repo.head = repo.commits['eng/pr-branch'][-1]
             self.assertEqual(0, program.main(
-                args=('pull-request', '-v', '--no-history'),
+                args=('pull-request', '-v', '--no-wpt-export', '--no-history'),
                 path=self.path,
             ))
 
@@ -1418,7 +1418,7 @@ No pre-PR checks to run""")
             ]
             repo.head = repo.commits['eng/pr-branch'][-1]
             self.assertEqual(0, program.main(
-                args=('pull-request', '-v', '--no-history'),
+                args=('pull-request', '-v', '--no-wpt-export', '--no-history'),
                 path=self.path,
             ))
 
@@ -1493,7 +1493,7 @@ No pre-PR checks to run""")
             ]
             repo.head = repo.commits['eng/pr-branch'][-1]
             self.assertEqual(0, program.main(
-                args=('pull-request', '-v', '--no-history', '--cc-radar'),
+                args=('pull-request', '-v', '--no-wpt-export', '--no-history', '--cc-radar'),
                 path=self.path,
             ))
 
@@ -1567,7 +1567,7 @@ No pre-PR checks to run""")
             ]
             repo.head = repo.commits['eng/pr-branch'][-1]
             self.assertEqual(0, program.main(
-                args=('pull-request', '-v', '--no-history', '--no-cc-radar'),
+                args=('pull-request', '-v', '--no-wpt-export', '--no-history', '--no-cc-radar'),
                 path=self.path,
             ))
 
@@ -1636,7 +1636,7 @@ No pre-PR checks to run""")
             ]
             repo.head = repo.commits['eng/pr-branch'][-1]
             self.assertEqual(0, program.main(
-                args=('pull-request', '-v', '--no-history', '--no-issue'),
+                args=('pull-request', '-v', '--no-wpt-export', '--no-history', '--no-issue'),
                 path=self.path,
             ))
 
@@ -1679,7 +1679,7 @@ No pre-PR checks to run""")
 
             repo.staged['added.txt'] = 'added'
             self.assertEqual(0, program.main(
-                args=('pull-request', '-i', 'pr-branch', '-v'),
+                args=('pull-request', '-i', 'pr-branch', '-v', '--no-wpt-export'),
                 path=self.path,
             ))
             self.assertEqual(local.Git(self.path).remote().pull_requests.get(1).draft, False)
@@ -1714,7 +1714,7 @@ No pre-PR checks to run""")
 
             repo.staged['added.txt'] = 'added'
             self.assertEqual(1, program.main(
-                args=('pull-request', '-i', 'pr-branch', '-v', '--draft'),
+                args=('pull-request', '-i', 'pr-branch', '-v', '--no-wpt-export', '--draft'),
                 path=self.path,
             ))
 
@@ -1751,14 +1751,14 @@ No pre-PR checks to run""")
             with OutputCapture():
                 repo.staged['added.txt'] = 'added'
                 self.assertEqual(0, program.main(
-                    args=('pull-request', '-i', 'pr-branch'),
+                    args=('pull-request', '-i', 'pr-branch', '--no-wpt-export'),
                     path=self.path,
                 ))
 
             with OutputCapture(level=logging.INFO) as captured:
                 repo.staged['added.txt'] = 'diff'
                 self.assertEqual(0, program.main(
-                    args=('pull-request', '-v'),
+                    args=('pull-request', '-v', '--no-wpt-export'),
                     path=self.path,
                 ))
 
@@ -1793,14 +1793,14 @@ No pre-PR checks to run""")
             with OutputCapture():
                 repo.staged['added.txt'] = 'added'
                 self.assertEqual(0, program.main(
-                    args=('pull-request', '-i', 'pr-branch'),
+                    args=('pull-request', '-i', 'pr-branch', '--no-wpt-export'),
                     path=self.path,
                 ))
 
             with OutputCapture(level=logging.INFO) as captured:
                 repo.staged['modified.txt'] = 'diff'
                 self.assertEqual(0, program.main(
-                    args=('pull-request', '-v', '--append'),
+                    args=('pull-request', '-v', '--no-wpt-export', '--append'),
                     path=self.path,
                 ))
 
@@ -1835,7 +1835,7 @@ No pre-PR checks to run""")
             with OutputCapture():
                 repo.staged['added.txt'] = 'added'
                 self.assertEqual(0, program.main(
-                    args=('pull-request', '-i', 'pr-branch'),
+                    args=('pull-request', '-i', 'pr-branch', '--no-wpt-export'),
                     path=self.path,
                 ))
 
@@ -1845,7 +1845,7 @@ No pre-PR checks to run""")
             with OutputCapture(level=logging.INFO) as captured, MockTerminal.input('n'):
                 repo.staged['added.txt'] = 'diff'
                 self.assertEqual(0, program.main(
-                    args=('pull-request', '-v'),
+                    args=('pull-request', '-v', '--no-wpt-export'),
                     path=self.path,
                 ))
 
@@ -1892,7 +1892,7 @@ No pre-PR checks to run""")
             ]
             repo.head = repo.commits['eng/pr-branch'][-1]
             self.assertEqual(0, program.main(
-                args=('pull-request', '-v', '--no-history'),
+                args=('pull-request', '-v', '--no-wpt-export', '--no-history'),
                 path=self.path,
             ))
 
@@ -1944,7 +1944,7 @@ No pre-PR checks to run""")
             ]
             repo.head = repo.commits['eng/pr-branch'][-1]
             self.assertEqual(0, program.main(
-                args=('pull-request', '-v', '--no-history'),
+                args=('pull-request', '-v', '--no-wpt-export', '--no-history'),
                 path=self.path,
             ))
 
