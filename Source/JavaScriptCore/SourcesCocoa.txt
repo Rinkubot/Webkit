@@ -32,6 +32,7 @@ API/JSStringRefCF.cpp
 API/JSValue.mm
 API/JSVirtualMachine.mm
 API/JSWrapperMap.mm
+API/MARReportCrashPrivate.cpp
 API/ObjCCallbackFunction.mm
 API/PASReportCrashPrivate.cpp
 

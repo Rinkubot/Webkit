@@ -26,6 +26,7 @@
 #include "bmalloc.h"
 
 #include "Environment.h"
+#include "MARRegistry.h"
 #include "PerProcess.h"
 #include "ProcessCheck.h"
 #include "SystemHeap.h"
@@ -52,7 +53,10 @@ pas_primitive_heap_ref gigacageHeaps[static_cast<size_t>(Gigacage::NumberOfKinds
 
 void* mallocOutOfLine(size_t size, CompactAllocationMode mode, HeapKind kind)
 {
-    return malloc(size, mode, kind);
+    void* allocation = malloc(size, mode, kind);
+    if (mode == CompactAllocationMode::NonCompact && MAR_isAddressInQualifyingPage(allocation))
+        MAR_didAllocate(&marRegistry, allocation, size);
+    return allocation;
 }
 
 void freeOutOfLine(void* object, HeapKind kind)
