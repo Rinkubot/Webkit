@@ -27,8 +27,10 @@
 #import "config.h"
 #import "MIMETypeRegistry.h"
 
+#import <UniformTypeIdentifiers/UniformTypeIdentifiers.h>
 #import <pal/spi/cocoa/CoreServicesSPI.h>
 #import <pal/spi/cocoa/NSURLFileTypeMappingsSPI.h>
+#import <pal/spi/cocoa/UniformTypeIdentifiersSPI.h>
 #import <wtf/RobinHoodHashMap.h>
 #import <wtf/RobinHoodHashSet.h>
 #import <wtf/cocoa/VectorCocoa.h>
@@ -59,19 +61,15 @@ static MemoryCompactLookupOnlyRobinHoodHashMap<String, MemoryCompactLookupOnlyRo
             }
         };
 
-ALLOW_DEPRECATED_DECLARATIONS_BEGIN
-        auto allUTIs = adoptCF(_UTCopyDeclaredTypeIdentifiers());
-
-        for (NSString *uti in (__bridge NSArray<NSString *> *)allUTIs.get()) {
-            auto type = adoptCF(UTTypeCopyPreferredTagWithClass((__bridge CFStringRef)uti, kUTTagClassMIMEType));
+        [UTType _enumerateAllDeclaredTypesUsingBlock:^(UTType *utType, BOOL *) {
+            auto type = utType.preferredMIMEType;
             if (!type)
-                continue;
-            auto extensions = adoptCF(UTTypeCopyAllTagsWithClass((__bridge CFStringRef)uti, kUTTagClassFilenameExtension));
-            if (!extensions || !CFArrayGetCount(extensions.get()))
-                continue;
-            addExtensions(type.get(), (__bridge NSArray<NSString *> *)extensions.get());
-        }
-ALLOW_DEPRECATED_DECLARATIONS_END
+                return;
+            auto extensions = (NSArray<NSString *> *)utType.tags[UTTagClassFilenameExtension];
+            if (!extensions || !extensions.count)
+                return;
+            addExtensions(type, extensions);
+        }];
 
         return map;
     }();
