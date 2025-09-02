@@ -211,9 +211,6 @@ public:
     void setPrinting() { m_isPrinting = true; }
 
     // Authentication
-    void setRejectsProtectionSpaceAndContinueForAuthenticationChallenges(bool);
-    void setHandlesAuthenticationChallenges(bool);
-    void setShouldLogCanAuthenticateAgainstProtectionSpace(bool);
     void setAuthenticationUsername(JSStringRef);
     void setAuthenticationPassword(JSStringRef);
 
@@ -222,7 +219,6 @@ public:
     // Audio testing.
     void setAudioResult(JSContextRef, JSValueRef data);
 
-    void setBlockAllPlugins(bool);
     void setPluginSupportedMode(JSStringRef);
 
     WhatToDump whatToDump() const;
@@ -249,10 +245,6 @@ public:
 
     // Downloads
     bool shouldFinishAfterDownload() const { return m_shouldFinishAfterDownload; }
-    void setShouldLogDownloadCallbacks(bool);
-    void setShouldLogDownloadSize(bool);
-    void setShouldLogDownloadExpectedSize(bool);
-    void setShouldDownloadContentDispositionAttachments(bool);
 
     bool shouldAllowEditing() const { return m_shouldAllowEditing; }
 
@@ -372,14 +364,7 @@ public:
     JSValueRef neverInlineFunction(JSContextRef, JSValueRef function);
 
     bool shouldDecideNavigationPolicyAfterDelay() const { return m_shouldDecideNavigationPolicyAfterDelay; }
-    void setShouldDecideNavigationPolicyAfterDelay(bool);
     bool shouldDecideResponsePolicyAfterDelay() const { return m_shouldDecideResponsePolicyAfterDelay; }
-    void setShouldDecideResponsePolicyAfterDelay(bool);
-    void setNavigationGesturesEnabled(bool);
-    void setIgnoresViewportScaleLimits(bool);
-    void setUseDarkAppearanceForTesting(bool);
-    void setShouldDownloadUndisplayableMIMETypes(bool);
-    void setShouldAllowDeviceOrientationAndMotionAccess(bool);
     void stopLoading();
 
     bool didCancelClientRedirect() const { return m_didCancelClientRedirect; }
