@@ -775,7 +775,6 @@ svg/SVGLengthContext.cpp
 svg/SVGLocatable.cpp
 svg/SVGMaskElement.cpp
 svg/SVGSVGElement.cpp
-svg/SVGToOTFFontConversion.cpp
 svg/SVGURIReference.cpp
 svg/SVGUseElement.cpp
 svg/animation/SVGSMILElement.cpp

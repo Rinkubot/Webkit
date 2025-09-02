@@ -42,7 +42,6 @@
 #include "SVGElementTypeHelpers.h"
 #include "SVGFontElement.h"
 #include "SVGFontFaceElement.h"
-#include "SVGToOTFFontConversion.h"
 #include "SVGURIReference.h"
 #include "SharedBuffer.h"
 
@@ -163,8 +162,6 @@ void CSSFontFaceSource::load(Document* document)
             if (m_svgFontFaceElement) {
                 if (RefPtr fontElement = dynamicDowncast<SVGFontElement>(m_svgFontFaceElement->parentNode())) {
                     ASSERT(!m_inDocumentCustomPlatformData);
-                    if (auto otfFont = convertSVGToOTFFont(*fontElement))
-                        m_generatedOTFBuffer = SharedBuffer::create(WTFMove(otfFont.value()));
                     if (m_generatedOTFBuffer) {
                         m_inDocumentCustomPlatformData = FontCustomPlatformData::create(Ref { *m_generatedOTFBuffer }, String());
                         success = static_cast<bool>(m_inDocumentCustomPlatformData);

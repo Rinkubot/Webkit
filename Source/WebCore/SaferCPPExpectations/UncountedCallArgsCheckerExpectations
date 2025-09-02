@@ -970,7 +970,6 @@ style/values/transforms/StyleScale.cpp
 style/values/transforms/StyleTranslate.cpp
 svg/SVGAElement.cpp
 svg/SVGAElement.h
-svg/SVGAltGlyphElement.cpp
 svg/SVGCircleElement.cpp
 svg/SVGCircleElement.h
 svg/SVGClipPathElement.cpp
@@ -1013,7 +1012,6 @@ svg/SVGFontFaceElement.cpp
 svg/SVGFontFaceUriElement.cpp
 svg/SVGForeignObjectElement.h
 svg/SVGGeometryElement.h
-svg/SVGGlyphRefElement.cpp
 svg/SVGGradientElement.cpp
 svg/SVGGradientElement.h
 svg/SVGGraphicsElement.cpp
@@ -1050,7 +1048,6 @@ svg/SVGTextPathElement.cpp
 svg/SVGTextPathElement.h
 svg/SVGTextPositioningElement.cpp
 svg/SVGTextPositioningElement.h
-svg/SVGToOTFFontConversion.cpp
 svg/SVGURIReference.cpp
 svg/SVGURIReference.h
 svg/SVGUseElement.cpp
