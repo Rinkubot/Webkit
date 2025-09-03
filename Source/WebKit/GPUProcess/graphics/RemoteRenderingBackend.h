@@ -31,11 +31,11 @@
 #include "Connection.h"
 #include "IPCEvent.h"
 #include "ImageBufferBackendHandle.h"
+#include "ImageBufferSetIdentifier.h"
 #include "MarkSurfacesAsVolatileRequestIdentifier.h"
 #include "MessageReceiver.h"
 #include "MessageSender.h"
 #include "RemoteGraphicsContextIdentifier.h"
-#include "RemoteImageBufferSetIdentifier.h"
 #include "RemoteResourceCache.h"
 #include "RemoteSerializedImageBufferIdentifier.h"
 #include "RemoteSharedResourceCache.h"
@@ -166,9 +166,9 @@ private:
     void releaseMemory();
     void releaseNativeImages();
     void finalizeRenderingUpdate(RenderingUpdateID);
-    void markSurfacesVolatile(MarkSurfacesAsVolatileRequestIdentifier, const Vector<std::pair<RemoteImageBufferSetIdentifier, OptionSet<BufferInSetType>>>&, bool forcePurge);
-    void createImageBufferSet(WebKit::RemoteImageBufferSetIdentifier, RemoteGraphicsContextIdentifier);
-    void releaseImageBufferSet(WebKit::RemoteImageBufferSetIdentifier);
+    void markSurfacesVolatile(MarkSurfacesAsVolatileRequestIdentifier, const Vector<std::pair<ImageBufferSetIdentifier, OptionSet<BufferInSetType>>>&, bool forcePurge);
+    void createImageBufferSet(WebKit::ImageBufferSetIdentifier, RemoteGraphicsContextIdentifier);
+    void releaseImageBufferSet(WebKit::ImageBufferSetIdentifier);
 
 #if USE(GRAPHICS_LAYER_WC)
     void flush(IPC::Semaphore&&);
@@ -202,7 +202,8 @@ private:
     RefPtr<WebCore::SharedMemory> m_getPixelBufferSharedMemory;
 
     HashMap<WebCore::RenderingResourceIdentifier, IPC::ScopedActiveMessageReceiveQueue<RemoteImageBuffer>> m_remoteImageBuffers WTF_GUARDED_BY_CAPABILITY(workQueue());
-    HashMap<RemoteImageBufferSetIdentifier, IPC::ScopedActiveMessageReceiveQueue<RemoteImageBufferSet>> m_remoteImageBufferSets WTF_GUARDED_BY_CAPABILITY(workQueue());
+
+    HashMap<ImageBufferSetIdentifier, IPC::ScopedActiveMessageReceiveQueue<RemoteImageBufferSet>> m_remoteImageBufferSets WTF_GUARDED_BY_CAPABILITY(workQueue());
     const Ref<ShapeDetection::ObjectHeap> m_shapeDetectionObjectHeap;
 };
 
