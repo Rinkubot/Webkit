@@ -106,9 +106,7 @@ UIProcess/API/mac/WKViewInternal.h
 UIProcess/Inspector/mac/WKInspectorViewController.h
 UIProcess/Inspector/mac/WebInspectorUIProxyMac.mm
 UIProcess/WebAuthentication/Cocoa/AuthenticationServicesForwardDeclarations.h
-UIProcess/mac/WKFullScreenWindowController.h
 UIProcess/mac/WKImmediateActionController.h
-UIProcess/mac/WKPrintingView.h
 UIProcess/mac/WKTextAnimationManagerMac.mm
 UIProcess/mac/WKTextFinderClient.mm
 UIProcess/mac/WebDataListSuggestionsDropdownMac.mm

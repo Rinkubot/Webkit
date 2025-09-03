@@ -304,16 +304,6 @@ static void makeResponderFirstResponderIfDescendantOfView(NSWindow *window, NSRe
     return _webViewPlaceholder.get();
 }
 
-- (void)setSavedConstraints:(NSArray *)savedConstraints
-{
-    _savedConstraints = savedConstraints;
-}
-
-- (NSArray *)savedConstraints
-{
-    return _savedConstraints.get();
-}
-
 #pragma mark -
 #pragma mark NSWindowController overrides
 
@@ -537,9 +527,9 @@ ALLOW_DEPRECATED_DECLARATIONS_END
         RetainPtr firstResponder = [[self window] firstResponder];
         [self _replaceView:_webViewPlaceholder.get() with:_webView.get().get()];
         BEGIN_BLOCK_OBJC_EXCEPTIONS
-        [NSLayoutConstraint activateConstraints:self.savedConstraints];
+        [NSLayoutConstraint activateConstraints:_savedConstraints.get()];
         END_BLOCK_OBJC_EXCEPTIONS
-        self.savedConstraints = nil;
+        _savedConstraints = nil;
         makeResponderFirstResponderIfDescendantOfView([_webView window], firstResponder.get(), _webView.get().get());
         [[_webView window] makeKeyAndOrderFront:self];
 
@@ -718,9 +708,9 @@ static RetainPtr<CGImageRef> takeWindowSnapshot(CGSWindowID windowID, bool captu
     [[_webViewPlaceholder superview] addSubview:_webView.get().get() positioned:NSWindowBelow relativeTo:_webViewPlaceholder.get()];
 
     BEGIN_BLOCK_OBJC_EXCEPTIONS
-    [NSLayoutConstraint activateConstraints:self.savedConstraints];
+    [NSLayoutConstraint activateConstraints:_savedConstraints.get()];
     END_BLOCK_OBJC_EXCEPTIONS
-    self.savedConstraints = nil;
+    _savedConstraints = nil;
     makeResponderFirstResponderIfDescendantOfView([_webView window], firstResponder.get(), _webView.get().get());
 
     // These messages must be sent after the swap or flashing will occur during forceRepaint:
@@ -943,7 +933,7 @@ static RetainPtr<CGImageRef> takeWindowSnapshot(CGSWindowID windowID, bool captu
     RetainPtr<NSIndexSet> validConstraints = [constraints indexesOfObjectsPassingTest:^BOOL(NSLayoutConstraint *constraint, NSUInteger, BOOL *) {
         return ![constraint isKindOfClass:objc_getClass("NSAutoresizingMaskLayoutConstraint")];
     }];
-    self.savedConstraints = [constraints objectsAtIndexes:validConstraints.get()];
+    _savedConstraints = [constraints objectsAtIndexes:validConstraints.get()];
 }
 
 static CAMediaTimingFunction *timingFunctionForDuration(CFTimeInterval duration)
