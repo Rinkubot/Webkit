@@ -756,8 +756,12 @@ LayoutUnit RenderBox::constrainLogicalWidthByMinMax(LayoutUnit logicalWidth, Lay
 {
     auto& styleToUse = style();
     auto computedMaxWidth = LayoutUnit::max();
-    if (!styleToUse.logicalMaxWidth().isNone() && (allowIntrinsic == AllowIntrinsic::Yes || !styleToUse.logicalMaxWidth().isIntrinsic()))
-        computedMaxWidth = computeLogicalWidthUsing(styleToUse.logicalMaxWidth(), availableWidth, cb);
+    if (!styleToUse.logicalMaxWidth().isNone() && (allowIntrinsic == AllowIntrinsic::Yes || !styleToUse.logicalMaxWidth().isIntrinsic())) {
+        // Skip percentage-based max-width when container width is undefined (0)
+        // to prevent breaking aspect ratio calculations during intrinsic sizing.
+        if (availableWidth > 0 || !styleToUse.logicalMaxWidth().isPercent())
+            computedMaxWidth = computeLogicalWidthUsing(styleToUse.logicalMaxWidth(), availableWidth, cb);
+    }
 
     if (allowIntrinsic == AllowIntrinsic::No && styleToUse.logicalMinWidth().isIntrinsic())
         return std::min(logicalWidth, computedMaxWidth);
