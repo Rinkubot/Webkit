@@ -387,6 +387,8 @@ static constexpr struct KnownZone {
     { "pdt"_s, -420 }
 };
 
+static constexpr std::array<long, 12> daysPerMonth { 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+
 inline static void skipSpacesAndComments(std::span<const LChar>& s)
 {
     int nesting = 0;
@@ -620,8 +622,6 @@ double parseES5Date(std::span<const LChar> dateString, bool& isLocalTime)
     // This parses a date of the form defined in ecma262/#sec-date-time-string-format
     // (similar to RFC 3339 / ISO 8601: YYYY-MM-DDTHH:mm:ss[.sss]Z).
     // In most cases it is intentionally strict (e.g. correct field widths, no stray whitespace).
-    
-    static constexpr std::array<long, 12> daysPerMonth { 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
     
     // The year must be present, but the other fields may be omitted - see ES5.1 15.9.1.15.
     int year = 0;
@@ -970,6 +970,11 @@ double parseDate(std::span<const LChar> dateString, bool& isLocalTime)
         year = 2000;
     }
     ASSERT(year);
+
+    if (day <= 0 || day > daysPerMonth[month])
+        return std::numeric_limits<double>::quiet_NaN();
+    if (month == 1 /* feb */ && day > 28 && year.has_value() && !isLeapYear(year.value()))
+        return std::numeric_limits<double>::quiet_NaN();
 
     return ymdhmsToMilliseconds(year.value(), month + 1, day, hour, minute, second, 0) - offset * (secondsPerMinute * msPerSecond);
 }
