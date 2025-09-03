@@ -900,6 +900,16 @@ bool Quirks::shouldMakeEventListenerPassive(const EventTarget& eventTarget, cons
 }
 
 #if ENABLE(MEDIA_STREAM)
+bool Quirks::shouldEnableLiveRecordingFlagQuirk() const
+{
+    return needsQuirks() && m_quirksData.shouldEnableLiveRecordingFlagQuirk;
+}
+
+void Quirks::disableEnableLiveRecordingFlagQuirk()
+{
+    m_quirksData.shouldEnableLiveRecordingFlagQuirk = false;
+}
+
 // warbyparker.com rdar://72839707
 // baidu.com rdar://56421276
 bool Quirks::shouldEnableLegacyGetUserMediaQuirk() const
@@ -2374,6 +2384,8 @@ static void handleFacebookQuirks(QuirksData& quirksData, const URL& quirksURL, c
 #if ENABLE(MEDIA_STREAM)
     // facebook.com rdar://158736355
     quirksData.shouldEnableCameraAndMicrophonePermissionStateQuirk = true;
+    // facebook.com rdar://41104397
+    quirksData.shouldEnableLiveRecordingFlagQuirk = true;
 #endif
 #if ENABLE(WEB_RTC)
     // facebook.com rdar://158736355
