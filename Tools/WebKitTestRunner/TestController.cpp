@@ -1925,6 +1925,8 @@ if (window.testRunner) {
     testRunner.finishFullscreenExit = () => post(['FinishFullscreenExit']);
     testRunner.requestExitFullscreenFromUIProcess = () => post(['RequestExitFullscreenFromUIProcess']);
     testRunner.keyExistsInKeychain = (attrLabel, applicationLabelBase64) => post(['KeyExistsInKeychain', attrLabel, applicationLabelBase64]);
+    testRunner.stopLoading = () => post(['StopLoading']);
+    testRunner.dumpFullScreenCallbacks = () => post(['DumpFullScreenCallbacks']);
 }
 )testRunnerJS";
 
@@ -1942,15 +1944,15 @@ void TestController::didReceiveScriptMessage(WKScriptMessageRef message, Complet
 
     WKTypeRef messageBody = WKScriptMessageGetBody(message);
     ASSERT(WKGetTypeID(messageBody) == WKArrayGetTypeID());
-    WKArrayRef array = (WKArrayRef)messageBody;
-    WKStringRef command = (WKStringRef)WKArrayGetItemAtIndex(array, 0);
+    WKArrayRef array = static_cast<WKArrayRef>(messageBody);
+    WKStringRef command = static_cast<WKStringRef>(WKArrayGetItemAtIndex(array, 0));
     WKTypeRef argument = WKArrayGetSize(array) > 1 ? WKArrayGetItemAtIndex(array, 1) : nullptr;
     WKTypeRef argument2 = WKArrayGetSize(array) > 2 ? WKArrayGetItemAtIndex(array, 2) : nullptr;
 
     if (WKStringIsEqualToUTF8CString(command, "FindString")) {
-        WKStringRef target = (WKStringRef)argument;
+        WKStringRef target = static_cast<WKStringRef>(argument);
         ASSERT(WKGetTypeID(target) == WKStringGetTypeID());
-        WKArrayRef optionsArray = (WKArrayRef)WKArrayGetItemAtIndex(array, 2);
+        WKArrayRef optionsArray = static_cast<WKArrayRef>(WKArrayGetItemAtIndex(array, 2));
         ASSERT(WKGetTypeID(optionsArray) == WKArrayGetTypeID());
         WKFindOptions options = findOptionsFromArray(optionsArray);
         return WKPageFindStringForTesting(mainWebView()->page(), completionHandler.leak(), target, options, 0, [] (bool found, void* context) {
@@ -1986,7 +1988,7 @@ void TestController::didReceiveScriptMessage(WKScriptMessageRef message, Complet
 
     if (WKStringIsEqualToUTF8CString(command, "RunUIScript")) {
         unsigned callbackID = UIScriptInvocationData::nextCallbackID++;
-        auto invocationData = new UIScriptInvocationData(callbackID, (WKStringRef)argument, m_currentInvocation);
+        auto invocationData = new UIScriptInvocationData(callbackID, static_cast<WKStringRef>(argument), m_currentInvocation);
         m_uiScriptCallbacks.add(callbackID, Callbacks { }).iterator->value.append(argument2);
         WKPageCallAfterNextPresentationUpdate(mainWebView()->page(), invocationData, [] (WKErrorRef, void* context) {
             runUISideScriptImmediately(context);
@@ -1996,7 +1998,7 @@ void TestController::didReceiveScriptMessage(WKScriptMessageRef message, Complet
 
     if (WKStringIsEqualToUTF8CString(command, "RunUIScriptImmediately")) {
         unsigned callbackID = UIScriptInvocationData::nextCallbackID++;
-        auto invocationData = new UIScriptInvocationData(callbackID, (WKStringRef)argument, m_currentInvocation);
+        auto invocationData = new UIScriptInvocationData(callbackID, static_cast<WKStringRef>(argument), m_currentInvocation);
         m_uiScriptCallbacks.add(callbackID, Callbacks { }).iterator->value.append(argument2);
         runUISideScriptImmediately(invocationData);
         return completionHandler(nullptr);
@@ -2022,6 +2024,16 @@ void TestController::didReceiveScriptMessage(WKScriptMessageRef message, Complet
 
     if (WKStringIsEqualToUTF8CString(command, "RequestExitFullscreenFromUIProcess")) {
         requestExitFullscreenFromUIProcess();
+        return completionHandler(nullptr);
+    }
+
+    if (WKStringIsEqualToUTF8CString(command, "DumpFullScreenCallbacks")) {
+        dumpFullScreenCallbacks();
+        return completionHandler(nullptr);
+    }
+
+    if (WKStringIsEqualToUTF8CString(command, "StopLoading")) {
+        WKPageStopLoading(mainWebView()->page());
         return completionHandler(nullptr);
     }
 
