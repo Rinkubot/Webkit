@@ -33,6 +33,7 @@
 #include <WebCore/LayoutSize.h>
 #include <WebCore/StyleScopeIdentifier.h>
 #include <WebCore/StyleScopeOrdinal.h>
+#include <WebCore/Styleable.h>
 #include <WebCore/Timer.h>
 #include <memory>
 #include <wtf/CheckedPtr.h>
@@ -167,6 +168,10 @@ public:
     const AnchorPositionedToAnchorMap& anchorPositionedToAnchorMap() const { return m_anchorPositionedToAnchorMap; }
     void updateAnchorPositioningStateAfterStyleResolution();
 
+    std::optional<size_t> lastSuccessfulPositionOptionIndexFor(const Styleable&);
+    void rememberLastSuccessfulPositionOptionIndex(const Styleable&, size_t);
+    void forgetLastSuccessfulPositionOptionIndex(const Styleable&);
+
     bool invalidateForAnchorDependencies(LayoutDependencyUpdateContext&);
 
 private:
@@ -267,6 +272,7 @@ private:
         bool operator==(const AnchorPosition&) const = default;
     };
     SingleThreadWeakHashMap<const RenderBoxModelObject, AnchorPosition> m_anchorPositionsOnLastUpdate;
+    HashMap<AnchorPositionedKey, size_t> m_lastSuccessfulPositionOptionIndexes;
 
     std::unique_ptr<MatchResultCache> m_matchResultCache;
 

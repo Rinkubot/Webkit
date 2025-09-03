@@ -1112,5 +1112,25 @@ void Scope::updateAnchorPositioningStateAfterStyleResolution()
     });
 }
 
+std::optional<size_t> Scope::lastSuccessfulPositionOptionIndexFor(const Styleable& styleable)
+{
+    AnchorPositionedKey key { styleable.element, styleable.pseudoElementIdentifier };
+    return m_lastSuccessfulPositionOptionIndexes.getOptional(key);
+}
+
+void Scope::rememberLastSuccessfulPositionOptionIndex(const Styleable& styleable, size_t index)
+{
+    // FIXME: maybe check that index is valid (within the bounds)
+
+    AnchorPositionedKey key { styleable.element, styleable.pseudoElementIdentifier };
+    m_lastSuccessfulPositionOptionIndexes.add(key, index);
+}
+
+void Scope::forgetLastSuccessfulPositionOptionIndex(const Styleable& styleable)
+{
+    AnchorPositionedKey key { styleable.element, styleable.pseudoElementIdentifier };
+    m_lastSuccessfulPositionOptionIndexes.remove(key);
+}
+
 }
 }

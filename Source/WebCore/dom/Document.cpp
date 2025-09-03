@@ -10282,6 +10282,19 @@ void Document::updateResizeObservations(Page& page)
         addConsoleMessage(MessageSource::Other, MessageLevel::Info, "ResizeObservers silenced due to: http://webkit.org/b/258597"_s);
         return;
     }
+
+    if (m_renderView) {
+        for (const auto& positionTryBox : m_renderView->positionTryBoxes()) {
+            auto styleable = Styleable::fromRenderer(positionTryBox);
+            ASSERT(styleable);
+
+            if (auto usedPositionOptionIndex = positionTryBox.style().usedPositionOptionIndex())
+                m_styleScope->rememberLastSuccessfulPositionOptionIndex(*styleable, *usedPositionOptionIndex);
+            else
+                m_styleScope->forgetLastSuccessfulPositionOptionIndex(*styleable);
+        }
+    }
+
     if (!hasResizeObservers() && !m_resizeObserverForContainIntrinsicSize && !m_contentVisibilityDocumentState)
         return;
 

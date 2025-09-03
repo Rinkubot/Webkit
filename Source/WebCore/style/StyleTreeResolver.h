@@ -212,15 +212,9 @@ private:
     TreeResolutionState m_treeResolutionState;
     HashMap<Ref<const Element>, std::unique_ptr<RenderStyle>> m_savedBeforeResolutionStylesForInterleaving;
 
-    struct PositionOption {
-        std::unique_ptr<RenderStyle> style;
-        // Index of the option in the position-try-fallbacks list.
-        std::optional<size_t> fallbackIndex;
-    };
-
     struct PositionOptions {
         // Array of option styles. By convention, the original style is at index 0.
-        Vector<PositionOption> optionStyles { };
+        Vector<std::unique_ptr<RenderStyle>> optionStyles { };
         size_t index { 0 };
         bool sorted { false };
         bool chosen { false };

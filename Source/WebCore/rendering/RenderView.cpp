@@ -70,6 +70,7 @@
 #include "SVGSVGElement.h"
 #include "Settings.h"
 #include "StyleInheritedData.h"
+#include "StyleScope.h"
 #include "TransformState.h"
 #include <wtf/SetForScope.h>
 #include <wtf/StackStats.h>
@@ -1125,6 +1126,9 @@ void RenderView::registerPositionTryBox(const RenderBox& box)
 void RenderView::unregisterPositionTryBox(const RenderBox& box)
 {
     m_positionTryBoxes.remove(box);
+
+    if (auto styleable = Styleable::fromRenderer(box))
+        document().styleScope().forgetLastSuccessfulPositionOptionIndex(*styleable);
 }
 
 void RenderView::addCounterNeedingUpdate(RenderCounter& renderer)
