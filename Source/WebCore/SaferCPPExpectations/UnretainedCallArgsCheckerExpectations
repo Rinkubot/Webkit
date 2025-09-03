@@ -33,8 +33,6 @@ accessibility/cocoa/AccessibilityObjectCocoa.mm
 accessibility/isolatedtree/mac/AXIsolatedObjectMac.mm
 accessibility/mac/AXObjectCacheMac.mm
 accessibility/mac/AccessibilityObjectMac.mm
-accessibility/mac/WebAccessibilityObjectWrapperBase.mm
-accessibility/mac/WebAccessibilityObjectWrapperMac.mm
 bridge/objc/WebScriptObject.mm
 bridge/objc/objc_class.mm
 bridge/objc/objc_instance.mm

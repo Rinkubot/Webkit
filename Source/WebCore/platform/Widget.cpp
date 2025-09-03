@@ -358,6 +358,13 @@ FloatRect Widget::convertFromContainingView(const FloatRect& parentRect) const
 
 // MARK: -
 
+#if PLATFORM(COCOA)
+RetainPtr<PlatformWidget> Widget::protectedPlatformWidget() const
+{
+    return platformWidget();
+}
+#endif
+
 #if !PLATFORM(COCOA)
 
 Widget::Widget(PlatformWidget widget)

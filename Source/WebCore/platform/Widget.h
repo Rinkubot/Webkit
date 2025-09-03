@@ -94,6 +94,9 @@ public:
 
     WEBCORE_EXPORT PlatformWidget platformWidget() const;
     WEBCORE_EXPORT void setPlatformWidget(PlatformWidget);
+#if PLATFORM(COCOA)
+    RetainPtr<PlatformWidget> protectedPlatformWidget() const;
+#endif
 
     int x() const { return frameRect().x(); }
     int y() const { return frameRect().y(); }
