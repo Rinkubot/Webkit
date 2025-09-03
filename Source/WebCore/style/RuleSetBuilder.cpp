@@ -292,7 +292,24 @@ void RuleSetBuilder::addStyleRuleWithSelectorList(const CSSSelectorList& selecto
     ASSERT(!selectorList.isEmpty());
     unsigned selectorListIndex = 0;
     for (size_t selectorIndex = 0; selectorIndex != notFound; selectorIndex = selectorList.indexOfNextSelectorAfter(selectorIndex)) {
-        RuleData ruleData(rule, selectorIndex, selectorListIndex, m_ruleSet->ruleCount(), m_isStartingStyle);
+        auto scopingRootLinkMatchType = [&] () -> std::optional<unsigned> {
+            if (m_currentScopeIdentifier > 0) {
+                const CSSSelector* selector = rule.selectorList().selectorAt(selectorIndex);
+                if (selector && selector->hasScope()) {
+                    const auto& scopeRule = m_ruleSet->m_scopeRules[m_currentScopeIdentifier - 1].scopeRule;
+                    if (!scopeRule->scopeStart().isEmpty()) {
+                        // FIXME: Support multiple selectors
+                        auto scopingRootLinkMatchType = SelectorChecker::determineLinkMatchType(scopeRule->scopeStart().first());
+                        if (!scopeRule->scopeEnd().isEmpty())
+                            scopingRootLinkMatchType &= SelectorChecker::determineLinkMatchType(scopeRule->scopeEnd().first());
+                        return scopingRootLinkMatchType;
+                    }
+                }
+            }
+            return { };
+        }();
+
+        RuleData ruleData(rule, selectorIndex, selectorListIndex, m_ruleSet->ruleCount(), m_isStartingStyle, scopingRootLinkMatchType);
         m_mediaQueryCollector.addRuleIfNeeded(ruleData);
         m_ruleSet->addRule(WTFMove(ruleData), m_currentCascadeLayerIdentifier, m_currentContainerQueryIdentifier, m_currentScopeIdentifier);
         ++selectorListIndex;

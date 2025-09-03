@@ -94,6 +94,7 @@ public:
         RefPtr<const ContainerNode> scope;
         const Element* hasScope { nullptr };
         bool matchesAllHasScopes { false };
+        bool isEvaluatingScopingRoot { false };
         Style::ScopeOrdinal styleScopeOrdinal { Style::ScopeOrdinal::Element };
         Style::SelectorMatchingState* selectorMatchingState { nullptr };
 
@@ -102,6 +103,7 @@ public:
         PseudoIdSet pseudoIDSet;
         bool matchedInsideScope { false };
         bool disallowHasPseudoClass { false };
+        bool scopingRootMatchesVisited { false };
     };
 
     bool match(const CSSSelector&, const Element&, CheckingContext&) const;
@@ -112,7 +114,7 @@ public:
     static bool attributeSelectorMatches(const Element&, const QualifiedName&, const AtomString& attributeValue, const CSSSelector&);
 
     enum LinkMatchMask { MatchDefault = 0, MatchLink = 1, MatchVisited = 2, MatchAll = MatchLink | MatchVisited };
-    static unsigned determineLinkMatchType(const CSSSelector*);
+    static unsigned determineLinkMatchType(const CSSSelector*, unsigned scopingRootLinkMatchType = MatchAll);
 
     struct LocalContext;
     

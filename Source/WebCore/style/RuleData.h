@@ -43,7 +43,7 @@ class RuleData {
 public:
     static const unsigned maximumSelectorComponentCount = 8192;
 
-    RuleData(const StyleRule&, unsigned selectorIndex, unsigned selectorListIndex, unsigned position, IsStartingStyle);
+    RuleData(const StyleRule&, unsigned selectorIndex, unsigned selectorListIndex, unsigned position, IsStartingStyle, std::optional<unsigned> scopingRootLinkMatchType = { });
 
     unsigned position() const { return m_position; }
 
