@@ -104,6 +104,8 @@ public:
 
     void clearPolicyItem();
 
+    static bool itemsAreClones(HistoryItem&, HistoryItem*);
+
 private:
     friend class Page;
     bool shouldStopLoadingForHistoryItem(HistoryItem&) const;
@@ -122,7 +124,6 @@ private:
     bool isReloadTypeWithProvisionalItem(FrameLoadType);
     void recursiveUpdateForCommit();
     void recursiveUpdateForSameDocumentNavigation();
-    static bool itemsAreClones(HistoryItem&, HistoryItem*);
     void updateBackForwardListClippedAtTarget(bool doClip);
     void updateCurrentItem();
     bool isFrameLoadComplete() const { return m_frameLoadComplete; }

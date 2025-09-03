@@ -7920,6 +7920,18 @@ void WebPageProxy::beginSafeBrowsingCheck(const URL&, API::Navigation&, bool for
 }
 #endif
 
+void WebPageProxy::decidePolicyForNavigationActionAndGetBackForwardListAsync(IPC::Connection& connection, NavigationActionData&& data, FrameIdentifier frameID, CompletionHandler<void(PolicyDecision&&, Vector<Ref<FrameState>>&&)>&& completionHandler)
+{
+    Vector<Ref<FrameState>> backForwardList;
+    backForwardAllItems(frameID, [&backForwardList](auto list) {
+        backForwardList = WTFMove(list);
+    });
+
+    decidePolicyForNavigationActionAsync(connection, WTFMove(data), [completionHandler = WTFMove(completionHandler), backForwardList = WTFMove(backForwardList)](auto policyDecision) mutable {
+        completionHandler(WTFMove(policyDecision), WTFMove(backForwardList));
+    });
+}
+
 void WebPageProxy::decidePolicyForNavigationActionAsync(IPC::Connection& connection, NavigationActionData&& data, CompletionHandler<void(PolicyDecision&&)>&& completionHandler)
 {
     RefPtr frame = WebFrameProxy::webFrame(data.frameInfo.frameID);
@@ -8313,6 +8325,18 @@ void WebPageProxy::logFrameNavigation(const WebFrameProxy& frame, const URL& pag
         return;
 
     protectedWebsiteDataStore()->protectedNetworkProcess()->send(Messages::NetworkProcess::LogFrameNavigation(m_websiteDataStore->sessionID(), RegistrableDomain { targetURL }, RegistrableDomain { pageURL }, RegistrableDomain { sourceURL }, isRedirect, frame.isMainFrame(), MonotonicTime::now() - internals().didFinishDocumentLoadForMainFrameTimestamp, wasPotentiallyInitiatedByUser), 0);
+}
+
+void WebPageProxy::decidePolicyForNavigationActionAndGetBackForwardListSync(IPC::Connection& connection, NavigationActionData&& data, FrameIdentifier frameID, CompletionHandler<void(PolicyDecision&&, Vector<Ref<FrameState>>&&)>&& completionHandler)
+{
+    Vector<Ref<FrameState>> backForwardList;
+    backForwardAllItems(frameID, [&backForwardList](auto list) {
+        backForwardList = WTFMove(list);
+    });
+
+    decidePolicyForNavigationActionSync(connection, WTFMove(data), [completionHandler = WTFMove(completionHandler), backForwardList = WTFMove(backForwardList)](auto policyDecision) mutable {
+        completionHandler(WTFMove(policyDecision), WTFMove(backForwardList));
+    });
 }
 
 void WebPageProxy::decidePolicyForNavigationActionSync(IPC::Connection& connection, NavigationActionData&& data, CompletionHandler<void(PolicyDecision&&)>&& reply)
@@ -10141,7 +10165,7 @@ void WebPageProxy::backForwardAllItems(FrameIdentifier frameID, CompletionHandle
         if (RefPtr frameItem = item->protectedMainFrameItem()->childItemForFrameID(frameID))
             frameState = frameItem->copyFrameStateWithChildren();
         else
-            frameState = item->mainFrameState();
+            frameState = item->mainFrameState(); // FIXME: it may be possible to move this filtering to  N::initializeForNewWindow
 
         allItems.append(frameState.releaseNonNull());
     }

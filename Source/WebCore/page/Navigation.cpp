@@ -99,10 +99,10 @@ bool Navigation::canGoForward() const
 }
 
 // https://html.spec.whatwg.org/multipage/nav-history-apis.html#getting-the-navigation-api-entry-index
-static std::optional<size_t> getEntryIndexOfHistoryItem(const Vector<Ref<NavigationHistoryEntry>>& entries, const HistoryItem& item, size_t start = 0)
+static std::optional<size_t> getEntryIndexOfHistoryItem(const Vector<Ref<NavigationHistoryEntry>>& entries, const HistoryItem& item)
 {
     // FIXME: We could have a more efficient solution than iterating through a list.
-    for (size_t index = start; index < entries.size(); index++) {
+    for (size_t index = 0; index < entries.size(); index++) {
         if (entries[index]->associatedHistoryItem().itemSequenceNumber() == item.itemSequenceNumber())
             return index;
     }
@@ -111,7 +111,7 @@ static std::optional<size_t> getEntryIndexOfHistoryItem(const Vector<Ref<Navigat
 }
 
 // https://html.spec.whatwg.org/multipage/nav-history-apis.html#initialize-the-navigation-api-entries-for-a-new-document
-void Navigation::initializeForNewWindow(std::optional<NavigationNavigationType> navigationType, LocalDOMWindow* previousWindow)
+void Navigation::initializeForNewWindow(std::optional<NavigationNavigationType> navigationType, LocalDOMWindow* previousWindow, Vector<Ref<HistoryItem>> backForwardList)
 {
     ASSERT(m_entries.isEmpty());
     ASSERT(!m_currentEntryIndex);
@@ -169,7 +169,28 @@ void Navigation::initializeForNewWindow(std::optional<NavigationNavigationType> 
     }
 
     // https://html.spec.whatwg.org/multipage/browsing-the-web.html#getting-session-history-entries-for-the-navigation-api
-    auto rawEntries = page->backForward().itemsForFrame(frame()->frameID());
+    // This is the sync IPC we're trying to remove.
+    // auto rawEntriesIPCForFrame = page->backForward().itemsForFrame(frame()->frameID());
+
+    auto rawEntriesPassedIn = backForwardList;
+
+    Vector<Ref<HistoryItem>> rawEntriesFilteredByFrame;
+    for (auto entry : rawEntriesPassedIn) {
+        if (entry->frameID() == frame()->frameID())
+            rawEntriesFilteredByFrame.append(WTFMove(entry));
+    }
+
+    Vector<Ref<HistoryItem>> rawEntries;
+    for (auto entry : rawEntriesFilteredByFrame) {
+        if (rawEntries.size() == 0) {
+            rawEntries.append(WTFMove(entry));
+            continue;
+        }
+
+        if (!HistoryController::itemsAreClones(rawEntries.last(), entry.ptr()))
+            rawEntries.append(WTFMove(entry));
+    }
+
     auto startingIndex = rawEntries.find(*currentItem);
 
     Vector<Ref<HistoryItem>> items;
@@ -197,12 +218,20 @@ void Navigation::initializeForNewWindow(std::optional<NavigationNavigationType> 
         }
     }
 
-    size_t start = m_entries.size();
+    if (m_entries.size() > 0) {
+        auto last = m_entries[m_entries.size() - 1];
+        auto lastItemID = last->associatedHistoryItem().itemID();
 
-    for (Ref item : items)
-        m_entries.append(NavigationHistoryEntry::create(*this, WTFMove(item)));
+        for (Ref item : items) {
+            if ((item->itemID().object() <=> lastItemID.object()) == std::strong_ordering::greater)
+                m_entries.append(NavigationHistoryEntry::create(*this, WTFMove(item)));
+        }
+    } else {
+        for (Ref item : items)
+            m_entries.append(NavigationHistoryEntry::create(*this, WTFMove(item)));
+    }
 
-    m_currentEntryIndex = getEntryIndexOfHistoryItem(m_entries, *currentItem, start);
+    m_currentEntryIndex = getEntryIndexOfHistoryItem(m_entries, *currentItem);
     setActivation(frame()->loader().history().protectedPreviousItem().get(), navigationType);
 }
 

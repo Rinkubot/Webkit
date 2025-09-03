@@ -1008,8 +1008,12 @@ void HistoryController::updateBackForwardListClippedAtTarget(bool doClip)
     RefPtr item = frame->loader().protectedClient()->createHistoryItemTree(doClip, BackForwardItemIdentifier::generate());
     if (!item)
         return;
+
+    Ref historyItem = item.releaseNonNull();
+    frame->addItemToBackForwardList(Ref { historyItem });
+
     LOG(History, "HistoryController %p updateBackForwardListClippedAtTarget: Adding backforward item %p in frame %p (main frame %d) %s", this, item.get(), m_frame.ptr(), m_frame->isMainFrame(), m_frame->loader().documentLoader()->url().string().utf8().data());
-    page->checkedBackForward()->addItem(item.releaseNonNull());
+    page->checkedBackForward()->addItem(WTFMove(historyItem));
 }
 
 void HistoryController::updateCurrentItem()

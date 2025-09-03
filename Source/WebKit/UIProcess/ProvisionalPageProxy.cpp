@@ -503,6 +503,17 @@ void ProvisionalPageProxy::didChangeProvisionalURLForFrame(FrameIdentifier frame
         page->didChangeProvisionalURLForFrameShared(protectedProcess(), frameID, navigationID, WTFMove(url));
 }
 
+void ProvisionalPageProxy::decidePolicyForNavigationActionAndGetBackForwardListAsync(IPC::Connection& connection, NavigationActionData&& data, FrameIdentifier frameID, CompletionHandler<void(PolicyDecision&&, Vector<Ref<FrameState>>&&)>&& completionHandler)
+{
+    if (!validateInput(data.frameInfo.frameID, data.navigationID))
+        return completionHandler({ }, { });
+
+    if (RefPtr page = m_page.get())
+        page->decidePolicyForNavigationActionAndGetBackForwardListAsync(connection, WTFMove(data), frameID, WTFMove(completionHandler));
+    else
+        completionHandler({ }, { });
+}
+
 void ProvisionalPageProxy::decidePolicyForNavigationActionAsync(IPC::Connection& connection, NavigationActionData&& data, CompletionHandler<void(PolicyDecision&&)>&& completionHandler)
 {
     if (!validateInput(data.frameInfo.frameID, data.navigationID))
@@ -555,6 +566,23 @@ void ProvisionalPageProxy::backForwardGoToItem(WebCore::BackForwardItemIdentifie
         page->backForwardGoToItemShared(identifier, WTFMove(completionHandler));
     else
         completionHandler({ });
+}
+
+void ProvisionalPageProxy::decidePolicyForNavigationActionAndGetBackForwardListSync(IPC::Connection& connection, NavigationActionData&& data, WebCore::FrameIdentifier frameID, CompletionHandler<void(PolicyDecision&&, Vector<Ref<FrameState>>&&)>&& completionHandler)
+{
+    auto& frameInfo = data.frameInfo;
+    auto navigationID = data.navigationID;
+    if (!frameInfo.isMainFrame || (m_mainFrame && m_mainFrame->frameID() != frameInfo.frameID) || navigationID != m_navigationID) {
+        completionHandler(PolicyDecision { std::nullopt, WebCore::PolicyAction::Ignore, navigationID }, { });
+        return;
+    }
+
+    ASSERT(m_mainFrame);
+
+    if (RefPtr page = m_page.get())
+        page->decidePolicyForNavigationActionAndGetBackForwardListSync(connection, WTFMove(data), frameID, WTFMove(completionHandler));
+    else
+        completionHandler({ }, { });
 }
 
 void ProvisionalPageProxy::decidePolicyForNavigationActionSync(IPC::Connection& connection, NavigationActionData&& data, CompletionHandler<void(PolicyDecision&&)>&& reply)
@@ -762,6 +790,12 @@ void ProvisionalPageProxy::didReceiveMessage(IPC::Connection& connection, IPC::D
         return;
     }
 
+    if (decoder.messageName() == Messages::WebPageProxy::DecidePolicyForNavigationActionAndGetBackForwardListAsync::name()) {
+        IPC::handleMessageAsync<Messages::WebPageProxy::DecidePolicyForNavigationActionAndGetBackForwardListAsync>(connection, decoder, this, &ProvisionalPageProxy::decidePolicyForNavigationActionAndGetBackForwardListAsync);
+        return;
+    }
+
+
     if (decoder.messageName() == Messages::WebPageProxy::DecidePolicyForResponse::name()) {
         IPC::handleMessageAsync<Messages::WebPageProxy::DecidePolicyForResponse>(connection, decoder, this, &ProvisionalPageProxy::decidePolicyForResponse);
         return;
@@ -840,6 +874,11 @@ void ProvisionalPageProxy::didReceiveSyncMessage(IPC::Connection& connection, IP
 
     if (decoder.messageName() == Messages::WebPageProxy::DecidePolicyForNavigationActionSync::name()) {
         IPC::handleMessageSynchronous<Messages::WebPageProxy::DecidePolicyForNavigationActionSync>(connection, decoder, replyEncoder, this, &ProvisionalPageProxy::decidePolicyForNavigationActionSync);
+        return;
+    }
+
+    if (decoder.messageName() == Messages::WebPageProxy::DecidePolicyForNavigationActionAndGetBackForwardListSync::name()) {
+        IPC::handleMessageSynchronous<Messages::WebPageProxy::DecidePolicyForNavigationActionAndGetBackForwardListSync>(connection, decoder, replyEncoder, this, &ProvisionalPageProxy::decidePolicyForNavigationActionAndGetBackForwardListSync);
         return;
     }
 

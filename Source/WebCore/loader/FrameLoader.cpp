@@ -871,7 +871,7 @@ void FrameLoader::didBeginDocument(bool dispatch, LocalDOMWindow* previousWindow
     }
 
     if (document->settings().navigationAPIEnabled() && document->window() && !document->protectedSecurityOrigin()->isOpaque())
-        document->protectedWindow()->protectedNavigation()->initializeForNewWindow(navigationType, previousWindow);
+        document->protectedWindow()->protectedNavigation()->initializeForNewWindow(navigationType, previousWindow, frame->backForwardList());
 
     history().restoreDocumentState();
 }
