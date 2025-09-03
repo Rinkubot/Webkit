@@ -301,6 +301,15 @@ struct FrameData {
     };
 
     struct ExternalTexture {
+        bool isNull() const
+        {
+#if PLATFORM(COCOA)
+            return !handle;
+#else
+            return fds.isEmpty();
+#endif
+        }
+
 #if PLATFORM(COCOA)
         MachSendRight handle;
         bool isSharedTexture { false };
