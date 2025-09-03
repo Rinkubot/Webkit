@@ -4890,6 +4890,9 @@
 		B8DBDB4E130B0F8A00F5CDB1 /* SpellingCorrectionCommand.h in Headers */ = {isa = PBXBuildFile; fileRef = B8DBDB4A130B0F8A00F5CDB1 /* SpellingCorrectionCommand.h */; };
 		B9CA3B402CAB1D3E00B2607C /* SpatialImageControls.h in Headers */ = {isa = PBXBuildFile; fileRef = B9CA3B3E2CAB1D3E00B2607C /* SpatialImageControls.h */; };
 		B9CA3B412CAB1D3E00B2607C /* SpatialImageControls.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B9CA3B3F2CAB1D3E00B2607C /* SpatialImageControls.cpp */; };
+		BA3BAEE52E12A7B300B8D3B7 /* DocumentPrefetcher.h in Headers */ = {isa = PBXBuildFile; fileRef = BA3BAEE32E12A7A700B8D3B7 /* DocumentPrefetcher.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		BA4E976A2E3A52290033CC0D /* SpeculationRules.h in Headers */ = {isa = PBXBuildFile; fileRef = BA4E97682E3A52200033CC0D /* SpeculationRules.h */; settings = {ATTRIBUTES = (Private, ); }; };
+		BA6920702E0E93A80014E98A /* SpeculationRulesMatcher.h in Headers */ = {isa = PBXBuildFile; fileRef = BA69206E2E0E939C0014E98A /* SpeculationRulesMatcher.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		BC000BE72C6011020033AA75 /* CSSCalcTree.h in Headers */ = {isa = PBXBuildFile; fileRef = BC000BDB2C5A9D4F0033AA75 /* CSSCalcTree.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		BC000BE82C60110B0033AA75 /* CSSCalcType.h in Headers */ = {isa = PBXBuildFile; fileRef = BC000BD82C5A96850033AA75 /* CSSCalcType.h */; settings = {ATTRIBUTES = (Private, ); }; };
 		BC000BF42C62CDF90033AA75 /* CalculationTree.h in Headers */ = {isa = PBXBuildFile; fileRef = BC000BF02C613ED00033AA75 /* CalculationTree.h */; settings = {ATTRIBUTES = (Private, ); }; };
@@ -18095,9 +18098,15 @@
 		B9CA3B3E2CAB1D3E00B2607C /* SpatialImageControls.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SpatialImageControls.h; sourceTree = "<group>"; };
 		B9CA3B3F2CAB1D3E00B2607C /* SpatialImageControls.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = SpatialImageControls.cpp; sourceTree = "<group>"; };
 		B9CA3B422CAB533800B2607C /* spatialImageControls.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = spatialImageControls.css; sourceTree = "<group>"; };
+		BA3BAEE32E12A7A700B8D3B7 /* DocumentPrefetcher.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DocumentPrefetcher.h; sourceTree = "<group>"; };
+		BA3BAEE42E12A7A700B8D3B7 /* DocumentPrefetcher.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = DocumentPrefetcher.cpp; sourceTree = "<group>"; };
+		BA4E97682E3A52200033CC0D /* SpeculationRules.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SpeculationRules.h; sourceTree = "<group>"; };
+		BA4E97692E3A52200033CC0D /* SpeculationRules.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = SpeculationRules.cpp; sourceTree = "<group>"; };
 		BA5AA8182DDF59100038722C /* IntegrityPolicyViolationReportBody.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IntegrityPolicyViolationReportBody.h; sourceTree = "<group>"; };
 		BA5AA8192DDF59100038722C /* IntegrityPolicyViolationReportBody.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = IntegrityPolicyViolationReportBody.cpp; sourceTree = "<group>"; };
 		BA5AA81A2DDF59100038722C /* IntegrityPolicyViolationReportBody.idl */ = {isa = PBXFileReference; lastKnownFileType = text; path = IntegrityPolicyViolationReportBody.idl; sourceTree = "<group>"; };
+		BA69206E2E0E939C0014E98A /* SpeculationRulesMatcher.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SpeculationRulesMatcher.h; sourceTree = "<group>"; };
+		BA69206F2E0E939C0014E98A /* SpeculationRulesMatcher.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = SpeculationRulesMatcher.cpp; sourceTree = "<group>"; };
 		BA79DEEF2DDDF89D000DB04C /* IntegrityPolicy.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IntegrityPolicy.h; sourceTree = "<group>"; };
 		BA79DEF02DDDF89D000DB04C /* IntegrityPolicy.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = IntegrityPolicy.cpp; sourceTree = "<group>"; };
 		BC000BD82C5A96850033AA75 /* CSSCalcType.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CSSCalcType.h; sourceTree = "<group>"; };
@@ -36128,6 +36137,8 @@
 				93E227DB0AF589AD00D48324 /* DocumentLoader.cpp */,
 				656D371E0ADBA5DE00A4554D /* DocumentLoader.h */,
 				8A12E35C11FA33280025836A /* DocumentLoadTiming.h */,
+				BA3BAEE42E12A7A700B8D3B7 /* DocumentPrefetcher.cpp */,
+				BA3BAEE32E12A7A700B8D3B7 /* DocumentPrefetcher.h */,
 				0B9056150F2578BE0095FF6A /* DocumentThreadableLoader.cpp */,
 				0B9056160F2578BE0095FF6A /* DocumentThreadableLoader.h */,
 				9738899E116EA9DC00ADF313 /* DocumentWriter.cpp */,
@@ -36250,6 +36261,8 @@
 				8362E8BF20CEF9CB00245886 /* ShouldTreatAsContinuingLoad.h */,
 				51327D5F11A33A2B004F9D65 /* SinkDocument.cpp */,
 				51327D5E11A33A2B004F9D65 /* SinkDocument.h */,
+				BA4E97692E3A52200033CC0D /* SpeculationRules.cpp */,
+				BA4E97682E3A52200033CC0D /* SpeculationRules.h */,
 				D000ED2511C1B9CD00C47726 /* SubframeLoader.cpp */,
 				D000ED2611C1B9CD00C47726 /* SubframeLoader.h */,
 				7CF158991EBBCDC700D4BFB7 /* SubresourceIntegrity.cpp */,
@@ -40222,6 +40235,8 @@
 				D01A27AC10C9BFD800026A42 /* SpaceSplitString.h */,
 				CA3344092D1625B9007473A1 /* SpatialBackdropSource.cpp */,
 				CA3344072D16174C007473A1 /* SpatialBackdropSource.h */,
+				BA69206F2E0E939C0014E98A /* SpeculationRulesMatcher.cpp */,
+				BA69206E2E0E939C0014E98A /* SpeculationRulesMatcher.h */,
 				EE7A169F2C607BFA0057B563 /* StartViewTransitionOptions.h */,
 				EE7A169E2C607AF00057B563 /* StartViewTransitionOptions.idl */,
 				BC7FA62C0D1F0EFF00DB22A9 /* StaticNodeList.cpp */,
@@ -42202,6 +42217,7 @@
 				46A49C9328EE67ED00208B6E /* DocumentOrShadowRootFullscreen.h in Headers */,
 				BCCFBAE80B5152ED0001F1D7 /* DocumentParser.h in Headers */,
 				1D2F8E03234474EF00993B68 /* DocumentPictureInPicture.h in Headers */,
+				BA3BAEE52E12A7B300B8D3B7 /* DocumentPrefetcher.h in Headers */,
 				AD6E71AD1668899D00320C13 /* DocumentSharedObjectPool.h in Headers */,
 				6BDB5DC2227BD3B800919770 /* DocumentStorageAccess.h in Headers */,
 				51EE9D642D09479500D97E5E /* DocumentSyncData.h in Headers */,
@@ -45648,6 +45664,8 @@
 				B9CA3B402CAB1D3E00B2607C /* SpatialImageControls.h in Headers */,
 				626CDE0F1140424C001E5A68 /* SpatialNavigation.h in Headers */,
 				517C11D52C6DD6A100489490 /* SpatialVideoMetadata.h in Headers */,
+				BA4E976A2E3A52290033CC0D /* SpeculationRules.h in Headers */,
+				BA6920702E0E93A80014E98A /* SpeculationRulesMatcher.h in Headers */,
 				934950CD253943610099F171 /* SpeechRecognition.h in Headers */,
 				934950CE253943650099F171 /* SpeechRecognitionAlternative.h in Headers */,
 				93F6B8222567A65600A08488 /* SpeechRecognitionCaptureSource.h in Headers */,
