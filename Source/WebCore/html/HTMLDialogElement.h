@@ -30,6 +30,13 @@
 
 namespace WebCore {
 
+enum class ClosedByState : uint8_t {
+    Auto,
+    None,
+    CloseRequest,
+    Any,
+};
+
 class HTMLDialogElement final : public HTMLElement {
     WTF_MAKE_TZONE_OR_ISO_ALLOCATED(HTMLDialogElement);
     WTF_OVERRIDE_DELETE_FOR_CHECKED_PTR(HTMLDialogElement);
@@ -40,6 +47,10 @@ public:
 
     const String& returnValue() const { return m_returnValue; }
     void setReturnValue(String&& value) { m_returnValue = WTFMove(value); }
+
+    ClosedByState closedByState() const;
+    ClosedByState computedClosedByState() const;
+    const AtomString& closedBy() const;
 
     ExceptionOr<void> show();
     ExceptionOr<void> showModal();
@@ -63,6 +74,14 @@ private:
     void removedFromAncestor(RemovalType, ContainerNode& oldParentOfRemovedTree) final;
     void setIsModal(bool newValue);
     bool supportsFocus() const final;
+
+    InsertedIntoAncestorResult insertedIntoAncestor(InsertionType, ContainerNode&) final;
+    void didFinishInsertingNode() final;
+
+    void attributeChanged(const QualifiedName&, const AtomString& oldValue, const AtomString& newValue, AttributeModificationReason) final;
+
+    void setupSteps();
+    void cleanupSteps();
 
     String m_returnValue;
     bool m_isModal { false };
