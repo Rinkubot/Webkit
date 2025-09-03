@@ -192,7 +192,7 @@ JSC_DEFINE_HOST_FUNCTION(callDate, (JSGlobalObject* globalObject, CallFrame*))
     VM& vm = globalObject->vm();
     GregorianDateTime ts;
     vm.dateCache.msToGregorianDateTime(WallTime::now().secondsSinceEpoch().milliseconds(), TimeType::LocalTime, ts);
-    return JSValue::encode(jsNontrivialString(vm, formatDateTime(ts, DateTimeFormatDateAndTime, false, vm.dateCache)));
+    return JSValue::encode(jsNontrivialString(vm, formatDateTime(ts, DateTimeFormat::DateTimeFormatDateAndTime, false, vm.dateCache)));
 }
 
 JSC_DEFINE_HOST_FUNCTION(dateParse, (JSGlobalObject* globalObject, CallFrame* callFrame))

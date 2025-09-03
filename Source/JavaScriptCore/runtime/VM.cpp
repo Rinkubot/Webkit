@@ -625,7 +625,7 @@ Exception* VM::ensureTerminationException()
 {
     if (!m_terminationException) {
         JSString* terminationError = jsNontrivialString(*this, terminationErrorString);
-        m_terminationException = Exception::create(*this, terminationError, Exception::DoNotCaptureStack);
+        m_terminationException = Exception::create(*this, terminationError, Exception::StackCaptureAction::DoNotCaptureStack);
     }
     return m_terminationException;
 }
