@@ -40,15 +40,23 @@
 
 namespace WebKit {
 
-Ref<WebCore::WebTransportSessionPromise> WebTransportSession::initialize(Ref<IPC::Connection>&& connection, ThreadSafeWeakPtr<WebCore::WebTransportSessionClient>&& client, const URL& url, const WebPageProxyIdentifier& pageID, const WebCore::ClientOrigin& clientOrigin)
+std::pair<Ref<WebTransportSession>, Ref<WebCore::WebTransportSessionPromise>> WebTransportSession::initialize(Ref<IPC::Connection>&& connection, ThreadSafeWeakPtr<WebCore::WebTransportSessionClient>&& client, const URL& url, const WebPageProxyIdentifier& pageID, const WebCore::ClientOrigin& clientOrigin)
 {
     ASSERT(RunLoop::isMain());
-    return connection->sendWithPromisedReply(Messages::NetworkConnectionToWebProcess::InitializeWebTransportSession(url, pageID, clientOrigin))->whenSettled(RunLoop::mainSingleton(), [connection, client = WTFMove(client)] (auto&& identifier) mutable {
-        ASSERT(RunLoop::isMain());
-        if (!identifier || !*identifier)
-            return WebCore::WebTransportSessionPromise::createAndReject();
-        return WebCore::WebTransportSessionPromise::createAndResolve(adoptRef(*new WebTransportSession(WTFMove(connection), WTFMove(client), **identifier)));
+    auto identifier = WebTransportSessionIdentifier::generate();
+    Ref boolPromise =  connection->sendWithPromisedReply(Messages::NetworkConnectionToWebProcess::InitializeWebTransportSession(identifier, url, pageID, clientOrigin));
+
+    WebCore::WebTransportSessionPromise::Producer producer;
+    Ref<WebCore::WebTransportSessionPromise> promise = producer.promise();
+    boolPromise->whenSettled(RunLoop::mainSingleton(), [producer = WTFMove(producer)] (auto&& result) mutable {
+        if (!result || !*result)
+            producer.reject();
+        else
+            producer.resolve();
     });
+
+    Ref session = adoptRef(*new WebTransportSession(WTFMove(connection), WTFMove(client), identifier));
+    return { WTFMove(session), WTFMove(promise) };
 }
 
 WebTransportSession::WebTransportSession(Ref<IPC::Connection>&& connection, ThreadSafeWeakPtr<WebCore::WebTransportSessionClient>&& client, WebTransportSessionIdentifier identifier)
