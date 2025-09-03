@@ -1925,6 +1925,21 @@ if (window.testRunner) {
     testRunner.finishFullscreenExit = () => post(['FinishFullscreenExit']);
     testRunner.requestExitFullscreenFromUIProcess = () => post(['RequestExitFullscreenFromUIProcess']);
     testRunner.keyExistsInKeychain = (attrLabel, applicationLabelBase64) => post(['KeyExistsInKeychain', attrLabel, applicationLabelBase64]);
+    testRunner.setShouldLogDownloadCallbacks = value => post(['SetShouldLogDownloadCallbacks', value]);
+    testRunner.setShouldLogDownloadSize = value => post(['SetShouldLogDownloadSize', value]);
+    testRunner.setShouldLogDownloadExpectedSize = value => post(['SetShouldLogDownloadExpectedSize', value]);
+    testRunner.setShouldDownloadContentDispositionAttachments = value => post(['SetShouldDownloadContentDispositionAttachments', value]);
+    testRunner.setShouldDecideNavigationPolicyAfterDelay = value => post(['SetShouldDecideNavigationPolicyAfterDelay', value]);
+    testRunner.setShouldDecideResponsePolicyAfterDelay = value => post(['SetShouldDecideResponsePolicyAfterDelay', value]);
+    testRunner.setNavigationGesturesEnabled = value => post(['SetNavigationGesturesEnabled', value]);
+    testRunner.setIgnoresViewportScaleLimits = value => post(['SetIgnoresViewportScaleLimits', value]);
+    testRunner.setUseDarkAppearanceForTesting = value => post(['SetUseDarkAppearanceForTesting', value]);
+    testRunner.setShouldDownloadUndisplayableMIMETypes = value => post(['SetShouldDownloadUndisplayableMIMETypes', value]);
+    testRunner.setShouldAllowDeviceOrientationAndMotionAccess = value => post(['SetShouldAllowDeviceOrientationAndMotionAccess', value]);
+    testRunner.setRejectsProtectionSpaceAndContinueForAuthenticationChallenges = value => post(['setRejectsProtectionSpaceAndContinueForAuthenticationChallenges', value]);
+    testRunner.setHandlesAuthenticationChallenges = value => post(['SetHandlesAuthenticationChallenges', value]);
+    testRunner.setShouldLogCanAuthenticateAgainstProtectionSpace = value => post(['SetShouldLogCanAuthenticateAgainstProtectionSpace', value]);
+    testRunner.setBlockAllPlugins = value => post(['SetBlockAllPlugins', value]);
 }
 )testRunnerJS";
 
@@ -2027,6 +2042,96 @@ void TestController::didReceiveScriptMessage(WKScriptMessageRef message, Complet
 
     if (WKStringIsEqualToUTF8CString(command, "KeyExistsInKeychain"))
         return completionHandler(adoptWK(WKBooleanCreate(keyExistsInKeychain(toWTFString(argument), toWTFString(argument2)))).get());
+
+    if (WKStringIsEqualToUTF8CString(command, "SetShouldLogDownloadCallbacks")) {
+        ASSERT(WKGetTypeID(argument) == WKBooleanGetTypeID());
+        m_shouldLogDownloadCallbacks = WKBooleanGetValue(static_cast<WKBooleanRef>(argument));
+        return completionHandler(nullptr);
+    }
+
+    if (WKStringIsEqualToUTF8CString(command, "SetShouldLogDownloadSize")) {
+        ASSERT(WKGetTypeID(argument) == WKBooleanGetTypeID());
+        setShouldLogDownloadSize(WKBooleanGetValue(static_cast<WKBooleanRef>(argument)));
+        return completionHandler(nullptr);
+    }
+
+    if (WKStringIsEqualToUTF8CString(command, "SetShouldLogDownloadExpectedSize")) {
+        ASSERT(WKGetTypeID(argument) == WKBooleanGetTypeID());
+        setShouldLogDownloadExpectedSize(WKBooleanGetValue(static_cast<WKBooleanRef>(argument)));
+        return completionHandler(nullptr);
+    }
+
+    if (WKStringIsEqualToUTF8CString(command, "SetShouldDownloadContentDispositionAttachments")) {
+        ASSERT(WKGetTypeID(argument) == WKBooleanGetTypeID());
+        setShouldDownloadContentDispositionAttachments(WKBooleanGetValue(static_cast<WKBooleanRef>(argument)));
+        return completionHandler(nullptr);
+    }
+
+    if (WKStringIsEqualToUTF8CString(command, "SetShouldDecideNavigationPolicyAfterDelay")) {
+        ASSERT(WKGetTypeID(argument) == WKBooleanGetTypeID());
+        setShouldDecideNavigationPolicyAfterDelay(WKBooleanGetValue(static_cast<WKBooleanRef>(argument)));
+        return completionHandler(nullptr);
+    }
+
+    if (WKStringIsEqualToUTF8CString(command, "SetShouldDecideResponsePolicyAfterDelay")) {
+        ASSERT(WKGetTypeID(argument) == WKBooleanGetTypeID());
+        setShouldDecideResponsePolicyAfterDelay(WKBooleanGetValue(static_cast<WKBooleanRef>(argument)));
+        return completionHandler(nullptr);
+    }
+
+    if (WKStringIsEqualToUTF8CString(command, "SetNavigationGesturesEnabled")) {
+        ASSERT(WKGetTypeID(argument) == WKBooleanGetTypeID());
+        setNavigationGesturesEnabled(WKBooleanGetValue(static_cast<WKBooleanRef>(argument)));
+        return completionHandler(nullptr);
+    }
+
+    if (WKStringIsEqualToUTF8CString(command, "SetIgnoresViewportScaleLimits")) {
+        ASSERT(WKGetTypeID(argument) == WKBooleanGetTypeID());
+        setIgnoresViewportScaleLimits(WKBooleanGetValue(static_cast<WKBooleanRef>(argument)));
+        return completionHandler(nullptr);
+    }
+
+    if (WKStringIsEqualToUTF8CString(command, "SetUseDarkAppearanceForTesting")) {
+        ASSERT(WKGetTypeID(argument) == WKBooleanGetTypeID());
+        setUseDarkAppearanceForTesting(WKBooleanGetValue(static_cast<WKBooleanRef>(argument)));
+        return completionHandler(nullptr);
+    }
+
+    if (WKStringIsEqualToUTF8CString(command, "SetShouldDownloadUndisplayableMIMETypes")) {
+        ASSERT(WKGetTypeID(argument) == WKBooleanGetTypeID());
+        setShouldDownloadUndisplayableMIMETypes(WKBooleanGetValue(static_cast<WKBooleanRef>(argument)));
+        return completionHandler(nullptr);
+    }
+
+    if (WKStringIsEqualToUTF8CString(command, "SetShouldAllowDeviceOrientationAndMotionAccess")) {
+        ASSERT(WKGetTypeID(argument) == WKBooleanGetTypeID());
+        setShouldAllowDeviceOrientationAndMotionAccess(WKBooleanGetValue(static_cast<WKBooleanRef>(argument)));
+        return completionHandler(nullptr);
+    }
+
+    if (WKStringIsEqualToUTF8CString(command, "setRejectsProtectionSpaceAndContinueForAuthenticationChallenges")) {
+        ASSERT(WKGetTypeID(argument) == WKBooleanGetTypeID());
+        setRejectsProtectionSpaceAndContinueForAuthenticationChallenges(WKBooleanGetValue(static_cast<WKBooleanRef>(argument)));
+        return completionHandler(nullptr);
+    }
+
+    if (WKStringIsEqualToUTF8CString(command, "SetHandlesAuthenticationChallenges")) {
+        ASSERT(WKGetTypeID(argument) == WKBooleanGetTypeID());
+        setHandlesAuthenticationChallenges(WKBooleanGetValue(static_cast<WKBooleanRef>(argument)));
+        return completionHandler(nullptr);
+    }
+
+    if (WKStringIsEqualToUTF8CString(command, "SetShouldLogCanAuthenticateAgainstProtectionSpace")) {
+        ASSERT(WKGetTypeID(argument) == WKBooleanGetTypeID());
+        m_shouldLogCanAuthenticateAgainstProtectionSpace = WKBooleanGetValue(static_cast<WKBooleanRef>(argument));
+        return completionHandler(nullptr);
+    }
+
+    if (WKStringIsEqualToUTF8CString(command, "SetBlockAllPlugins")) {
+        ASSERT(WKGetTypeID(argument) == WKBooleanGetTypeID());
+        setBlockAllPlugins(WKBooleanGetValue(static_cast<WKBooleanRef>(argument)));
+        return completionHandler(nullptr);
+    }
 
     ASSERT_NOT_REACHED();
 }
