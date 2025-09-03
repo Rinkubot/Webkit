@@ -113,6 +113,14 @@ bool defaultAppleMailPaginationQuirkEnabled()
 #endif
 
 #if ENABLE(MEDIA_STREAM)
+double defaultInactiveMediaCaptureStreamRepromptWithoutUserGestureIntervalInMinutes()
+{
+#if PLATFORM(IOS_FAMILY)
+    if (!PAL::currentUserInterfaceIdiomIsDesktop())
+        return 1;
+#endif
+    return 10;
+}
 
 bool defaultCaptureAudioInGPUProcessEnabled()
 {
