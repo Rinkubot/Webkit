@@ -263,6 +263,11 @@ ExceptionOr<void> HTMLTextFormControlElement::setRangeText(StringView replacemen
     start = std::min(start, textLength);
     end = std::min(end, textLength);
 
+#if PLATFORM(WPE)
+    if (!start || !end)
+        return { };
+#endif
+
     if (start < end)
         text = makeStringByReplacing(text, start, end - start, replacement);
     else
