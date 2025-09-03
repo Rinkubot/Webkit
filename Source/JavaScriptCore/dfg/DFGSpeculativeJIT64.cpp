@@ -5545,13 +5545,9 @@ void SpeculativeJIT::compile(Node* node)
         compileWeakMapSet(node);
         break;
 
+    case StringSubstring:
     case StringSlice: {
         compileStringSlice(node);
-        break;
-    }
-
-    case StringSubstring: {
-        compileStringSubstring(node);
         break;
     }
 
