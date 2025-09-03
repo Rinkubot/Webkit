@@ -268,14 +268,37 @@ ExceptionOr<float> SVGLengthContext::convertValueFromUserUnits(float value, SVGL
 
 float SVGLengthContext::computeNonCalcLength(float inputValue, CSS::LengthUnit unit) const
 {
-    if (conversionToCanonicalUnitRequiresConversionData(unit)) {
-        auto conversionData = cssConversionData();
-        if (!conversionData)
-            return 0.0f;
-        return clampTo<float>(Style::computeNonCalcLengthDouble(inputValue, unit, *conversionData));
+    if (!conversionToCanonicalUnitRequiresConversionData(unit))
+        return clampTo<float>(Style::computeNonCalcLengthDouble(inputValue, unit, { }));
+
+
+    auto conversionData = cssConversionData();
+    if (!conversionData)
+        return 0.0f;
+
+    auto resolvedValue = clampTo<float>(Style::computeNonCalcLengthDouble(inputValue, unit, *conversionData));
+
+    if (unit == CSS::LengthUnit::Em || unit == CSS::LengthUnit::Rem) {
+        RefPtr svg = m_context->isOutermostSVGSVGElement()
+            ? downcast<SVGSVGElement>(m_context.get())
+            : dynamicDowncast<SVGSVGElement>(m_context->viewportElement());
+
+        if (svg && svg->renderer()) {
+            float usedZoom = 1.0f;
+
+            if (unit == CSS::LengthUnit::Em)
+                usedZoom = svg->renderer()->style().usedZoom();
+            else if (unit == CSS::LengthUnit::Rem) {
+                if (auto* rootRenderer = svg->document().documentElement()->renderer())
+                    usedZoom = rootRenderer->style().usedZoom();
+            }
+
+            if (usedZoom != 1.0f)
+                resolvedValue = resolvedValue / usedZoom;
+        }
     }
 
-    return clampTo<float>(Style::computeNonCalcLengthDouble(inputValue, unit, { }));
+    return resolvedValue;
 }
 
 ExceptionOr<float> SVGLengthContext::resolveValueToUserUnits(float value, const CSS::LengthPercentageUnit& targetUnit, SVGLengthMode lengthMode) const
