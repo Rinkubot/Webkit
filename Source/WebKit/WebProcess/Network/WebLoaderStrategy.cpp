@@ -81,6 +81,10 @@
 #include <WebCore/QuickLook.h>
 #endif
 
+#if PLATFORM(WPE)
+#include <wtf/glib/GResources.h>
+#endif
+
 #if ENABLE(WK_WEB_EXTENSIONS) && PLATFORM(COCOA)
 #include "WebExtensionControllerProxy.h"
 #endif
@@ -267,6 +271,9 @@ void WebLoaderStrategy::scheduleLoad(ResourceLoader& resourceLoader, CachedResou
     if (resourceLoader.request().url().protocolIs("resource"_s)) {
         LOG(NetworkScheduling, "(WebProcess) WebLoaderStrategy::scheduleLoad, url '%s' will be handled as a GResource.", resourceLoader.url().string().utf8().data());
         WEBLOADERSTRATEGY_RELEASE_LOG("scheduleLoad: URL will be handled as a GResource");
+#if PLATFORM(WPE)
+        WTF::registerInspectorResources();
+#endif
         startLocalLoad(resourceLoader);
         return;
     }
