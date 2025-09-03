@@ -465,6 +465,7 @@ void EventHandler::clear()
     m_lastScrollbarUnderMouse = nullptr;
     m_clickCount = 0;
     m_clickNode = nullptr;
+    m_clickCaptureElement = nullptr;
 #if ENABLE(IOS_GESTURE_EVENTS)
     m_gestureInitialDiameter = GestureUnknown;
     m_gestureInitialRotation = GestureUnknown;
@@ -509,6 +510,9 @@ void EventHandler::nodeWillBeRemoved(Node& nodeToBeRemoved)
 
     if (nodeToBeRemoved.isShadowIncludingInclusiveAncestorOf(RefPtr { m_lastElementUnderMouse }.get()))
         m_lastElementUnderMouse = nullptr;
+
+    if (nodeToBeRemoved.isShadowIncludingInclusiveAncestorOf(RefPtr { m_clickCaptureElement }.get()))
+        m_clickCaptureElement = nullptr;
 }
 
 static void setSelectionIfNeeded(FrameSelection& selection, const VisibleSelection& newSelection)
@@ -2383,6 +2387,7 @@ void EventHandler::invalidateClick()
 {
     m_clickCount = 0;
     m_clickNode = nullptr;
+    m_clickCaptureElement = nullptr;
 }
 
 static RefPtr<Node> targetNodeForClickEvent(Node* mousePressNode, Node* mouseReleaseNode)
@@ -2416,6 +2421,9 @@ bool EventHandler::swallowAnyClickEvent(const PlatformMouseEvent& platformMouseE
         return false;
 
     auto nodeToClick = [&] -> RefPtr<Node> {
+        if (m_clickCaptureElement)
+            return m_clickCaptureElement;
+
         if (ignoreAncestorNodesForClickEvent == IgnoreAncestorNodesForClickEvent::Yes) {
             if (mouseEvent.targetNode() != m_clickNode)
                 return nullptr;
@@ -2857,6 +2865,10 @@ void EventHandler::pointerCaptureElementDidChange(Element* element)
         return;
 
     setCapturingMouseEventsElement(element);
+
+    // Click events should be aware of pointer capture, too.
+    if (element && m_clickNode)
+        m_clickCaptureElement = element;
 
     // Now that we have a new capture element, we need to dispatch boundary mouse events.
     updateMouseEventTargetNode(eventNames().gotpointercaptureEvent, element, m_lastPlatformMouseEvent, FireMouseOverOut::Yes);
