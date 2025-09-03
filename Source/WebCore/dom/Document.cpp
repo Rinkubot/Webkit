@@ -5367,6 +5367,7 @@ void Document::processReferrerPolicy(const String& policy, ReferrerPolicySource 
         return;
     }
     setReferrerPolicy(referrerPolicy.value());
+    frame()->updateEffectiveReferrerPolicy(referrerPolicy.value());
 }
 
 #if ENABLE(APPLICATION_MANIFEST)
@@ -8246,7 +8247,7 @@ void Document::initSecurityContext()
     // Flags from CSP will be added when the response is received, but should not be carried over to the frame's next document.
     enforceSandboxFlags(m_frame->sandboxFlagsFromSandboxAttributeNotCSP());
 
-    setReferrerPolicy(m_frame->loader().effectiveReferrerPolicy());
+    setReferrerPolicy(m_frame->effectiveReferrerPolicy());
 
     if (shouldEnforceContentDispositionAttachmentSandbox())
         applyContentDispositionAttachmentSandbox();
