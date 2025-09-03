@@ -24,44 +24,48 @@
  */
 
 #include "config.h"
-#include "StyleRuleFunction.h"
+#include "CSSFunctionDeclarations.h"
 
-#include "MutableStyleProperties.h"
-#include "StylePropertiesInlines.h"
+#include "CSSFunctionDescriptors.h"
+#include "CSSSerializationContext.h"
+#include "StyleProperties.h"
+#include "StyleRuleFunction.h"
 
 namespace WebCore {
 
-Ref<StyleRuleFunction> StyleRuleFunction::create(const AtomString& name, Vector<Parameter>&& parameters, CSSCustomPropertySyntax&& returnType, Vector<Ref<StyleRuleBase>>&& rules)
-{
-    return adoptRef(*new StyleRuleFunction(name, WTFMove(parameters), WTFMove(returnType), WTFMove(rules)));
-}
-
-StyleRuleFunction::StyleRuleFunction(const AtomString& name, Vector<Parameter>&& parameters, CSSCustomPropertySyntax&& returnType, Vector<Ref<StyleRuleBase>>&& rules)
-    : StyleRuleGroup(StyleRuleType::Function, WTFMove(rules))
-    , m_name(name)
-    , m_parameters(WTFMove(parameters))
-    , m_returnType(WTFMove(returnType))
+CSSFunctionDeclarations::CSSFunctionDeclarations(StyleRuleFunctionDeclarations& rule, CSSStyleSheet* parent)
+    : CSSRule(parent)
+    , m_styleRule(rule)
 {
 }
 
-StyleRuleFunction::StyleRuleFunction(const StyleRuleFunction&) = default;
+CSSFunctionDeclarations::~CSSFunctionDeclarations() = default;
 
-StyleRuleFunctionDeclarations::StyleRuleFunctionDeclarations(Ref<StyleProperties>&& properties)
-    : StyleRuleBase(StyleRuleType::FunctionDeclarations)
-    , m_properties(WTFMove(properties))
+CSSFunctionDescriptors& CSSFunctionDeclarations::style()
 {
+    if (!m_descriptorsCSSOMWrapper) {
+        Ref styleRule = m_styleRule;
+        Ref properties = styleRule->mutableProperties();
+        m_descriptorsCSSOMWrapper = CSSFunctionDescriptors::create(properties, *this);
+    }
+    return *m_descriptorsCSSOMWrapper;
 }
 
-StyleRuleFunctionDeclarations::StyleRuleFunctionDeclarations(const StyleRuleFunctionDeclarations&) = default;
-
-MutableStyleProperties& StyleRuleFunctionDeclarations::mutableProperties()
+String CSSFunctionDeclarations::cssText() const
 {
-    Ref properties = m_properties;
+    Ref properties = m_styleRule->properties();
+    return properties->asText(CSS::defaultSerializationContext());
+}
 
-    if (!is<MutableStyleProperties>(properties))
-        m_properties = properties->mutableCopy();
+void CSSFunctionDeclarations::reattach(StyleRuleBase& rule)
+{
+    m_styleRule = downcast<StyleRuleFunctionDeclarations>(rule);
 
-    return downcast<MutableStyleProperties>(m_properties.get());
+    if (RefPtr wrapper = m_descriptorsCSSOMWrapper) {
+        Ref styleRule = m_styleRule;
+        Ref properties = styleRule->mutableProperties();
+        wrapper->reattach(properties);
+    }
 }
 
 }

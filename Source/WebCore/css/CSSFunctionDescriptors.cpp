@@ -24,44 +24,38 @@
  */
 
 #include "config.h"
-#include "StyleRuleFunction.h"
+#include "CSSFunctionDescriptors.h"
 
-#include "MutableStyleProperties.h"
-#include "StylePropertiesInlines.h"
+#include "ExceptionOr.h"
+#include <wtf/TZoneMallocInlines.h>
 
 namespace WebCore {
 
-Ref<StyleRuleFunction> StyleRuleFunction::create(const AtomString& name, Vector<Parameter>&& parameters, CSSCustomPropertySyntax&& returnType, Vector<Ref<StyleRuleBase>>&& rules)
-{
-    return adoptRef(*new StyleRuleFunction(name, WTFMove(parameters), WTFMove(returnType), WTFMove(rules)));
-}
+WTF_MAKE_TZONE_OR_ISO_ALLOCATED_IMPL(CSSFunctionDescriptors);
 
-StyleRuleFunction::StyleRuleFunction(const AtomString& name, Vector<Parameter>&& parameters, CSSCustomPropertySyntax&& returnType, Vector<Ref<StyleRuleBase>>&& rules)
-    : StyleRuleGroup(StyleRuleType::Function, WTFMove(rules))
-    , m_name(name)
-    , m_parameters(WTFMove(parameters))
-    , m_returnType(WTFMove(returnType))
+CSSFunctionDescriptors::CSSFunctionDescriptors(MutableStyleProperties& propertySet, CSSFunctionDeclarations& parentRule)
+    : PropertySetCSSDescriptors(propertySet, parentRule)
 {
 }
 
-StyleRuleFunction::StyleRuleFunction(const StyleRuleFunction&) = default;
+CSSFunctionDescriptors::~CSSFunctionDescriptors() = default;
 
-StyleRuleFunctionDeclarations::StyleRuleFunctionDeclarations(Ref<StyleProperties>&& properties)
-    : StyleRuleBase(StyleRuleType::FunctionDeclarations)
-    , m_properties(WTFMove(properties))
+StyleRuleType CSSFunctionDescriptors::ruleType() const
 {
+    return StyleRuleType::FunctionDeclarations;
 }
 
-StyleRuleFunctionDeclarations::StyleRuleFunctionDeclarations(const StyleRuleFunctionDeclarations&) = default;
+// MARK: - Descriptors
 
-MutableStyleProperties& StyleRuleFunctionDeclarations::mutableProperties()
+// @position-try 'margin'
+String CSSFunctionDescriptors::result() const
 {
-    Ref properties = m_properties;
+    return getPropertyValueInternal(CSSPropertyResult);
+}
 
-    if (!is<MutableStyleProperties>(properties))
-        m_properties = properties->mutableCopy();
-
-    return downcast<MutableStyleProperties>(m_properties.get());
+ExceptionOr<void> CSSFunctionDescriptors::setResult(const String& value)
+{
+    return setPropertyInternal(CSSPropertyResult, value, IsImportant::No);
 }
 
 }
