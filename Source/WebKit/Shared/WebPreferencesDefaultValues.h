@@ -101,6 +101,7 @@ bool defaultAppleMailPaginationQuirkEnabled();
 #endif
 
 #if ENABLE(MEDIA_STREAM)
+double defaultInactiveMediaCaptureStreamRepromptWithoutUserGestureIntervalInMinutes();
 bool defaultCaptureAudioInGPUProcessEnabled();
 bool defaultManageCaptureStatusBarInGPUProcessEnabled();
 #endif
