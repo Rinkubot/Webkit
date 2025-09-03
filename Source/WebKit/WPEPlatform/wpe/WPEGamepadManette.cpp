@@ -68,12 +68,8 @@ static void wpeGamepadManetteSetProperty(GObject* object, guint propId, const GV
     }
 }
 
-static std::optional<WPEGamepadButton> wpeGamepadButtonFromEvent(ManetteEvent* event)
+static WPEGamepadButton wpeGamepadButton(uint16_t button)
 {
-    uint16_t button;
-    if (!manette_event_get_button(event, &button))
-        return std::nullopt;
-
     switch (button) {
     case BTN_SOUTH:
         return WPE_GAMEPAD_BUTTON_RIGHT_CLUSTER_BOTTOM;
@@ -112,10 +108,12 @@ static std::optional<WPEGamepadButton> wpeGamepadButtonFromEvent(ManetteEvent* e
     default:
         break;
     }
-    return std::nullopt;
+    // In case could not map button to a WPE_GAMEPAD_BUTTON value, return
+    // a valid WPE_GAMEPAD_BUTTON value anyway.
+    return static_cast<WPEGamepadButton>(button % static_cast<size_t>(WPE_GAMEPAD_BUTTON_SIZE));
 }
 
-static std::optional<WPEGamepadAxis> wpeGamepadAxis(uint16_t axis)
+static WPEGamepadAxis wpeGamepadAxis(uint16_t axis)
 {
     switch (axis) {
     case ABS_X:
@@ -127,27 +125,33 @@ static std::optional<WPEGamepadAxis> wpeGamepadAxis(uint16_t axis)
     case ABS_RY:
         return WPE_GAMEPAD_AXIS_RIGHT_Y;
     }
-    return std::nullopt;
+    // In case could not map axis to a WPE_GAMEPAD_AXIS value, return
+    // a valid WPE_GAMEPAD_AXIS value anyway.
+    return static_cast<WPEGamepadAxis>(axis % static_cast<size_t>(WPE_GAMEPAD_AXIS_SIZE));
 }
 
 static void wpeGamepadManetteStartInputMonitor(WPEGamepad* gamepad)
 {
     auto* priv = WPE_GAMEPAD_MANETTE(gamepad)->priv;
+
     g_signal_connect_object(priv->device.get(), "button-press-event", G_CALLBACK(+[](WPEGamepad* gamepad, ManetteEvent* event) {
-        if (auto button = wpeGamepadButtonFromEvent(event))
-            wpe_gamepad_button_event(gamepad, *button, TRUE);
+        uint16_t button;
+        if (!manette_event_get_button(event, &button))
+            return;
+        wpe_gamepad_button_event(gamepad, wpeGamepadButton(button), TRUE);
     }), gamepad, G_CONNECT_SWAPPED);
     g_signal_connect_object(priv->device.get(), "button-release-event", G_CALLBACK(+[](WPEGamepad* gamepad, ManetteEvent* event) {
-        if (auto button = wpeGamepadButtonFromEvent(event))
-            wpe_gamepad_button_event(gamepad, *button, FALSE);
+        uint16_t button;
+        if (!manette_event_get_button(event, &button))
+            return;
+        wpe_gamepad_button_event(gamepad, wpeGamepadButton(button), FALSE);
     }), gamepad, G_CONNECT_SWAPPED);
     g_signal_connect_object(priv->device.get(), "absolute-axis-event", G_CALLBACK(+[](WPEGamepad* gamepad, ManetteEvent* event) {
         uint16_t axis;
         double value;
         if (!manette_event_get_absolute(event, &axis, &value))
             return;
-        if (auto wpeAxis = wpeGamepadAxis(axis))
-            wpe_gamepad_axis_event(gamepad, *wpeAxis, value);
+        wpe_gamepad_axis_event(gamepad, wpeGamepadAxis(axis), value);
     }), gamepad, G_CONNECT_SWAPPED);
 }
 
