@@ -571,10 +571,10 @@ public:
 
     static RuntimeFlags javaScriptRuntimeFlags(const JSGlobalObject*) { return RuntimeFlags::createAllEnabled(); }
 
-    static void getOwnPropertyNames(JSObject* object, JSGlobalObject* globalObject, PropertyNameArray& propertyNames, DontEnumPropertiesMode mode)
+    static void getOwnPropertyNames(JSObject* object, JSGlobalObject* globalObject, PropertyNameArrayBuilder& propertyNames, DontEnumPropertiesMode mode)
     {
         VM& vm = globalObject->vm();
-        PropertyNameArray ownPropertyNames(vm, propertyNames.propertyNameMode(), propertyNames.privateSymbolMode());
+        PropertyNameArrayBuilder ownPropertyNames(vm, propertyNames.propertyNameMode(), propertyNames.privateSymbolMode());
         Base::getOwnPropertyNames(object, globalObject, ownPropertyNames, mode);
         auto* thisObject = jsCast<GlobalObject*>(object);
         auto& filter = thisObject->ensurePropertyFilter();

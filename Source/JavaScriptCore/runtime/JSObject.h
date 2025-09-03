@@ -68,7 +68,7 @@ class LLIntOffsetsExtractor;
 class MarkedBlock;
 class ObjectInitializationScope;
 class PropertyDescriptor;
-class PropertyNameArray;
+class PropertyNameArrayBuilder;
 class Structure;
 class ThrowScope;
 class VM;
@@ -627,12 +627,12 @@ public:
     static bool defaultHasInstance(JSGlobalObject*, JSValue, JSValue prototypeProperty);
 
     static constexpr unsigned maximumPrototypeChainDepth = 40000;
-    JS_EXPORT_PRIVATE void getPropertyNames(JSGlobalObject*, PropertyNameArray&, DontEnumPropertiesMode);
-    JS_EXPORT_PRIVATE static void getOwnPropertyNames(JSObject*, JSGlobalObject*, PropertyNameArray&, DontEnumPropertiesMode);
-    JS_EXPORT_PRIVATE static void getOwnSpecialPropertyNames(JSObject*, JSGlobalObject*, PropertyNameArray&, DontEnumPropertiesMode);
-    JS_EXPORT_PRIVATE void getOwnIndexedPropertyNames(JSGlobalObject*, PropertyNameArray&, DontEnumPropertiesMode);
-    JS_EXPORT_PRIVATE void getOwnNonIndexPropertyNames(JSGlobalObject*, PropertyNameArray&, DontEnumPropertiesMode);
-    void getNonReifiedStaticPropertyNames(VM&, PropertyNameArray&, DontEnumPropertiesMode);
+    JS_EXPORT_PRIVATE void getPropertyNames(JSGlobalObject*, PropertyNameArrayBuilder&, DontEnumPropertiesMode);
+    JS_EXPORT_PRIVATE static void getOwnPropertyNames(JSObject*, JSGlobalObject*, PropertyNameArrayBuilder&, DontEnumPropertiesMode);
+    JS_EXPORT_PRIVATE static void getOwnSpecialPropertyNames(JSObject*, JSGlobalObject*, PropertyNameArrayBuilder&, DontEnumPropertiesMode);
+    JS_EXPORT_PRIVATE void getOwnIndexedPropertyNames(JSGlobalObject*, PropertyNameArrayBuilder&, DontEnumPropertiesMode);
+    JS_EXPORT_PRIVATE void getOwnNonIndexPropertyNames(JSGlobalObject*, PropertyNameArrayBuilder&, DontEnumPropertiesMode);
+    void getNonReifiedStaticPropertyNames(VM&, PropertyNameArrayBuilder&, DontEnumPropertiesMode);
 
     JS_EXPORT_PRIVATE uint32_t getEnumerableLength();
 

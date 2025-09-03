@@ -878,7 +878,7 @@ inline void JSObject::definePrivateField(JSGlobalObject* globalObject, PropertyN
     putDirect(vm, propertyName, value, putSlot);
 }
 
-ALWAYS_INLINE void JSObject::getNonReifiedStaticPropertyNames(VM& vm, PropertyNameArray& propertyNames, DontEnumPropertiesMode mode)
+ALWAYS_INLINE void JSObject::getNonReifiedStaticPropertyNames(VM& vm, PropertyNameArrayBuilder& propertyNames, DontEnumPropertiesMode mode)
 {
     if (staticPropertiesReified())
         return;

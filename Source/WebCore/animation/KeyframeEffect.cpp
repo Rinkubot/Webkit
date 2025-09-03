@@ -441,7 +441,7 @@ static inline ExceptionOr<KeyframeEffect::KeyframeLikeObject> processKeyframeLik
     //       name to IDL attribute name algorithm.
 
     // 3. Let input properties be the result of calling the EnumerableOwnNames operation with keyframe input as the object.
-    PropertyNameArray inputProperties(vm, PropertyNameMode::Strings, PrivateSymbolMode::Exclude);
+    PropertyNameArrayBuilder inputProperties(vm, PropertyNameMode::Strings, PrivateSymbolMode::Exclude);
     JSObject::getOwnPropertyNames(keyframesInput.get(), &lexicalGlobalObject, inputProperties, DontEnumPropertiesMode::Exclude);
 
     auto isDirectionAwareShorthand = [](CSSPropertyID property) {

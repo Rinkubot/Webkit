@@ -692,7 +692,7 @@ bool JSGenericTypedArrayView<Adaptor>::deletePropertyByIndex(
 
 template<typename Adaptor>
 void JSGenericTypedArrayView<Adaptor>::getOwnPropertyNames(
-    JSObject* object, JSGlobalObject* globalObject, PropertyNameArray& array, DontEnumPropertiesMode mode)
+    JSObject* object, JSGlobalObject* globalObject, PropertyNameArrayBuilder& array, DontEnumPropertiesMode mode)
 {
     VM& vm = globalObject->vm();
     JSGenericTypedArrayView* thisObject = jsCast<JSGenericTypedArrayView*>(object);
