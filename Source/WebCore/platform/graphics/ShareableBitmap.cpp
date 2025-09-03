@@ -112,27 +112,29 @@ RefPtr<ShareableBitmap> ShareableBitmap::create(const ShareableBitmapConfigurati
     return adoptRef(new ShareableBitmap(configuration, WTFMove(sharedMemory)));
 }
 
-RefPtr<ShareableBitmap> ShareableBitmap::createFromImageDraw(NativeImage& image, const DestinationColorSpace& colorSpace)
+RefPtr<ShareableBitmap> ShareableBitmap::createFromNativeImage(NativeImage& image, const DestinationColorSpace& fallbackColorSpace, std::optional<IntSize> overrideDestinationSize, std::optional<IntSize> overrideSourceSize)
 {
-    return createFromImageDraw(image, colorSpace, image.size());
-}
+    ASSERT(fallbackColorSpace.supportsOutput());
+    auto imageSize = image.size();
+    auto destinationSize = overrideDestinationSize.value_or(imageSize);
+    auto sourceSize = overrideSourceSize.value_or(imageSize);
+#if USE(CG)
+    if (destinationSize == imageSize && sourceSize == imageSize) {
+        if (RefPtr bitmap = createFromImagePixels(image))
+            return bitmap;
+    }
+#endif
+    auto colorSpace = image.colorSpace();
+    if (!colorSpace.supportsOutput())
+        colorSpace = fallbackColorSpace;
 
-RefPtr<ShareableBitmap> ShareableBitmap::createFromImageDraw(NativeImage& image, const DestinationColorSpace& colorSpace, const IntSize& destinationSize)
-{
-    return createFromImageDraw(image, colorSpace, destinationSize, destinationSize);
-}
-
-RefPtr<ShareableBitmap> ShareableBitmap::createFromImageDraw(NativeImage& image, const DestinationColorSpace& colorSpace, const IntSize& destinationSize, const IntSize& sourceSize)
-{
     auto bitmap = ShareableBitmap::create({ destinationSize, colorSpace });
     if (!bitmap)
         return nullptr;
-
     auto context = bitmap->createGraphicsContext();
     if (!context)
         return nullptr;
-
-    context->drawNativeImage(image, FloatRect({ }, destinationSize), FloatRect({ }, sourceSize), { CompositeOperator::Copy });
+    context->drawNativeImage(image, FloatRect { { }, destinationSize }, FloatRect { { }, sourceSize }, { CompositeOperator::Copy });
     return bitmap;
 }
 

@@ -195,23 +195,15 @@ std::optional<ShareableBitmap::Handle> RemoteMediaPlayerManagerProxy::bitmapImag
 {
     auto player = mediaPlayer(identifier);
     if (!player)
-        return { };
+        return std::nullopt;
 
-    auto image = player->nativeImageForCurrentTime();
+    RefPtr image = player->nativeImageForCurrentTime();
     if (!image)
-        return { };
+        return std::nullopt;
 
-    auto imageSize = image->size();
-    auto bitmap = ShareableBitmap::create({ imageSize, player->colorSpace() });
+    auto bitmap = ShareableBitmap::createFromNativeImage(*image, player->colorSpace());
     if (!bitmap)
-        return { };
-
-    auto context = bitmap->createGraphicsContext();
-    if (!context)
-        return { };
-
-    context->drawNativeImage(*image, FloatRect { { }, imageSize }, FloatRect { { }, imageSize });
-
+        return std::nullopt;
     return bitmap->createHandle();
 }
 

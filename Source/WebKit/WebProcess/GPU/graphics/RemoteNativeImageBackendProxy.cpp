@@ -33,30 +33,12 @@
 namespace WebKit {
 using namespace WebCore;
 
-std::unique_ptr<RemoteNativeImageBackendProxy> RemoteNativeImageBackendProxy::create(NativeImage& image, const DestinationColorSpace& colorSpace)
+std::unique_ptr<RemoteNativeImageBackendProxy> RemoteNativeImageBackendProxy::create(NativeImage& image, const DestinationColorSpace& fallbackColorSpace)
 {
-    RefPtr<ShareableBitmap> bitmap;
-    PlatformImagePtr platformImage;
-#if USE(CG)
-    bitmap = ShareableBitmap::createFromImagePixels(image);
-    if (bitmap)
-        platformImage = bitmap->createPlatformImage(DontCopyBackingStore, ShouldInterpolate::Yes);
-#endif
-
-    // If we failed to create ShareableBitmap or PlatformImage, fall back to image-draw method.
-    if (!platformImage) {
-        bitmap = ShareableBitmap::createFromImageDraw(image, colorSpace);
-        if (bitmap)
-            platformImage = bitmap->createPlatformImage(DontCopyBackingStore, ShouldInterpolate::Yes);
-
-        // If createGraphicsContext() failed because the image colorSpace is not
-        // supported for output, fallback to SRGB.
-        if (!platformImage) {
-            bitmap = ShareableBitmap::createFromImageDraw(image, DestinationColorSpace::SRGB());
-            if (bitmap)
-                platformImage = bitmap->createPlatformImage(DontCopyBackingStore, ShouldInterpolate::Yes);
-        }
-    }
+    RefPtr bitmap = ShareableBitmap::createFromNativeImage(image, fallbackColorSpace);
+    if (!bitmap)
+        return nullptr;
+    PlatformImagePtr platformImage = bitmap->createPlatformImage(DontCopyBackingStore, ShouldInterpolate::Yes);
     if (!platformImage)
         return nullptr;
     return std::unique_ptr<RemoteNativeImageBackendProxy> { new RemoteNativeImageBackendProxy(bitmap.releaseNonNull(), WTFMove(platformImage)) };
