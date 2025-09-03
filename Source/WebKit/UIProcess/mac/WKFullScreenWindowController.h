@@ -71,11 +71,10 @@ typedef enum FullScreenState : NSInteger FullScreenState;
 
 @property (readonly) NSRect initialFrame;
 @property (readonly) NSRect finalFrame;
-@property (assign) NSArray *savedConstraints;
 
 - (instancetype)initWithWindow:(NSWindow *)window webView:(WKWebView *)webView page:(std::reference_wrapper<WebKit::WebPageProxy>)page;
 
-@property (nonatomic, readonly) WebCoreFullScreenPlaceholderView *webViewPlaceholder;
+- (WebCoreFullScreenPlaceholderView*)webViewPlaceholder;
 
 - (BOOL)isFullScreen;
 
