@@ -29,6 +29,9 @@ class TweetListener {
 
     public function listen() {
         
+        if ( ! self::AUTH_TOKEN || empty( $_POST['auth_token'] ) || $_POST['auth_token'] !== self::AUTH_TOKEN )
+            wp_die();
+
         $defaults = array(
             'text' => '', 
             'username' => '@webkit',
