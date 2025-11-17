@@ -1510,6 +1510,7 @@ JIT::JumpList JIT::emitIntTypedArrayGetByVal(Instruction*, PatchableJump& badTyp
     load8(Address(base, JSCell::typeInfoTypeOffset()), scratch);
     badType = patchableBranch32(NotEqual, scratch, TrustedImm32(typeForTypedArrayType(type)));
     slowCases.append(branch32(AboveOrEqual, property, Address(base, JSArrayBufferView::offsetOfLength())));
+    slowCases.append(branch32(LessThan, property, TrustedImm32(0)));
     loadPtr(Address(base, JSArrayBufferView::offsetOfVector()), scratch);
     
     switch (elementSize(type)) {

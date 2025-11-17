@@ -262,6 +262,8 @@ public:
     void allocateBuffer(size_t newCapacity)
     {
         ASSERT(newCapacity);
+        if (newCapacity > std::numeric_limits<unsigned>::max())
+            CRASH();
         if (newCapacity > std::numeric_limits<unsigned>::max() / sizeof(T))
             CRASH();
         size_t sizeToAllocate = newCapacity * sizeof(T);
@@ -272,6 +274,8 @@ public:
     bool tryAllocateBuffer(size_t newCapacity)
     {
         ASSERT(newCapacity);
+        if (newCapacity > std::numeric_limits<unsigned>::max())
+            return false;
         if (newCapacity > std::numeric_limits<unsigned>::max() / sizeof(T))
             return false;
 
@@ -293,6 +297,8 @@ public:
     void reallocateBuffer(size_t newCapacity)
     {
         ASSERT(shouldReallocateBuffer(newCapacity));
+        if (newCapacity > std::numeric_limits<unsigned>::max())
+            CRASH();
         if (newCapacity > std::numeric_limits<size_t>::max() / sizeof(T))
             CRASH();
         size_t sizeToAllocate = newCapacity * sizeof(T);
