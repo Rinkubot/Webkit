@@ -26,7 +26,10 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 # OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-import StringIO
+try:
+    from StringIO import StringIO
+except ImportError:
+    from io import StringIO
 
 from webkitpy.common.config import urls
 from webkitpy.common.checkout.changelog import ChangeLog, parse_bug_id_from_changelog
@@ -149,7 +152,7 @@ class Checkout(object):
     def bug_id_for_this_commit(self, git_commit, changed_files=None):
         try:
             return parse_bug_id_from_changelog(self.commit_message_for_this_commit(git_commit, changed_files).message())
-        except ScriptError, e:
+        except ScriptError as e:
             pass # We might not have ChangeLogs.
 
     def apply_patch(self, patch):

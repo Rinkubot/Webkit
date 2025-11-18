@@ -205,22 +205,22 @@ class Executive(object):
                 # already exited, and forcefully kill it if SIGTERM wasn't enough.
                 os.kill(pid, signal.SIGTERM)
                 os.kill(pid, signal.SIGKILL)
-            except OSError, e:
-                if e.errno == errno.EAGAIN:
-                    if retries_left <= 0:
-                        _log.warn("Failed to kill pid %s.  Too many EAGAIN errors." % pid)
-                    continue
-                if e.errno == errno.ESRCH:  # The process does not exist.
-                    return
-                if e.errno == errno.EPIPE:  # The process has exited already on cygwin
-                    return
-                if e.errno == errno.ECHILD:
-                    # Can't wait on a non-child process, but the kill worked.
-                    return
-                if e.errno == errno.EACCES and sys.platform == 'cygwin':
-                    # Cygwin python sometimes can't kill native processes.
-                    return
-                raise
+        except OSError as e:
+            if e.errno == errno.EAGAIN:
+                if retries_left <= 0:
+                    _log.warn("Failed to kill pid %s.  Too many EAGAIN errors." % pid)
+                continue
+            if e.errno == errno.ESRCH:  # The process does not exist.
+                return
+            if e.errno == errno.EPIPE:  # The process has exited already on cygwin
+                return
+            if e.errno == errno.ECHILD:
+                # Can't wait on a non-child process, but the kill worked.
+                return
+            if e.errno == errno.EACCES and sys.platform == 'cygwin':
+                # Cygwin python sometimes can't kill native processes.
+                return
+            raise
 
     def _win32_check_running_pid(self, pid):
         # importing ctypes at the top-level seems to cause weird crashes at
@@ -291,7 +291,7 @@ class Executive(object):
                     if process_name_filter(process_name):
                         running_pids.append(int(pid))
                         self.pid_to_system_pid[int(pid)] = int(winpid)
-                except ValueError, e:
+                except ValueError as e:
                     pass
         else:
             ps_process = self.popen(['ps', '-eo', 'pid,comm'], stdout=self.PIPE, stderr=self.PIPE)
@@ -303,7 +303,7 @@ class Executive(object):
                     pid, process_name = line.strip().split(' ', 1)
                     if process_name_filter(process_name):
                         running_pids.append(int(pid))
-                except ValueError, e:
+                except ValueError as e:
                     pass
 
         return sorted(running_pids)

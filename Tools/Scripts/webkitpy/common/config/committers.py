@@ -135,9 +135,9 @@ class CommitterList(object):
         contributors = json.loads(filesystem.read_text_file(json_path))
 
         return {
-            'Contributors': [Contributor(name, data.get('emails'), data.get('nicks')) for name, data in contributors['Contributors'].iteritems()],
-            'Committers': [Committer(name, data.get('emails'), data.get('nicks')) for name, data in contributors['Committers'].iteritems()],
-            'Reviewers': [Reviewer(name, data.get('emails'), data.get('nicks')) for name, data in contributors['Reviewers'].iteritems()],
+            'Contributors': [Contributor(name, data.get('emails'), data.get('nicks')) for name, data in contributors['Contributors'].items()],
+            'Committers': [Committer(name, data.get('emails'), data.get('nicks')) for name, data in contributors['Committers'].items()],
+            'Reviewers': [Reviewer(name, data.get('emails'), data.get('nicks')) for name, data in contributors['Reviewers'].items()],
         }
 
     def contributors(self):

@@ -101,6 +101,11 @@ WebSocketFrame::ParseFrameResult WebSocketFrame::parseFrame(char* data, size_t d
     }
     size_t payloadLength = static_cast<size_t>(payloadLength64);
 
+    if (payloadLength > 0x7FFFFFFFFFFFFFFF) {
+        errorString = "WebSocket frame length is too large";
+        return FrameError;
+    }
+
     if (static_cast<size_t>(bufferEnd - p) < maskingKeyLength + payloadLength)
         return FrameIncomplete;
 
