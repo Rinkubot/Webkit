@@ -319,6 +319,10 @@ bool SVGPathParser::parsePathData(bool checkForInitialMoveTo)
     if (checkForInitialMoveTo && command != PathSegMoveToAbs && command != PathSegMoveToRel)
         return false;
 
+    // Set a limit to the number of path segments to avoid denial of service.
+    const unsigned maxPathSegments = 1000000;
+    unsigned segmentCount = 0;
+
     while (true) {
         // Skip spaces between command and first coordinate.
         m_source.moveToNextToken();
@@ -414,6 +418,9 @@ bool SVGPathParser::parsePathData(bool checkForInitialMoveTo)
             m_controlPoint = m_currentPoint;
 
         m_consumer.incrementPathSegmentCount();
+
+        if (++segmentCount > maxPathSegments)
+            return false;
     }
 
     return false;

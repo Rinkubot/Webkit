@@ -30,7 +30,6 @@
 
 import codecs
 import errno
-import exceptions
 import filecmp
 import glob
 import hashlib
@@ -199,7 +198,7 @@ class FileSystem(object):
         """Create the specified directory if it doesn't already exist."""
         try:
             os.makedirs(self.join(*path))
-        except OSError, e:
+        except OSError as e:
             if e.errno != errno.EEXIST:
                 raise
 
@@ -265,7 +264,7 @@ class FileSystem(object):
     def relpath(self, path, start='.'):
         return os.path.relpath(path, start)
 
-    class _WindowsError(exceptions.OSError):
+    class _WindowsError(OSError):
         """Fake exception for Linux and Mac."""
         pass
 
@@ -274,10 +273,7 @@ class FileSystem(object):
         file, the OS will hold on to the file for a short while.  This makes
         attempts to delete the file fail.  To work around that, this method
         will retry for a few seconds until Windows is done with the file."""
-        try:
-            exceptions.WindowsError
-        except AttributeError:
-            exceptions.WindowsError = FileSystem._WindowsError
+        pass
 
         retry_timeout_sec = 3.0
         sleep_interval = 0.1
@@ -285,7 +281,7 @@ class FileSystem(object):
             try:
                 osremove(path)
                 return True
-            except exceptions.WindowsError, e:
+            except OSError as e:
                 time.sleep(sleep_interval)
                 retry_timeout_sec -= sleep_interval
                 if retry_timeout_sec < 0:

